@@ -1,11 +1,12 @@
-name: Staging Workflow
+name: Staging Deployment
 on:
   push:
     branches:
       - staging
 jobs:
-  production-workflow:
+  deployment:
     runs-on: ubuntu-20.04
+    environment: staging
     steps:
       - run: 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
       - run: eval $(ssh-agent -s)

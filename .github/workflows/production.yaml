@@ -1,11 +1,12 @@
-name: Production Workflow
+name: Production Deployment
 on:
   push:
     branches:
       - main
 jobs:
-  production-workflow:
+  deployment:
     runs-on: ubuntu-20.04
+    environment: production
     steps:
       - run: 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
       - run: eval $(ssh-agent -s)
