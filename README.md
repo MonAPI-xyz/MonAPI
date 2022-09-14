@@ -19,15 +19,12 @@ This repository is providing backend service for MonAPI, written in Python and u
 ## Our websites
 [Main Site - https://monapi.xyz](https://monapi.xyz)
 
-## Our Teams
-![Lucky Susanto](https://avatars.githubusercontent.com/u/78904597?s=96&v=4 =96x96)
-![Ferdi Fadillah](https://avatars.githubusercontent.com/u/46517394?s=96&v=4 =96x96)
-![Hugo Irwanto](https://avatars.githubusercontent.com/u/55941318?s=36&v=4 =96x96)
-![Muhammad Luthfi Fahlevi](https://avatars.githubusercontent.com/u/77453015?s=96&v=4 =96x96)
-![Andrew](https://avatars.githubusercontent.com/u/28893391?s=96&v=4 =96x96)
+[Blog Site - https://blog.monapi.xyz](https://blog.monapi.xyz)
 
+## Our Teams
 - Lucky Susanto
 - Ferdi Fadillah
 - Hugo Irwanto
 - Muhammad Luthfi Fahlevi
 - Andrew
+
