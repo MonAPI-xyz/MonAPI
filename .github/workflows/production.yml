@@ -8,10 +8,11 @@ jobs:
     runs-on: ubuntu-20.04
     environment: production
     steps:
-      - run: 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
-      - run: eval $(ssh-agent -s)
-      - run: echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
-      - run: mkdir -p ~/.ssh
-      - run: chmod 700 ~/.ssh
-      - run: ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-      - run: ssh root@${{ secrets.SERVER_IP }} "set -x && ./deploy_backend_production.sh && exit"
+      - run: |
+          command -v ssh-agent >/dev/null 
+          apt-get update -y && apt-get install openssh-client -y
+          eval `ssh-agent -s` && echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh root@${{ secrets.SERVER_IP }} "set -x && ./deploy_backend_production.sh && exit"
