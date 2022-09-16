@@ -29,9 +29,9 @@ if os.getenv('SECRET_KEY', '') != '':
     SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-if os.getenv('PRODUCTION') == 'True':
-    DEBUG = False
+DEBUG = False
+if os.getenv('PRODUCTION') == 'False':
+    DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 if os.getenv('PRODUCTION') == 'True':
