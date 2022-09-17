@@ -20,9 +20,11 @@ This repository is providing backend service for MonAPI, written in Python and u
 
 ## Table of contents
 - [Features](#features)
+- [Related Documentation](#related-documentation)
+- [Latest Release Notes](#latest-release-notes)
 - [Our Websites](#our-websites)
 - [Our Teams](#our-teams)
-- [Release Notes](#release-notes)
+- [Licence](#license)
 - [Acknowledgements](#acknowledgements)
 
 ## Features
@@ -36,10 +38,16 @@ This repository is providing backend service for MonAPI, written in Python and u
 - [ ] Team Management
 - [ ] Integrated Status Page
 
-## Release Notes
+## Related Documentation
+
+- [Run Development Server](https://github.com/MonAPI-xyz/MonAPI/blob/staging/docs/development.md)
+
+## Latest Release Notes
 Version: Pre-release<br>Date: 16th November 2022
 1. Staging server is now officially online! checkout on https://api-staging.monapi.xyz
 2. Our blog is now officially online! checkout on https://blog.monapi.xyz
+
+Full release notes can be found in [Release Notes](https://github.com/MonAPI-xyz/MonAPI/blob/staging/docs/release_notes.md)
 
 ## Our websites
 🌐 [Main Site - https://monapi.xyz](https://monapi.xyz)
@@ -52,6 +60,9 @@ Version: Pre-release<br>Date: 16th November 2022
 - Hugo Irwanto
 - Muhammad Luthfi Fahlevi
 - Andrew
+
+## License
+The scripts and documentation in this project are released under the [GNU General Public License v3.0](https://github.com/MonAPI-xyz/MonAPI/blob/main/LICENSE).
 
 ## Acknowledgements
 * Computer Science Universitas Indonesia - Software Engineering Project 2022

@@ -8,6 +8,7 @@ Give name of backlog / task this PR relates to
 - [ ] I have performed a self-review of my code
 - [ ] Code successfully run on local
 - [ ] Feature / changes tested on local
-- [ ] Unit test case updated
+- [ ] No failing unit test
+- [ ] Passed UAT Test
 - [ ] Sonarqube tested 
 - [ ] Required any changes to environment variable

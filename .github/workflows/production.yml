@@ -4,7 +4,18 @@ on:
     branches:
       - main
 jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - run: |
+          pip install -r requirements.txt
+          python manage.py test
   deployment:
+    needs: test
     runs-on: ubuntu-20.04
     environment: production
     steps:
