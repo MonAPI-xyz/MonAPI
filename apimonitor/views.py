@@ -83,7 +83,7 @@ class APIMonitorViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             
             success_rate_history = []
             date_time_sc = last_24_hour
-            for i in range(24):
+            for _ in range(24):
                 date_time_sc_in_zone = date_time_sc.astimezone()
                 
                 if date_time_sc_in_zone.isoformat() in success_rate_history_dict:
