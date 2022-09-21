@@ -9,3 +9,9 @@
 7. Run database migrations by using `python manage.py migrate`
 8. Run local server by using `python manage.py runserver`
 9. You can access local server on http://localhost:8000 or http://127.0.0.1:8000
+
+## How to run tests
+1. You can run `python manage.py test` or using make command `make test`
+
+## How to run test coverage report
+1. You can run `make test-cover`

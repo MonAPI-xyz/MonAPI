@@ -1,8 +1,16 @@
 ### Describe your changes
-Describe what changes in this PR
+Describe what changed in this PR
 
 ### Backlog name
 Give name of backlog / task this PR relates to
+
+### Acceptance criteria
+- Please copy acceptance criteria from backlog info
+
+### Example Request
+```
+Put your API CURL and example response here
+```
 
 ### Checklist
 - [ ] I have performed a self-review of my code

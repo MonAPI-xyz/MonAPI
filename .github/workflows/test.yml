@@ -2,8 +2,7 @@ name: Test
 on:
   push:
     branches:
-      - main
-      - staging
+      - '**'
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
@@ -12,9 +11,11 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8'
-      - run: |
+      - name: Run test and coverage report
+        run: |
           pip install -r requirements.txt
           python manage.py test
