@@ -6,7 +6,6 @@ from register.serializers import RegistrationSerializer
 
 @api_view(['POST', ])
 def registration_view(request):
-    print("Registration_view is being called!")
     if request.method == 'POST':
         serializer = RegistrationSerializer(data=request.data)
         data = {}
