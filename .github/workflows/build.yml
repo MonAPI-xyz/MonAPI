@@ -14,6 +14,17 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Run test and coverage report
+        run: |
+          pip install -r requirements.txt
+          coverage run --omit="**/tests.py,monapi/settings.py,manage.py" manage.py test
+          coverage xml
+      - name: Override Coverage Source Path for Sonar
+        run: sed -i "s/<source>\/home\/runner\/work\/MonAPI\/MonAPI<\/source>/<source>\/github\/workspace<\/source>/g" /home/runner/work/MonAPI/MonAPI/coverage.xml
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
