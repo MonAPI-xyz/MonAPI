@@ -13,5 +13,14 @@ class APIViewTestCase(APITestCase):
                 'password2': 'Abcd1234'
             },
         )
-        print(f"response = {response}")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_user_password_must_match(self):
+        response = self.client.post(
+            reverse('register-api'),
+            {
+                'email': 'user2@gmail.com',
+                'password': 'Aaaa1234',
+                'password2': 'Bbbb1234'
+            }
+        )
