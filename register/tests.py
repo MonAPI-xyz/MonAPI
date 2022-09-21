@@ -24,3 +24,6 @@ class APIViewTestCase(APITestCase):
                 'password2': 'Bbbb1234'
             }
         )
+
+        self.assertEqual(response.data['password'], 'Password must match.')
+        self.assertEqual(response.status_code, 400)
