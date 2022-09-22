@@ -8,7 +8,7 @@ class ListAPIMonitor(APITestCase):
   logout_url = reverse('logout')
 
   def test_when_non_authenticated_then_return_unauthorized(self):
-    response = self.client.get(self.logout_url)
+    response = self.client.post(self.logout_url)
 
     self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
     self.assertEqual(response.data, {
@@ -21,7 +21,7 @@ class ListAPIMonitor(APITestCase):
     token = Token.objects.create(user=user)
 
     header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
-    response = self.client.get(self.logout_url, **header)
+    response = self.client.post(self.logout_url, **header)
 
     self.assertEqual(response.status_code, status.HTTP_200_OK)
     self.assertEqual(response.data, 'User Logged out successfully')
