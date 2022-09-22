@@ -23,5 +23,5 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('admin/', admin.site.urls),
+    path('logout/', include('logout.urls')),
 ]
