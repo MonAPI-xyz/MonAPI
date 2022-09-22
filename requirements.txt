@@ -1,5 +1,6 @@
 asgiref==3.5.2
 backports.zoneinfo==0.2.1
+coverage==6.4.4
 Django==4.1.1
 djangorestframework==3.13.1
 python-dotenv==0.21.0
