@@ -37,6 +37,10 @@ class APIViewTestCase(APITestCase):
                 'password2': 'a'
             }
         )
+
         self.assertEqual(response.data['password'][0].title(),
                          str(['This Password Is Too Short. It Must Contain At Least 8 Characters.',
-                              'This Password Is Too Common.']))
+                              'This Password Is Too Common.',
+                              'The Password Must Contain At Least 1 Digit, 0-9.',
+                              'The Password Must Contain At Least 1 Uppercase Letter, A-Z.'])
+                         )
