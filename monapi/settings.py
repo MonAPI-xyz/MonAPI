@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'register',
+    'password_validators',
 ]
 
 MIDDLEWARE = [
@@ -130,6 +131,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+    {
+        'NAME': 'password_validators.validators.NumberValidator',
+    },
+    {
+        'NAME': 'password_validators.validators.UppercaseValidator',
     },
 ]
 
