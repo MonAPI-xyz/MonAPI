@@ -27,3 +27,16 @@ class APIViewTestCase(APITestCase):
 
         self.assertEqual(response.data['password'], 'Password must match.')
         self.assertEqual(response.status_code, 400)
+
+    def test_user_password_must_follow_policy(self):
+        response = self.client.post(
+            reverse('register-api'),
+            {
+                'email': 'user3@gmail.com',
+                'password': 'a',
+                'password2': 'a'
+            }
+        )
+        self.assertEqual(response.data['password'][0].title(),
+                         str(['This Password Is Too Short. It Must Contain At Least 8 Characters.',
+                              'This Password Is Too Common.']))
