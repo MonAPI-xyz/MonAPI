@@ -48,7 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'rest_framework',
-    'apimonitor'
+    "rest_framework.authtoken",
+    'logout',
+    'apimonitor',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +71,14 @@ if os.getenv('PRODUCTION', '') == 'True':
         )
     }
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
 
 ROOT_URLCONF = 'monapi.urls'
 
