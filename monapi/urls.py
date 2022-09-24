@@ -22,6 +22,8 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 
 urlpatterns = [
-    path('', include(router.urls)),
     path('admin/', admin.site.urls),
+    
+    path('', include(router.urls)),
+    path('monitor/', include('apimonitor.urls')),
 ]
