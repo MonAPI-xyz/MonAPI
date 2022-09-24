@@ -18,7 +18,6 @@ class APIViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['response'], 'Successfully registered new user.')
         self.assertEqual(response.data['email'], 'user1@gmail.com')
-        self.assertEqual(response.data['status_code'], 201)
         self.assertEqual(User.objects.all().count(), 1)
 
         # Check user is saved correctly
@@ -49,9 +48,32 @@ class APIViewTestCase(APITestCase):
             }
         )
 
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['password'][0].title(),
                          str(['This Password Is Too Short. It Must Contain At Least 8 Characters.',
                               'This Password Is Too Common.',
                               'The Password Must Contain At Least 1 Digit, 0-9.',
                               'The Password Must Contain At Least 1 Uppercase Letter, A-Z.'])
                          )
+
+    def test_only_one_user_per_email(self):
+        response1 = self.client.post(
+            reverse('register-api'),
+            {
+                'email': 'user1@gmail.com',
+                'password': 'B0tch1ng',
+                'password2': 'B0tch1ng'
+            },
+        )
+
+        response2 = self.client.post(
+            reverse('register-api'),
+            {
+                'email': 'user1@gmail.com',
+                'password': 'B0tch1ng',
+                'password2': 'B0tch1ng'
+            },
+        )
+        self.assertEqual(response2.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response2.data['response'],
+                         'User already registered! Please use a different email to register.')
