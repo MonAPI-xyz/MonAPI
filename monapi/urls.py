@@ -25,5 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', include('register.urls')),
     path('', include(router.urls)),
+    path('admin/', admin.site.urls),
+    path('logout/', include('logout.urls')),
     path('monitor/', include('apimonitor.urls')),
 ]

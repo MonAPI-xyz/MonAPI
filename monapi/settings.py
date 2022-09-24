@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'register',
     'password_validators',
+    "rest_framework.authtoken",
+    'logout',
     'apimonitor',
 ]
 
@@ -71,6 +73,14 @@ if os.getenv('PRODUCTION', '') == 'True':
         )
     }
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
 
 ROOT_URLCONF = 'monapi.urls'
 
