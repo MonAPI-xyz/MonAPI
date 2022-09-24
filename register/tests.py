@@ -1,6 +1,7 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 
 class APIViewTestCase(APITestCase):
@@ -9,11 +10,21 @@ class APIViewTestCase(APITestCase):
             reverse('register-api'),
             {
                 'email': 'user1@gmail.com',
-                'password': 'Abcd1234',
-                'password2': 'Abcd1234'
+                'password': 'B0tch1ng',
+                'password2': 'B0tch1ng'
             },
         )
+        # Check user is created
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['response'], 'Successfully registered new user.')
+        self.assertEqual(response.data['email'], 'user1@gmail.com')
+        self.assertEqual(response.data['status_code'], 201)
+        self.assertEqual(User.objects.all().count(), 1)
+
+        # Check user is saved correctly
+        new_user = User.objects.get_by_natural_key("user1@gmail.com")
+        self.assertEqual(new_user.get_username(), "user1@gmail.com")
+        self.assertEqual(new_user.check_password('B0tch1ng'), True)
 
     def test_user_password_must_match(self):
         response = self.client.post(
