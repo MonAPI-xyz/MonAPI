@@ -1,11 +1,13 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import status
 
 from django.db.utils import IntegrityError
 from register.serializers import RegistrationSerializer
 
 @api_view(['POST', ])
+@authentication_classes([])
+@permission_classes([])
 def registration_view(request):
     serializer = RegistrationSerializer(data=request.data)
     data = {}
