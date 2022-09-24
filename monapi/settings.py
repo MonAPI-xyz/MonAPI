@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     
     'rest_framework',
     "rest_framework.authtoken",
-    'logout'
+    'logout',
+    'apimonitor',
 ]
 
 MIDDLEWARE = [
