@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework.authtoken.models import Token
 
 from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, APIMonitorResult
 
@@ -22,7 +23,7 @@ class ListAPIMonitor(APITestCase):
     
     def test_when_non_authenticated_then_return_forbidden(self):
         response = self.client.get(self.test_url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.data, {
             "detail": "Authentication credentials were not provided."
         })
@@ -30,16 +31,18 @@ class ListAPIMonitor(APITestCase):
     def test_when_authenticated_and_empty_monitor_then_return_success_empty_monitor(self):
         # Create dummy user and authenticate
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        self.client.force_login(user)
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         
-        response = self.client.get(self.test_url, format='json')
+        response = self.client.get(self.test_url, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [])
         
     def test_when_authenticated_and_non_empty_monitor_then_return_success_with_monitor(self):
         # Create dummy user and authenticate
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        self.client.force_login(user)
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         
         monitor = APIMonitor.objects.create(
             user=user,
@@ -117,7 +120,7 @@ class ListAPIMonitor(APITestCase):
             log_response='{}'
         )
         
-        response = self.client.get(self.test_url, format='json')
+        response = self.client.get(self.test_url, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [
             {
@@ -337,7 +340,8 @@ class ListAPIMonitor(APITestCase):
     def test_when_authenticated_and_empty_monitor_result_then_return_one_hunderd_success_rate(self):
         # Create dummy user and authenticate
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        self.client.force_login(user)
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         
         monitor = APIMonitor.objects.create(
             user=user,
@@ -371,7 +375,7 @@ class ListAPIMonitor(APITestCase):
             body='Test Body',
         )
         
-        response = self.client.get(self.test_url, format='json')
+        response = self.client.get(self.test_url, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [
             {
