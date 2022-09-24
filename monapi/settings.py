@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'register',
     'password_validators',
+    'apimonitor',
 ]
 
 MIDDLEWARE = [
