@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'rest_framework',
+    'register',
+    'password_validators',
     "rest_framework.authtoken",
     'logout',
     'apimonitor',
@@ -140,6 +142,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+    {
+        'NAME': 'password_validators.validators.NumberValidator',
+    },
+    {
+        'NAME': 'password_validators.validators.UppercaseValidator',
     },
 ]
 
