@@ -74,6 +74,6 @@ class APIViewTestCase(APITestCase):
                 'password2': 'B0tch1ng'
             },
         )
-        self.assertEqual(response2.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response2.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response2.data['response'],
                          'User already registered! Please use a different email to register.')
