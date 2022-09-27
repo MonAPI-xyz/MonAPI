@@ -15,6 +15,8 @@ class LoginTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['response'], 'Sign-in successful.')
+        self.assertEqual(response.data['email'], 'test@gmail.com')
+        assert(response.data['token'])
 
     def test_when_non_authenticated_and_login_and_email_or_password_is_invalid(self):
         User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')

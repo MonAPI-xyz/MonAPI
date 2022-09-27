@@ -27,4 +27,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('logout/', include('logout.urls')),
     path('monitor/', include('apimonitor.urls')),
+    path('login/', include('login.urls')),
 ]
