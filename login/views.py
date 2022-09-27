@@ -1,8 +1,10 @@
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
+from django.contrib.auth import authenticate
 from rest_framework import status
-from rest_framework.authtoken.models import Token
+
 from login.serializers import LoginSerializer
+from .utils import generate_token
 
 @api_view(["POST"])
 @authentication_classes([])
@@ -13,7 +15,13 @@ def user_login(request):
     
     serializer.validate_attribute(request.data)
     if serializer.is_valid():
-        user = serializer.validated_data['user']
+        user = authenticate(request=request,
+                            username=request.data['email'], 
+                            email=request.data['email'], 
+                            password=request.data['password'])
+        if not user:
+            data['response'] = 'Invalid email or password.'
+            return Response(data=data, status=status.HTTP_401_UNAUTHORIZED)   
 
         data['response'] = 'Sign-in successful.'
         data['email']= user.email
@@ -24,6 +32,3 @@ def user_login(request):
         data['response'] = 'Invalid email or password.'
         return Response(data=data, status=status.HTTP_401_UNAUTHORIZED)            
     
-def generate_token(user):
-    token, created = Token.objects.get_or_create(user=user)
-    return token.key
