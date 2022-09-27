@@ -14,21 +14,17 @@ def user_login(request):
     serializer = LoginSerializer(data=request.data)
     
     serializer.validate_attribute(request.data)
-    if serializer.is_valid():
-        user = authenticate(request=request,
-                            username=request.data['email'], 
-                            email=request.data['email'], 
-                            password=request.data['password'])
-        if not user:
-            data['response'] = 'Invalid email or password.'
-            return Response(data=data, status=status.HTTP_401_UNAUTHORIZED)   
-
-        data['response'] = 'Sign-in successful.'
-        data['email']= user.email
-        data['token']= generate_token(user)
-        
-        return Response(data=data, status=status.HTTP_200_OK)
-    else:
+    user = authenticate(request=request,
+                        username=request.data['email'], 
+                        email=request.data['email'], 
+                        password=request.data['password'])
+    if not user:
         data['response'] = 'Invalid email or password.'
-        return Response(data=data, status=status.HTTP_401_UNAUTHORIZED)            
+        return Response(data=data, status=status.HTTP_401_UNAUTHORIZED)   
+
+    data['response'] = 'Sign-in successful.'
+    data['email']= user.email
+    data['token']= generate_token(user)
+    
+    return Response(data=data, status=status.HTTP_200_OK)
     
