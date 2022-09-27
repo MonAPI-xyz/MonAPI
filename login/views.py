@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from login.serializers import LoginSerializer
-from django.db.utils import IntegrityError
 
 @api_view(["POST"])
 @authentication_classes([])
