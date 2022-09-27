@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from rest_framework import status
 
 from login.serializers import LoginSerializer
-from .utils import generate_token
+from login.utils import generate_token
 
 @api_view(["POST"])
 @authentication_classes([])
