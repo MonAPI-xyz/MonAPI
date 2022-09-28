@@ -35,11 +35,12 @@ if os.getenv('PRODUCTION') == 'False':
 
 ALLOWED_HOSTS = ['*']
 if os.getenv('PRODUCTION') == 'True':
-    ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS', '')]
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # Application definition
 
 INSTALLED_APPS = [
+    # Django core
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,15 +48,21 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    # Rest Framework
+    'corsheaders',
     'rest_framework',
+    'rest_framework.authtoken',
+    
+    # App module
+    'apimonitor',
+    'logout',
     'register',
     'password_validators',
-    "rest_framework.authtoken",
-    'logout',
-    'apimonitor',
+    'login',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -65,14 +72,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
-if os.getenv('PRODUCTION', '') == 'True':
-    REST_FRAMEWORK = {
-        'DEFAULT_RENDERER_CLASSES': (
-            'rest_framework.renderers.JSONRenderer',
-        )
-    }
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -81,6 +80,13 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ]
 }
+
+if os.getenv('PRODUCTION', '') == 'True':
+    REST_FRAMEWORK = {
+        'DEFAULT_RENDERER_CLASSES': (
+            'rest_framework.renderers.JSONRenderer',
+        )
+    }
 
 ROOT_URLCONF = 'monapi.urls'
 
@@ -186,14 +192,12 @@ if os.getenv('MEDIA_ROOT', '') != '':
     MEDIA_ROOT = os.getenv('MEDIA_ROOT')
     
 # DRF CORS configuration
-CORS_ORIGIN_WHITELIST = [
+CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',
 ]
 
 if os.getenv('PRODUCTION', '') == 'True':
-    CORS_ORIGIN_WHITELIST = [
-        os.getenv('FRONTEND_URL', ''),
-    ]
+    CORS_ALLOWED_ORIGINS = os.getenv('FRONTEND_URL', '').split(',')
 
 
 # Default primary key field type
