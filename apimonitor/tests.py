@@ -161,7 +161,7 @@ class ListAPIMonitor(APITestCase):
                     }
                 ],
                 "schedule": "10MIN",
-                "success_rate": 75,
+                "success_rate": "75.0",
                 "success_rate_history": [
                     {
                         "date": "2022-09-19",
@@ -416,7 +416,7 @@ class ListAPIMonitor(APITestCase):
                     }
                 ],
                 "schedule": "10MIN",
-                "success_rate": 100,
+                "success_rate": "100.0",
                 "success_rate_history": [
                     {
                         "date": "2022-09-19",
