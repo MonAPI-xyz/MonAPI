@@ -36,6 +36,10 @@ if os.getenv('PRODUCTION') == 'False':
 ALLOWED_HOSTS = ['*']
 if os.getenv('PRODUCTION') == 'True':
     ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+    
+CSRF_TRUSTED_ORIGINS = ["http://*", "https://*"]
+if os.getenv('PRODUCTION') == 'True':
+    CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
 
 # Application definition
 
