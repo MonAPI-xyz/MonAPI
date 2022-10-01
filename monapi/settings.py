@@ -36,6 +36,10 @@ if os.getenv('PRODUCTION') == 'False':
 ALLOWED_HOSTS = ['*']
 if os.getenv('PRODUCTION') == 'True':
     ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+    
+CSRF_TRUSTED_ORIGINS = ["http://*", "https://*"]
+if os.getenv('PRODUCTION') == 'True':
+    CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
 
 # Application definition
 
@@ -83,6 +87,12 @@ REST_FRAMEWORK = {
 
 if os.getenv('PRODUCTION', '') == 'True':
     REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': [
+            'rest_framework.authentication.TokenAuthentication',
+        ],
+        'DEFAULT_PERMISSION_CLASSES': [
+            'rest_framework.permissions.IsAuthenticated',
+        ],
         'DEFAULT_RENDERER_CLASSES': (
             'rest_framework.renderers.JSONRenderer',
         )
