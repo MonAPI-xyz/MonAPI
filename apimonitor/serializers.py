@@ -77,7 +77,7 @@ class APIMonitorSerializer(serializers.ModelSerializer):
 
 
 class APIMonitorRetrieveSerializer(APIMonitorSerializer):
-    success_rate = serializers.FloatField()
+    success_rate = serializers.DecimalField(None, decimal_places=1)
     avg_response_time = serializers.IntegerField()
     success_rate_history = APIMonitorSuccessRateHistorySerializer(many=True)
     
