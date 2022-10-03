@@ -119,12 +119,4 @@ class APIMonitorDestroyView(generics.DestroyAPIView):
         super().destroy(*args, **kwargs)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    # def perform_destroy(self, instance):
-    #     request_sender = self.request.user
-    #     object_owner = instance.user
-    #     if (object_owner != request_sender):
-    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
-    #     else:
-    #         super().perform_destroy(instance)
-
 monitor_delete_view = APIMonitorDestroyView.as_view()
