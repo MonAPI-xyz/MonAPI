@@ -675,14 +675,24 @@ class ListAPIMonitor(APITestCase):
             log_response='{}'
         )
 
+        malicious_user = User.objects.create_user(username="test2@test.com", email="test2@test.com", password="Test1234")
+        token2 = Token.objects.create(user=malicious_user)
+        header2 = {'HTTP_AUTHORIZATION': f"Token {token2.key}"}
         # Test object is created
-        assert(APIMonitor.objects.all().count(), 1)
-        assert(APIMonitorResult.objects.all().count(), 1)
+        self.assertEqual(APIMonitor.objects.all().count(), 1)
+
+        # Other user CANNOT delete monitor that is now owned by themself
         # Get the monitor's ID, in this case: delete first created
         target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
         delete_test_path = reverse('monitor-delete-api', kwargs={'pk' : target_monitor_id})
-        # Call view, check if it's actually deleted
+
+        # Request failed
+        response = self.client.delete(delete_test_path, format='json', **header2)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(APIMonitor.objects.all().count(), 1)
+
+        # Object is deleted
         self.client.delete(delete_test_path, format='json', **header)
-        assert(APIMonitor.objects.all().count(), 0)
-        assert(APIMonitorResult.objects.all().count(), 0)
+        self.assertEqual(APIMonitor.objects.all().count(), 0)
+        self.assertEqual(APIMonitorResult.objects.all().count(), 0)
 
