@@ -4,7 +4,7 @@ import pytz
 from django.db.models import Avg, Count, Q
 from django.utils import timezone
 from django.conf import settings
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
@@ -16,7 +16,7 @@ class APIMonitorViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = APIMonitor.objects.all()
     serializer_class = APIMonitorSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def get_queryset(self):
         queryset = APIMonitor.objects.filter(user=self.request.user)
         return queryset
@@ -102,5 +102,13 @@ class APIMonitorViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         
         serializer = APIMonitorRetrieveSerializer(queryset, many=True)
         return Response(serializer.data)
+
+class APIMonitorDestroyView(generics.DestroyAPIView):
+    queryset = APIMonitor.objects.all()
+    serializer_class = APIMonitorSerializer
+    lookup_field = 'pk'
     
-    
+    def perform_destroy(self, instance):
+        super().perform_destroy(instance)
+
+monitor_delete_view = APIMonitorDestroyView.as_view()
