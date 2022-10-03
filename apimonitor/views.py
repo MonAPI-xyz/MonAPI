@@ -4,9 +4,10 @@ import pytz
 from django.db.models import Avg, Count, Q
 from django.utils import timezone
 from django.conf import settings
-from rest_framework import viewsets, mixins, generics
+from rest_framework import viewsets, mixins, generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
 
 from apimonitor.models import APIMonitor, APIMonitorResult
 from apimonitor.serializers import APIMonitorSerializer, APIMonitorRetrieveSerializer
@@ -107,8 +108,23 @@ class APIMonitorDestroyView(generics.DestroyAPIView):
     queryset = APIMonitor.objects.all()
     serializer_class = APIMonitorSerializer
     lookup_field = 'pk'
-    
-    def perform_destroy(self, instance):
-        super().perform_destroy(instance)
+
+    def destroy(self, *args, **kwargs):
+        instance = self.get_object()
+        request_sender = self.request.user
+        object_owner = instance.user
+        if (object_owner != request_sender):
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        super().destroy(*args, **kwargs)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # def perform_destroy(self, instance):
+    #     request_sender = self.request.user
+    #     object_owner = instance.user
+    #     if (object_owner != request_sender):
+    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
+    #     else:
+    #         super().perform_destroy(instance)
 
 monitor_delete_view = APIMonitorDestroyView.as_view()
