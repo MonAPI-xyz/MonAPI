@@ -590,3 +590,99 @@ class ListAPIMonitor(APITestCase):
                 "url": "Test Path"
             }
         ])
+
+    #PBI-13-delete-api-monitor-backend
+    def test_user_can_delete_an_api_monitor(self):
+        # Create a user object
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+        # Create an API Monitor object under their account
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='Test Monitor',
+            method='GET',
+            url='Test Path',
+            schedule='10MIN',
+            body_type='FORM',
+        )
+
+        APIMonitorQueryParam.objects.create(
+            monitor=monitor,
+            key='Test Key Query',
+            value='Test Value Query',
+        )
+
+        APIMonitorHeader.objects.create(
+            monitor=monitor,
+            key='Test Key Header',
+            value='Test Value Header',
+        )
+
+        APIMonitorBodyForm.objects.create(
+            monitor=monitor,
+            key='Test Key Body',
+            value='Test Value Body',
+        )
+
+        APIMonitorRawBody.objects.create(
+            monitor=monitor,
+            body='Test Body',
+        )
+
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            date=self.mock_current_time.date(),
+            hour=self.mock_current_time.hour,
+            minute=self.mock_current_time.minute,
+            response_time=100,
+            success=True,
+            log_response='{}'
+        )
+
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            date=self.mock_current_time.date(),
+            hour=self.mock_current_time.hour,
+            minute=self.mock_current_time.minute,
+            response_time=75,
+            success=True,
+            log_response='{}'
+        )
+
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            date=self.mock_current_time.date(),
+            hour=self.mock_current_time.hour - 1,
+            minute=self.mock_current_time.minute,
+            response_time=100,
+            success=True,
+            log_response='{}'
+        )
+
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            date=self.mock_current_time.date(),
+            hour=self.mock_current_time.hour - 1,
+            minute=self.mock_current_time.minute,
+            response_time=50,
+            success=False,
+            log_response='{}'
+        )
+
+        # Test object is created
+        assert(APIMonitor.objects.all().count(), 1)
+        assert(APIMonitorResult.objects.all().count(), 1)
+        # Get the monitor's ID, in this case: delete first created
+        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        delete_test_path = reverse('monitor-delete-api', kwargs={'pk' : target_monitor_id})
+        # Call view, check if it's actually deleted
+        self.client.delete(delete_test_path, format='json', **header)
+        assert(APIMonitor.objects.all().count(), 0)
+        assert(APIMonitorResult.objects.all().count(), 0)
+
