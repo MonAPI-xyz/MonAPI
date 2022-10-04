@@ -675,9 +675,6 @@ class ListAPIMonitor(APITestCase):
             log_response='{}'
         )
 
-        malicious_user = User.objects.create_user(username="test2@test.com", email="test2@test.com", password="Test1234")
-        token2 = Token.objects.create(user=malicious_user)
-        header2 = {'HTTP_AUTHORIZATION': f"Token {token2.key}"}
         # Test object is created
         self.assertEqual(APIMonitor.objects.all().count(), 1)
 
@@ -686,13 +683,104 @@ class ListAPIMonitor(APITestCase):
         target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
         delete_test_path = reverse('monitor-delete-api', kwargs={'pk' : target_monitor_id})
 
-        # Request failed
-        response = self.client.delete(delete_test_path, format='json', **header2)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(APIMonitor.objects.all().count(), 1)
-
         # Object is deleted
         self.client.delete(delete_test_path, format='json', **header)
         self.assertEqual(APIMonitor.objects.all().count(), 0)
         self.assertEqual(APIMonitorResult.objects.all().count(), 0)
 
+    def test_non_owner_cannot_delete_another_owned_api_monitor(self):
+        # Create a user object
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+        # Create an API Monitor object under their account
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='Test Monitor',
+            method='GET',
+            url='Test Path',
+            schedule='10MIN',
+            body_type='FORM',
+        )
+
+        APIMonitorQueryParam.objects.create(
+            monitor=monitor,
+            key='Test Key Query',
+            value='Test Value Query',
+        )
+
+        APIMonitorHeader.objects.create(
+            monitor=monitor,
+            key='Test Key Header',
+            value='Test Value Header',
+        )
+
+        APIMonitorBodyForm.objects.create(
+            monitor=monitor,
+            key='Test Key Body',
+            value='Test Value Body',
+        )
+
+        APIMonitorRawBody.objects.create(
+            monitor=monitor,
+            body='Test Body',
+        )
+
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            date=self.mock_current_time.date(),
+            hour=self.mock_current_time.hour,
+            minute=self.mock_current_time.minute,
+            response_time=100,
+            success=True,
+            log_response='{}'
+        )
+
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            date=self.mock_current_time.date(),
+            hour=self.mock_current_time.hour,
+            minute=self.mock_current_time.minute,
+            response_time=75,
+            success=True,
+            log_response='{}'
+        )
+
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            date=self.mock_current_time.date(),
+            hour=self.mock_current_time.hour - 1,
+            minute=self.mock_current_time.minute,
+            response_time=100,
+            success=True,
+            log_response='{}'
+        )
+
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            date=self.mock_current_time.date(),
+            hour=self.mock_current_time.hour - 1,
+            minute=self.mock_current_time.minute,
+            response_time=50,
+            success=False,
+            log_response='{}'
+        )
+
+        # Create malicious user
+        malicious_user = User.objects.create_user(username="test2@test.com", email="test2@test.com", password="Test1234")
+        token2 = Token.objects.create(user=malicious_user)
+        header2 = {'HTTP_AUTHORIZATION': f"Token {token2.key}"}
+
+        # Get path
+        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        delete_test_path = reverse('monitor-delete-api', kwargs={'pk' : target_monitor_id})
+
+        # Request failed, api monitor is not deleted
+        response = self.client.delete(delete_test_path, format='json', **header2)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(APIMonitor.objects.all().count(), 1)
