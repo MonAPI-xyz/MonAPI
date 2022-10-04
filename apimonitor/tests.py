@@ -681,7 +681,7 @@ class ListAPIMonitor(APITestCase):
         # Other user CANNOT delete monitor that is now owned by themself
         # Get the monitor's ID, in this case: delete first created
         target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
-        delete_test_path = reverse('monitor-delete-api', kwargs={'pk' : target_monitor_id})
+        delete_test_path = reverse('api-monitor-detail', kwargs={'pk' : target_monitor_id})
 
         # Object is deleted
         self.client.delete(delete_test_path, format='json', **header)
@@ -778,9 +778,10 @@ class ListAPIMonitor(APITestCase):
 
         # Get path
         target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
-        delete_test_path = reverse('monitor-delete-api', kwargs={'pk' : target_monitor_id})
+        delete_test_path = reverse('api-monitor-detail', kwargs={'pk' : target_monitor_id})
+        print("DELETE PATH: ", delete_test_path)
 
         # Request failed, api monitor is not deleted
         response = self.client.delete(delete_test_path, format='json', **header2)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(APIMonitor.objects.all().count(), 1)

@@ -13,10 +13,11 @@ from apimonitor.models import APIMonitor, APIMonitorResult
 from apimonitor.serializers import APIMonitorSerializer, APIMonitorRetrieveSerializer
 
 
-class APIMonitorViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class APIMonitorViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = APIMonitor.objects.all()
     serializer_class = APIMonitorSerializer
     permission_classes = [IsAuthenticated]
+    lookup_field = "pk"
 
     def get_queryset(self):
         queryset = APIMonitor.objects.filter(user=self.request.user)
@@ -103,20 +104,3 @@ class APIMonitorViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         
         serializer = APIMonitorRetrieveSerializer(queryset, many=True)
         return Response(serializer.data)
-
-class APIMonitorDestroyView(generics.DestroyAPIView):
-    queryset = APIMonitor.objects.all()
-    serializer_class = APIMonitorSerializer
-    lookup_field = 'pk'
-
-    def destroy(self, *args, **kwargs):
-        instance = self.get_object()
-        request_sender = self.request.user
-        object_owner = instance.user
-        if (object_owner != request_sender):
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-        super().destroy(*args, **kwargs)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-monitor_delete_view = APIMonitorDestroyView.as_view()
