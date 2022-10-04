@@ -822,3 +822,4 @@ class ListAPIMonitor(APITestCase):
         create_new_monitor_test_path = reverse('api-monitor-list')
         response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(APIMonitor.objects.all().count(), 1)
