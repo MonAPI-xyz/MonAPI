@@ -779,7 +779,6 @@ class ListAPIMonitor(APITestCase):
         # Get path
         target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
         delete_test_path = reverse('api-monitor-detail', kwargs={'pk' : target_monitor_id})
-        print("DELETE PATH: ", delete_test_path)
 
         # Request failed, api monitor is not deleted
         response = self.client.delete(delete_test_path, format='json', **header2)
