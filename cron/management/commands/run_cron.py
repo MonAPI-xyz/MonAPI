@@ -51,7 +51,7 @@ class Command(BaseCommand):
                 elif monitor.body_type == 'RAW':
                     try:
                         raw_body = APIMonitorRawBody.objects.get(monitor=monitor)
-                        request_body = raw_body.body
+                        request_body = json.dumps(json.loads(raw_body.body))
                     except APIMonitorRawBody.DoesNotExist:
                         pass
                 elif monitor.body_type == 'EMPTY':
