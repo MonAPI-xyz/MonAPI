@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     
     # App module
     'apimonitor',
+    'cron',
     'logout',
     'register',
     'password_validators',
