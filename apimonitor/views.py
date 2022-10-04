@@ -4,19 +4,83 @@ import pytz
 from django.db.models import Avg, Count, Q
 from django.utils import timezone
 from django.conf import settings
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from apimonitor.models import APIMonitor, APIMonitorResult
-from apimonitor.serializers import APIMonitorSerializer, APIMonitorRetrieveSerializer
+from apimonitor.models import (APIMonitor, APIMonitorResult, APIMonitorQueryParam,
+                               APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody)
+from apimonitor.serializers import (APIMonitorSerializer, APIMonitorRetrieveSerializer,
+                                    APIMonitorQueryParamSerializer, APIMonitorHeaderSerializer,
+                                    APIMonitorBodyFormSerializer, APIMonitorRawBodySerializer)
 
 
-class APIMonitorViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+class APIMonitorViewSet(mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        mixins.DestroyModelMixin,
+                        viewsets.GenericViewSet):
+
     queryset = APIMonitor.objects.all()
     serializer_class = APIMonitorSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = "pk"
+
+    def create(self, request, *args, **kwargs):
+        monitor_data = {
+            'user': request.user,
+            'name': request.data['name'],
+            'method': request.data['method'],
+            'url': request.data['url'],
+            'schedule': request.data['schedule'],
+            'body_type': request.data['body_type']
+        }
+        api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
+        try:
+            if (api_monitor_serializer.is_valid()):
+                monitor_obj = APIMonitor.objects.create(**monitor_data)
+
+                for (key, value) in request.data['query_params']:
+                    record = {
+                        'monitor': monitor_obj.id,
+                        'key': key,
+                        'value': value
+                    }
+                    if (APIMonitorQueryParamSerializer(data=record).is_valid(raise_exception=True)):
+                        record['monitor'] = monitor_obj
+                        APIMonitorQueryParam.objects.create(**record)
+
+                for (key, value) in request.data['headers']:
+                    record = {
+                        'monitor': monitor_obj.id,
+                        'key': key,
+                        'value': value
+                    }
+                    if (APIMonitorHeaderSerializer(data=record).is_valid(raise_exception=True)):
+                        record['monitor'] = monitor_obj
+                        APIMonitorHeader.objects.create(**record)
+
+                if (request.data['body_type'] == 'FORM'):
+                    for (key, value) in request.data['body_form']:
+                        record = {
+                            'monitor': monitor_obj.id,
+                            'key': key,
+                            'value': value
+                        }
+                        if (APIMonitorBodyFormSerializer(data=record).is_valid(raise_exception=True)):
+                            record['monitor'] = monitor_obj
+                            APIMonitorBodyForm.objects.create(**record)
+                elif (request.data['body_type'] == 'RAW'):
+                    record = {
+                        'monitor': monitor_obj.id,
+                        'body': request.data['raw_body']
+                    }
+                    if (APIMonitorRawBodySerializer(data=record).is_valid(raise_exception=True)):
+                        record['monitor'] = monitor_obj
+                        APIMonitorRawBody.objects.create(**record)
+                return Response(status=status.HTTP_201_CREATED)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
     def get_queryset(self):
         queryset = APIMonitor.objects.filter(user=self.request.user)
