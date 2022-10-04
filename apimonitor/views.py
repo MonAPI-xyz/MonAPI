@@ -4,10 +4,9 @@ import pytz
 from django.db.models import Avg, Count, Q
 from django.utils import timezone
 from django.conf import settings
-from rest_framework import viewsets, mixins, generics, status
+from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authtoken.models import Token
 
 from apimonitor.models import APIMonitor, APIMonitorResult
 from apimonitor.serializers import APIMonitorSerializer, APIMonitorRetrieveSerializer
