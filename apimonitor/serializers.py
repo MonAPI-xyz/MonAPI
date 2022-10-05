@@ -74,12 +74,29 @@ class APIMonitorSerializer(serializers.ModelSerializer):
             'body_form',
             'raw_body',
         ]
+        
+        
+class APIMonitorResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = APIMonitorResult
+        fields = [
+            'id',
+            'monitor',
+            'execution_time',
+            'date',
+            'hour',
+            'minute',
+            'response_time',
+            'success',
+            'log_response',
+        ]
 
 
-class APIMonitorRetrieveSerializer(APIMonitorSerializer):
+class APIMonitorListSerializer(APIMonitorSerializer):
     success_rate = serializers.DecimalField(None, decimal_places=1)
     avg_response_time = serializers.IntegerField()
     success_rate_history = APIMonitorSuccessRateHistorySerializer(many=True)
+    last_result = APIMonitorResultSerializer()
     
     class Meta:
         model = APIMonitor
@@ -97,4 +114,5 @@ class APIMonitorRetrieveSerializer(APIMonitorSerializer):
             'success_rate',
             'avg_response_time',
             'success_rate_history',
+            'last_result',
         ]

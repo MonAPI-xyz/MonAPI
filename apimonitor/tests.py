@@ -1,3 +1,4 @@
+import json
 import pytz
 from datetime import datetime
 
@@ -143,6 +144,17 @@ class ListAPIMonitor(APITestCase):
                     }
                 ],
                 "id": 1,
+                "last_result": {
+                    "date": "2022-09-20",
+                    "execution_time": "2022-09-20T10:00:00+07:00",
+                    "hour": 9,
+                    "id": 4,
+                    "log_response": "{}",
+                    "minute": 0,
+                    "monitor": 1,
+                    "response_time": 50,
+                    "success": False
+                },
                 "method": "GET",
                 "name": "Test Monitor",
                 "query_params": [
@@ -398,6 +410,7 @@ class ListAPIMonitor(APITestCase):
                     }
                 ],
                 "id": 1,
+                "last_result": None,
                 "method": "GET",
                 "name": "Test Monitor",
                 "query_params": [
