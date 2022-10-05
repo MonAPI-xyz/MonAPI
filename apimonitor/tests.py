@@ -876,7 +876,6 @@ class ListAPIMonitor(APITestCase):
 
         queryparam_value = [
             {
-                'key': 'key1',
                 'value': 'value1',
                 'corrupted': 'corrupted'
             },
@@ -947,9 +946,8 @@ class ListAPIMonitor(APITestCase):
             }
         ]
         monitorheader_value = [{
-            'key': 'key3',
-            'value': 'value3',
-            'corrupted': 'corrupted'
+            'corrupted_key': 'corrupted',
+            'value': 'value3'
         }]
         monitorbodyform_value = [
             {
@@ -1019,9 +1017,8 @@ class ListAPIMonitor(APITestCase):
                 'value': 'value4'
             },
             {
-                'key': 'key5',
+                'corrupted_key': 'key5',
                 'value': 'value5',
-                'corrupted': 'corrupted'
             }
         ]
         monitorrawbody_value = "This doesn't matter since body_type is FORM"

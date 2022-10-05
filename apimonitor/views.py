@@ -41,7 +41,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             try:
                 if request.data.get('query_params'):
                     for key_value_pair in request.data.get('query_params'):
-                        if len(key_value_pair) == 2:
+                        if 'key' in key_value_pair and 'value' in key_value_pair:
                             key, value = key_value_pair['key'], key_value_pair['value']
                         else:
                             error_log += ["Please make sure you submit correct [query params]"]
@@ -60,7 +60,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
 
                 if request.data.get('headers'):
                     for key_value_pair in request.data.get('headers'):
-                        if len(key_value_pair) == 2:
+                        if 'key' in key_value_pair and 'value' in key_value_pair:
                             key, value = key_value_pair['key'], key_value_pair['value']
                         else:
                             error_log += ["Please make sure you submit correct [headers]"]
@@ -79,7 +79,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
 
                 if request.data.get('body_type') == 'FORM':
                     for key_value_pair in request.data.get('body_form'):
-                        if len(key_value_pair) == 2:
+                        if 'key' in key_value_pair and 'value' in key_value_pair:
                             key, value = key_value_pair['key'], key_value_pair['value']
                         else:
                             error_log += ["Please make sure you submit correct [body form]"]
