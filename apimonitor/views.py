@@ -35,14 +35,14 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             'body_type': request.data.get('body_type')
         }
         api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
-        if (api_monitor_serializer.is_valid()):
+        if api_monitor_serializer.is_valid():
             monitor_obj = APIMonitor.objects.create(**monitor_data)
             error_log = []
             try:
                 if request.data.get('query_params'):
                     for key_value_pair in request.data.get('query_params'):
                         if len(key_value_pair) == 2:
-                            key, value = key_value_pair[0], key_value_pair[1]
+                            key, value = key_value_pair['key'], key_value_pair['value']
                         else:
                             error_log += ["Please make sure you submit correct [query params]"]
                             break
@@ -61,7 +61,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                 if request.data.get('headers'):
                     for key_value_pair in request.data.get('headers'):
                         if len(key_value_pair) == 2:
-                            key, value = key_value_pair[0], key_value_pair[1]
+                            key, value = key_value_pair['key'], key_value_pair['value']
                         else:
                             error_log += ["Please make sure you submit correct [headers]"]
                             break
@@ -77,11 +77,10 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                             error_log += ["Please make sure your [headers] key and value are valid strings!"]
                             break
 
-
                 if request.data.get('body_type') == 'FORM':
                     for key_value_pair in request.data.get('body_form'):
                         if len(key_value_pair) == 2:
-                            key, value = key_value_pair[0], key_value_pair[1]
+                            key, value = key_value_pair['key'], key_value_pair['value']
                         else:
                             error_log += ["Please make sure you submit correct [body form]"]
                             break
@@ -115,7 +114,6 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                 return Response(data={"error": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(data={"error": "['Please make sure your [name, method, url, schedule, body_type] is valid']"}, status=status.HTTP_400_BAD_REQUEST)
-
 
     def get_queryset(self):
         queryset = APIMonitor.objects.filter(user=self.request.user)
