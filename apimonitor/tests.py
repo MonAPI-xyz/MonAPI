@@ -1084,3 +1084,159 @@ class ListAPIMonitor(APITestCase):
         response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['error'], "['Please make sure your [name, method, url, schedule, body_type] is valid']")
+
+    def test_query_params_is_not_valid(self):
+        # Create a user object
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+        }
+
+        queryparam_value = [[['this is', 'bad query param'], 'value1'], ['key2', 'value2']]
+        monitorheader_value = [['key3', 'value3']]
+        monitorbodyform_value = "This doesn't matter since body_type is RAW"
+        monitorrawbody_value = "RAW BODY VALUE"
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value,
+        }
+
+        # Get path
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], "['Please make sure your [query params] key and value are valid strings!']")
+
+    def test_header_is_not_valid(self):
+        # Create a user object
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+        }
+
+        queryparam_value = [['key1', 'value1'], ['key2', 'value2']]
+        monitorheader_value = [[['this is', 'an invalid header'], 'value3']]
+        monitorbodyform_value = "This doesn't matter since body_type is RAW"
+        monitorrawbody_value = "RAW BODY VALUE"
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # Get path
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], "['Please make sure your [headers] key and value are valid strings!']")
+
+    def test_raw_body_is_not_valid(self):
+        # Create a user object
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+        }
+
+        queryparam_value = [['key1', 'value1'], ['key2', 'value2']]
+        monitorheader_value = [['key3', 'value3']]
+        monitorbodyform_value = "This doesn't matter since body_type is RAW"
+        monitorrawbody_value = ["This is", "invalid raw body"]
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # Get path
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], "['Please make sure your [raw body] is a valid string or JSON!']")
+
+    def test_body_form_is_not_valid(self):
+        # Create a user object
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'FORM',
+        }
+
+        queryparam_value = [['key1', 'value1'], ['key2', 'value2']]
+        monitorheader_value = [['key3', 'value3']]
+        monitorbodyform_value = [[["this is", "invalid"], "body form"]]
+        monitorrawbody_value = "This doesn't matter since body_type is FORM"
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # Get path
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.error['data'], "['Please make sure your [body form] key and value are valid strings!']")
