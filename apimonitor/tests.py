@@ -876,6 +876,7 @@ class ListAPIMonitor(APITestCase):
         response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(APIMonitor.objects.all().count(), 0)
+        self.assertEqual(response.data['error'], "['Please make sure your [query params] is in the form of [[key1, value1], [key2,value2], ...]']")
 
     def test_failed_attempt_because_headers_doesnt_create_object(self):
         # Create a user object
@@ -916,6 +917,7 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(APIMonitor.objects.all().count(), 0)
         self.assertEqual(APIMonitorQueryParam.objects.all().count(), 0)
+        self.assertEqual(response.data['error'], "['Please make sure your [headers] is in the form of [[key1, value1], [key2,value2], ...]']")
 
     def test_failed_attempt_because_body_form_doesnt_create_object(self):
         # Create a user object
@@ -957,6 +959,7 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(APIMonitor.objects.all().count(), 0)
         self.assertEqual(APIMonitorQueryParam.objects.all().count(), 0)
         self.assertEqual(APIMonitorHeader.objects.all().count(), 0)
+        self.assertEqual(response.data['error'], "['Please make sure your [body form] is in the form of [[key1, value1], [key2,value2], ...]']")
 
     def test_failed_attempt_because_raw_body_doesnt_create_object(self):
         # Create a user object
@@ -998,6 +1001,7 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(APIMonitor.objects.all().count(), 0)
         self.assertEqual(APIMonitorQueryParam.objects.all().count(), 0)
         self.assertEqual(APIMonitorHeader.objects.all().count(), 0)
+        self.assertEqual(response.data['error'], "['Please make sure your [raw body] is a valid string or JSON!']")
 
     def test_user_can_create_api_monitor_with_raw_body(self):
         # Create a user object
@@ -1041,3 +1045,42 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(APIMonitorHeader.objects.all().count(), 1)
         self.assertEqual(APIMonitorBodyForm.objects.all().count(), 0)
         self.assertEqual(APIMonitorRawBody.objects.all().count(), 1)
+
+    def test_bad_monitor_data_shouldnt_be_created(self):
+        # Create a user object
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+        }
+
+        queryparam_value = [['key1', 'value1'], ['key2', 'value2']]
+        monitorheader_value = [['key3', 'value3']]
+        monitorbodyform_value = "This doesn't matter since body_type is RAW"
+        monitorrawbody_value = "RAW BODY VALUE"
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            # 'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value,
+        }
+
+        # Get path
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], "['Please make sure your [name, method, url, schedule, body_type] is valid']")
