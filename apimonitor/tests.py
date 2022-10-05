@@ -1239,4 +1239,4 @@ class ListAPIMonitor(APITestCase):
         create_new_monitor_test_path = reverse('api-monitor-list')
         response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.error['data'], "['Please make sure your [body form] key and value are valid strings!']")
+        self.assertEqual(response.data['error'], "['Please make sure your [body form] key and value are valid strings!']")
