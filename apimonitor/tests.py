@@ -876,7 +876,7 @@ class ListAPIMonitor(APITestCase):
         response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(APIMonitor.objects.all().count(), 0)
-        self.assertEqual(response.data['error'], "['Please make sure your [query params] is in the form of [[key1, value1], [key2,value2], ...]']")
+        self.assertEqual(response.data['error'], "['Please make sure you submit correct [query params]']")
 
     def test_failed_attempt_because_headers_doesnt_create_object(self):
         # Create a user object
@@ -917,7 +917,7 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(APIMonitor.objects.all().count(), 0)
         self.assertEqual(APIMonitorQueryParam.objects.all().count(), 0)
-        self.assertEqual(response.data['error'], "['Please make sure your [headers] is in the form of [[key1, value1], [key2,value2], ...]']")
+        self.assertEqual(response.data['error'], "['Please make sure you submit correct [headers]']")
 
     def test_failed_attempt_because_body_form_doesnt_create_object(self):
         # Create a user object
@@ -959,7 +959,7 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(APIMonitor.objects.all().count(), 0)
         self.assertEqual(APIMonitorQueryParam.objects.all().count(), 0)
         self.assertEqual(APIMonitorHeader.objects.all().count(), 0)
-        self.assertEqual(response.data['error'], "['Please make sure your [body form] is in the form of [[key1, value1], [key2,value2], ...]']")
+        self.assertEqual(response.data['error'], "['Please make sure you submit correct [body form]']")
 
     def test_failed_attempt_because_raw_body_doesnt_create_object(self):
         # Create a user object

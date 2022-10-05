@@ -39,38 +39,38 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             monitor_obj = APIMonitor.objects.create(**monitor_data)
             error_log = []
             try:
-                if (request.data.get('query_params')):
+                if request.data.get('query_params'):
                     for key_value_pair in request.data.get('query_params'):
-                        if (len(key_value_pair) == 2):
+                        if len(key_value_pair) == 2:
                             key, value = key_value_pair[0], key_value_pair[1]
                         else:
-                            error_log += ["Please make sure your [query params] is in the form of [[key1, value1], [key2,value2], ...]"]
+                            error_log += ["Please make sure you submit correct [query params]"]
                             break
                         record = {
                             'monitor': monitor_obj.id,
                             'key': key,
                             'value': value
                         }
-                        if (APIMonitorQueryParamSerializer(data=record).is_valid()):
+                        if APIMonitorQueryParamSerializer(data=record).is_valid():
                             record['monitor'] = monitor_obj
                             APIMonitorQueryParam.objects.create(**record)
                         else:
                             error_log += ["Please make sure your [query params] key and value are valid strings!"]
                             break
 
-                if (request.data.get('headers')):
+                if request.data.get('headers'):
                     for key_value_pair in request.data.get('headers'):
-                        if (len(key_value_pair) == 2):
+                        if len(key_value_pair) == 2:
                             key, value = key_value_pair[0], key_value_pair[1]
                         else:
-                            error_log += ["Please make sure your [headers] is in the form of [[key1, value1], [key2,value2], ...]"]
+                            error_log += ["Please make sure you submit correct [headers]"]
                             break
                         record = {
                             'monitor': monitor_obj.id,
                             'key': key,
                             'value': value
                         }
-                        if (APIMonitorHeaderSerializer(data=record).is_valid()):
+                        if APIMonitorHeaderSerializer(data=record).is_valid():
                             record['monitor'] = monitor_obj
                             APIMonitorHeader.objects.create(**record)
                         else:
@@ -78,37 +78,36 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                             break
 
 
-                if (request.data.get('body_type') == 'FORM'):
+                if request.data.get('body_type') == 'FORM':
                     for key_value_pair in request.data.get('body_form'):
-                        if (len(key_value_pair) == 2):
+                        if len(key_value_pair) == 2:
                             key, value = key_value_pair[0], key_value_pair[1]
                         else:
-                            error_log += ["Please make sure your [body form] is in the form of [[key1, value1], [key2,value2], ...]"]
+                            error_log += ["Please make sure you submit correct [body form]"]
                             break
                         record = {
                             'monitor': monitor_obj.id,
                             'key': key,
                             'value': value
                         }
-                        if (APIMonitorBodyFormSerializer(data=record).is_valid()):
+                        if APIMonitorBodyFormSerializer(data=record).is_valid():
                             record['monitor'] = monitor_obj
                             APIMonitorBodyForm.objects.create(**record)
                         else:
                             error_log += ["Please make sure your [body form] key and value are valid strings!"]
                             break
-                elif (request.data.get('body_type') == 'RAW'):
+                elif request.data.get('body_type') == 'RAW':
                     record = {
                         'monitor': monitor_obj.id,
                         'body': request.data['raw_body']
                     }
-                    if (APIMonitorRawBodySerializer(data=record).is_valid()):
+                    if APIMonitorRawBodySerializer(data=record).is_valid():
                         record['monitor'] = monitor_obj
                         APIMonitorRawBody.objects.create(**record)
                     else:
                         error_log += ["Please make sure your [raw body] is a valid string or JSON!"]
 
-                if (error_log):
-                    raise AssertionError(error_log)
+                assert len(error_log) == 0, error_log
                 return Response(status=status.HTTP_201_CREATED)
             except AssertionError as e:
                 monitor_obj.delete()
