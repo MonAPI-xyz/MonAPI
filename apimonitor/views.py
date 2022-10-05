@@ -12,11 +12,12 @@ from apimonitor.models import APIMonitor, APIMonitorResult
 from apimonitor.serializers import APIMonitorSerializer, APIMonitorListSerializer
 
 
-class APIMonitorViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class APIMonitorViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = APIMonitor.objects.all()
     serializer_class = APIMonitorSerializer
     permission_classes = [IsAuthenticated]
-    
+    lookup_field = "pk"
+
     def get_queryset(self):
         queryset = APIMonitor.objects.filter(user=self.request.user)
         return queryset
@@ -106,5 +107,3 @@ class APIMonitorViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         
         serializer = APIMonitorListSerializer(queryset, many=True)
         return Response(serializer.data)
-    
-    
