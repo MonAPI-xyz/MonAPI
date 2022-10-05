@@ -164,6 +164,10 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                 date_time_sc += timedelta(hours=1)
            
             monitor.success_rate_history = success_rate_history
-        
+            
+            # Last result 
+            last_result = APIMonitorResult.objects.filter(monitor=monitor).last()
+            monitor.last_result = last_result
+       
         serializer = APIMonitorListSerializer(queryset, many=True)
         return Response(serializer.data)
