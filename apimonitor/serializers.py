@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from apimonitor.models import APIMonitor, APIMonitorQueryParam, APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody, APIMonitorResult
+from apimonitor.models import APIMonitor, APIMonitorQueryParam, APIMonitorHeader, APIMonitorRawBody, \
+    APIMonitorResult
 
 
 class APIMonitorQueryParamSerializer(serializers.ModelSerializer):
@@ -12,8 +13,8 @@ class APIMonitorQueryParamSerializer(serializers.ModelSerializer):
             'key',
             'value',
         ]
-        
-        
+
+
 class APIMonitorHeaderSerializer(serializers.ModelSerializer):
     class Meta:
         model = APIMonitorHeader
@@ -52,14 +53,14 @@ class APIMonitorSuccessRateHistorySerializer(serializers.Serializer):
     minute = serializers.IntegerField()
     success = serializers.IntegerField()
     failed = serializers.IntegerField()
-    
+
 
 class APIMonitorSerializer(serializers.ModelSerializer):
     query_params = APIMonitorQueryParamSerializer(many=True, required=False, allow_null=True)
     headers = APIMonitorHeaderSerializer(many=True, required=False, allow_null=True)
     body_form = APIMonitorBodyFormSerializer(many=True, required=False, allow_null=True)
     raw_body = APIMonitorRawBodySerializer(many=True, required=False, allow_null=True)
-    
+
     class Meta:
         model = APIMonitor
         fields = [
@@ -76,11 +77,28 @@ class APIMonitorSerializer(serializers.ModelSerializer):
         ]
 
 
-class APIMonitorRetrieveSerializer(APIMonitorSerializer):
+class APIMonitorResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = APIMonitorResult
+        fields = [
+            'id',
+            'monitor',
+            'execution_time',
+            'date',
+            'hour',
+            'minute',
+            'response_time',
+            'success',
+            'log_response',
+        ]
+
+
+class APIMonitorListSerializer(APIMonitorSerializer):
     success_rate = serializers.DecimalField(None, decimal_places=1)
     avg_response_time = serializers.IntegerField()
     success_rate_history = APIMonitorSuccessRateHistorySerializer(many=True)
-    
+    last_result = APIMonitorResultSerializer()
+
     class Meta:
         model = APIMonitor
         fields = [
@@ -97,4 +115,5 @@ class APIMonitorRetrieveSerializer(APIMonitorSerializer):
             'success_rate',
             'avg_response_time',
             'success_rate_history',
+            'last_result',
         ]
