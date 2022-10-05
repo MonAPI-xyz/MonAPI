@@ -38,7 +38,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
         if (api_monitor_serializer.is_valid()):
             monitor_obj = APIMonitor.objects.create(**monitor_data)
             try:
-                for (key, value) in request.data['query_params']:
+                for (key, value) in request.data.get('query_params'):
                     record = {
                         'monitor': monitor_obj.id,
                         'key': key,
@@ -48,7 +48,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                         record['monitor'] = monitor_obj
                         APIMonitorQueryParam.objects.create(**record)
 
-                for (key, value) in request.data['headers']:
+                for (key, value) in request.data.get('headers'):
                     record = {
                         'monitor': monitor_obj.id,
                         'key': key,
@@ -58,8 +58,8 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                         record['monitor'] = monitor_obj
                         APIMonitorHeader.objects.create(**record)
 
-                if (request.data['body_type'] == 'FORM'):
-                    for (key, value) in request.data['body_form']:
+                if (request.data.get('body_type') == 'FORM'):
+                    for (key, value) in request.data.get('body_form'):
                         record = {
                             'monitor': monitor_obj.id,
                             'key': key,
@@ -68,7 +68,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                         if (APIMonitorBodyFormSerializer(data=record).is_valid(raise_exception=True)):
                             record['monitor'] = monitor_obj
                             APIMonitorBodyForm.objects.create(**record)
-                elif (request.data['body_type'] == 'RAW'):
+                elif (request.data.get('body_type') == 'RAW'):
                     record = {
                         'monitor': monitor_obj.id,
                         'body': request.data['raw_body']
@@ -77,9 +77,9 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                         record['monitor'] = monitor_obj
                         APIMonitorRawBody.objects.create(**record)
                 return Response(status=status.HTTP_201_CREATED)
-            except:
+            except Exception as e:
                 monitor_obj.delete()
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(data={"error": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
     def get_queryset(self):
