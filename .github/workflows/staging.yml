@@ -1,0 +1,30 @@
+name: Staging Deployment
+on:
+  push:
+    branches:
+      - staging
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - run: |
+          pip install -r requirements.txt
+          python manage.py test
+  deployment:
+    needs: test
+    runs-on: ubuntu-20.04
+    environment: staging
+    steps:
+      - name: Deploy to staging server
+        run: |
+          command -v ssh-agent >/dev/null 
+          apt-get update -y && apt-get install openssh-client -y
+          eval `ssh-agent -s` && echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh root@${{ secrets.SERVER_IP }} "set -x && ./deploy_backend_staging.sh && exit"
