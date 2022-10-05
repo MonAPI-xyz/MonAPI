@@ -108,7 +108,8 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                         error_log += ["Please make sure your [raw body] is a valid string or JSON!"]
 
                 assert len(error_log) == 0, error_log
-                return Response(status=status.HTTP_201_CREATED)
+                serialized_obj = APIMonitorSerializer(monitor_obj)
+                return Response(data=serialized_obj.data, status=status.HTTP_201_CREATED)
             except AssertionError as e:
                 monitor_obj.delete()
                 return Response(data={"error": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
