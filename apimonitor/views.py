@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from apimonitor.models import (APIMonitor, APIMonitorResult, APIMonitorQueryParam,
                                APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody)
-from apimonitor.serializers import (APIMonitorSerializer, APIMonitorRetrieveSerializer,
+from apimonitor.serializers import (APIMonitorSerializer, APIMonitorListSerializer,
                                     APIMonitorQueryParamSerializer, APIMonitorHeaderSerializer,
                                     APIMonitorBodyFormSerializer, APIMonitorRawBodySerializer)
 
@@ -164,6 +164,10 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                 date_time_sc += timedelta(hours=1)
            
             monitor.success_rate_history = success_rate_history
-        
-        serializer = APIMonitorRetrieveSerializer(queryset, many=True)
+            
+            # Last result 
+            last_result = APIMonitorResult.objects.filter(monitor=monitor).last()
+            monitor.last_result = last_result
+       
+        serializer = APIMonitorListSerializer(queryset, many=True)
         return Response(serializer.data)
