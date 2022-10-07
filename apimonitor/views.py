@@ -4,19 +4,116 @@ import pytz
 from django.db.models import Avg, Count, Q
 from django.utils import timezone
 from django.conf import settings
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from apimonitor.models import APIMonitor, APIMonitorResult
-from apimonitor.serializers import APIMonitorSerializer, APIMonitorListSerializer
+from apimonitor.models import (APIMonitor, APIMonitorResult, APIMonitorQueryParam,
+                               APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody)
+from apimonitor.serializers import (APIMonitorSerializer, APIMonitorListSerializer,
+                                    APIMonitorQueryParamSerializer, APIMonitorHeaderSerializer,
+                                    APIMonitorBodyFormSerializer, APIMonitorRawBodySerializer)
 
 
-class APIMonitorViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+class APIMonitorViewSet(mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        mixins.DestroyModelMixin,
+                        viewsets.GenericViewSet):
+
     queryset = APIMonitor.objects.all()
     serializer_class = APIMonitorSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = "pk"
+
+    def create(self, request, *args, **kwargs):
+        monitor_data = {
+            'user': request.user,
+            'name': request.data.get('name'),
+            'method': request.data.get('method'),
+            'url': request.data.get('url'),
+            'schedule': request.data.get('schedule'),
+            'body_type': request.data.get('body_type')
+        }
+        api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
+        if api_monitor_serializer.is_valid():
+            monitor_obj = APIMonitor.objects.create(**monitor_data)
+            error_log = []
+            try:
+                if request.data.get('query_params'):
+                    for key_value_pair in request.data.get('query_params'):
+                        if 'key' in key_value_pair and 'value' in key_value_pair:
+                            key, value = key_value_pair['key'], key_value_pair['value']
+                        else:
+                            error_log += ["Please make sure you submit correct [query params]"]
+                            break
+                        record = {
+                            'monitor': monitor_obj.id,
+                            'key': key,
+                            'value': value
+                        }
+                        if APIMonitorQueryParamSerializer(data=record).is_valid():
+                            record['monitor'] = monitor_obj
+                            APIMonitorQueryParam.objects.create(**record)
+                        else:
+                            error_log += ["Please make sure your [query params] key and value are valid strings!"]
+                            break
+
+                if request.data.get('headers'):
+                    for key_value_pair in request.data.get('headers'):
+                        if 'key' in key_value_pair and 'value' in key_value_pair:
+                            key, value = key_value_pair['key'], key_value_pair['value']
+                        else:
+                            error_log += ["Please make sure you submit correct [headers]"]
+                            break
+                        record = {
+                            'monitor': monitor_obj.id,
+                            'key': key,
+                            'value': value
+                        }
+                        if APIMonitorHeaderSerializer(data=record).is_valid():
+                            record['monitor'] = monitor_obj
+                            APIMonitorHeader.objects.create(**record)
+                        else:
+                            error_log += ["Please make sure your [headers] key and value are valid strings!"]
+                            break
+
+                if request.data.get('body_type') == 'FORM':
+                    for key_value_pair in request.data.get('body_form'):
+                        if 'key' in key_value_pair and 'value' in key_value_pair:
+                            key, value = key_value_pair['key'], key_value_pair['value']
+                        else:
+                            error_log += ["Please make sure you submit correct [body form]"]
+                            break
+                        record = {
+                            'monitor': monitor_obj.id,
+                            'key': key,
+                            'value': value
+                        }
+                        if APIMonitorBodyFormSerializer(data=record).is_valid():
+                            record['monitor'] = monitor_obj
+                            APIMonitorBodyForm.objects.create(**record)
+                        else:
+                            error_log += ["Please make sure your [body form] key and value are valid strings!"]
+                            break
+                elif request.data.get('body_type') == 'RAW':
+                    record = {
+                        'monitor': monitor_obj.id,
+                        'body': request.data['raw_body']
+                    }
+                    if APIMonitorRawBodySerializer(data=record).is_valid():
+                        record['monitor'] = monitor_obj
+                        APIMonitorRawBody.objects.create(**record)
+                    else:
+                        error_log += ["Please make sure your [raw body] is a valid string or JSON!"]
+
+                assert len(error_log) == 0, error_log
+                serialized_obj = APIMonitorSerializer(monitor_obj)
+                return Response(data=serialized_obj.data, status=status.HTTP_201_CREATED)
+            except AssertionError as e:
+                monitor_obj.delete()
+                return Response(data={"error": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(data={"error": "['Please make sure your [name, method, url, schedule, body_type] is valid']"}, status=status.HTTP_400_BAD_REQUEST)
 
     def get_queryset(self):
         queryset = APIMonitor.objects.filter(user=self.request.user)
@@ -104,6 +201,6 @@ class APIMonitorViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, viewset
             # Last result 
             last_result = APIMonitorResult.objects.filter(monitor=monitor).last()
             monitor.last_result = last_result
-        
+       
         serializer = APIMonitorListSerializer(queryset, many=True)
         return Response(serializer.data)

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from apimonitor.models import APIMonitor, APIMonitorQueryParam, APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody, APIMonitorResult
+from apimonitor.models import APIMonitor, APIMonitorQueryParam, APIMonitorHeader, APIMonitorRawBody, \
+    APIMonitorResult
 
 
 class APIMonitorQueryParamSerializer(serializers.ModelSerializer):
@@ -12,8 +13,8 @@ class APIMonitorQueryParamSerializer(serializers.ModelSerializer):
             'key',
             'value',
         ]
-        
-        
+
+
 class APIMonitorHeaderSerializer(serializers.ModelSerializer):
     class Meta:
         model = APIMonitorHeader
@@ -52,13 +53,14 @@ class APIMonitorSuccessRateHistorySerializer(serializers.Serializer):
     minute = serializers.IntegerField()
     success = serializers.IntegerField()
     failed = serializers.IntegerField()
-    
+
 
 class APIMonitorSerializer(serializers.ModelSerializer):
-    query_params = APIMonitorQueryParamSerializer(many=True)
-    headers = APIMonitorHeaderSerializer(many=True)
-    body_form = APIMonitorBodyFormSerializer(many=True)
-    raw_body = APIMonitorRawBodySerializer()
+
+    query_params = APIMonitorQueryParamSerializer(many=True, required=False, allow_null=True)
+    headers = APIMonitorHeaderSerializer(many=True, required=False, allow_null=True)
+    body_form = APIMonitorBodyFormSerializer(many=True, required=False, allow_null=True)
+    raw_body = APIMonitorRawBodySerializer(required=False, allow_null=True)
     
     class Meta:
         model = APIMonitor
@@ -74,8 +76,8 @@ class APIMonitorSerializer(serializers.ModelSerializer):
             'body_form',
             'raw_body',
         ]
-        
-        
+
+
 class APIMonitorResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = APIMonitorResult
@@ -97,7 +99,7 @@ class APIMonitorListSerializer(APIMonitorSerializer):
     avg_response_time = serializers.IntegerField()
     success_rate_history = APIMonitorSuccessRateHistorySerializer(many=True)
     last_result = APIMonitorResultSerializer()
-    
+
     class Meta:
         model = APIMonitor
         fields = [
