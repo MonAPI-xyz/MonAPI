@@ -87,7 +87,7 @@ class Command(BaseCommand):
                 if resp is not None:
                     if resp.status_code >= 200 and resp.status_code <= 299:
                         success = True
-                    resp_content = resp.content.decode('utf-8')
+                    resp_content = resp.content.decode('utf-8', errors='ignore')
                     
                 execution_time = timezone.localtime()
                 APIMonitorResult.objects.create(
