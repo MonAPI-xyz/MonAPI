@@ -165,13 +165,11 @@ class ListAPIMonitor(APITestCase):
                         "value": "Test Value Query"
                     }
                 ],
-                "raw_body": [
-                    {
-                        "body": "Test Body",
-                        "id": 1,
-                        "monitor": 1
-                    }
-                ],
+                "raw_body": {
+                    "body": "Test Body",
+                    "id": 1,
+                    "monitor": 1
+                },
                 "schedule": "10MIN",
                 "success_rate": "75.0",
                 "success_rate_history": [
@@ -421,13 +419,11 @@ class ListAPIMonitor(APITestCase):
                         "value": "Test Value Query"
                     }
                 ],
-                "raw_body": [
-                    {
-                        "body": "Test Body",
-                        "id": 1,
-                        "monitor": 1
-                    }
-                ],
+                "raw_body": {
+                    "body": "Test Body",
+                    "id": 1,
+                    "monitor": 1
+                },
                 "schedule": "10MIN",
                 "success_rate": "100.0",
                 "success_rate_history": [

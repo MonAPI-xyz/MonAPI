@@ -58,7 +58,7 @@ class APIMonitorSerializer(serializers.ModelSerializer):
     query_params = APIMonitorQueryParamSerializer(many=True)
     headers = APIMonitorHeaderSerializer(many=True)
     body_form = APIMonitorBodyFormSerializer(many=True)
-    raw_body = APIMonitorRawBodySerializer(many=True)
+    raw_body = APIMonitorRawBodySerializer()
     
     class Meta:
         model = APIMonitor
