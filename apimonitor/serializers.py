@@ -56,11 +56,12 @@ class APIMonitorSuccessRateHistorySerializer(serializers.Serializer):
 
 
 class APIMonitorSerializer(serializers.ModelSerializer):
+
     query_params = APIMonitorQueryParamSerializer(many=True, required=False, allow_null=True)
     headers = APIMonitorHeaderSerializer(many=True, required=False, allow_null=True)
     body_form = APIMonitorBodyFormSerializer(many=True, required=False, allow_null=True)
     raw_body = APIMonitorRawBodySerializer(many=True, required=False, allow_null=True)
-
+    
     class Meta:
         model = APIMonitor
         fields = [

@@ -55,7 +55,7 @@ class APIMonitorBodyForm(models.Model):
 
 
 class APIMonitorRawBody(models.Model):
-    monitor = models.ForeignKey(APIMonitor, on_delete=models.CASCADE, related_name='raw_body')
+    monitor = models.OneToOneField(APIMonitor, on_delete=models.CASCADE, related_name='raw_body')
     body = models.TextField()
 
 
@@ -68,3 +68,4 @@ class APIMonitorResult(models.Model):
     response_time = models.IntegerField() # in miliseconds
     success = models.BooleanField()
     log_response = models.TextField()
+    log_error = models.TextField()
