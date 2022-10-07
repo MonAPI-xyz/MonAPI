@@ -29,7 +29,7 @@ This repository is providing backend service for MonAPI, written in Python and u
 
 ## Features
 
-- [ ] Authentication
+- [x] Authentication
 - [ ] API Monitor Dashboard
 - [ ] API Monitor Alert
 - [ ] API Monitor Error Log
@@ -43,9 +43,11 @@ This repository is providing backend service for MonAPI, written in Python and u
 - [Run Development Server](https://github.com/MonAPI-xyz/MonAPI/blob/staging/docs/development.md)
 
 ## Latest Release Notes
-Version: Pre-release<br>Date: 16th November 2022
-1. Staging server is now officially online! checkout on https://api-staging.monapi.xyz
-2. Our blog is now officially online! checkout on https://blog.monapi.xyz
+Version: v0.1.0<br>
+Date: 25th September 2022
+1. Add all models needed for api monitor
+2. Implement authentication method, including login and register
+3. Implement view list api monitor endpoint
 
 Full release notes can be found in [Release Notes](https://github.com/MonAPI-xyz/MonAPI/blob/staging/docs/release_notes.md)
 
