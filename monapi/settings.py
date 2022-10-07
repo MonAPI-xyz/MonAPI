@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'register',
     'password_validators',
     'login',
+    'error_logs',
 ]
 
 MIDDLEWARE = [
