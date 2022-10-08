@@ -1,5 +1,4 @@
 import pytz
-import json
 from datetime import datetime
 
 from django.conf import settings
@@ -11,7 +10,6 @@ from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 
 from apimonitor.models import APIMonitor, APIMonitorResult
-from apimonitor.serializers import APIMonitorSerializer
 
 class ListErrorLogs(APITestCase):
   url = reverse('error-logs-list')

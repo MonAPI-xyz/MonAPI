@@ -5,6 +5,7 @@ from apimonitor.serializers import APIMonitorSerializer
 
 class ErrorLogsSerializer(serializers.ModelSerializer):
   monitor = APIMonitorSerializer()
+  
   class Meta:
       model = APIMonitorResult
       fields = [
