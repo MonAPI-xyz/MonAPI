@@ -1,26 +1,256 @@
 from datetime import datetime, timedelta
+from gc import get_objects
+from tracemalloc import start
 import pytz
 
 from django.db.models import Avg, Count, Q
 from django.utils import timezone
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from apimonitor.models import APIMonitor, APIMonitorResult
-from apimonitor.serializers import APIMonitorSerializer, APIMonitorListSerializer
+from apimonitor.serializers import APIMonitorSerializer, APIMonitorListSerializer, APIMonitorRetrieveSerializer
 
-
-class APIMonitorViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet):
+class APIMonitorViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = APIMonitor.objects.all()
     serializer_class = APIMonitorSerializer
     permission_classes = [IsAuthenticated]
-    lookup_field = "pk"
-
+    
     def get_queryset(self):
         queryset = APIMonitor.objects.filter(user=self.request.user)
         return queryset
+
+    def retrieve(self, request, pk):          
+        
+        queryset = self.filter_queryset(self.get_queryset())
+
+        monitor = get_object_or_404(queryset,pk=pk)
+
+        response_time = []
+        success_rate = []
+
+        if(self.request.query_params.get("range")=="30MIN"):
+            last_30_minutes = timezone.now() - timedelta(minutes=30)
+            for i in range(30):
+                start_time = last_30_minutes
+                end_time = last_30_minutes+timedelta(minutes=1)
+                avg_response_time = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(avg=Avg('response_time'))
+                
+                avg = 0
+
+                if  avg_response_time["avg"]!=None:
+                    avg = avg_response_time['avg']
+                
+                response_time.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "avg": avg
+                })
+                
+                # Average success rate
+                success_count = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(
+                        s=Count('success', filter=Q(success=True)), 
+                        f=Count('success', filter=Q(success=False)),
+                        total=Count('pk'),
+                    )
+
+                success_rate.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "success": success_count['s'],
+                    "failed" : success_count['f']
+                })
+
+        elif(self.request.query_params.get("range")=="60MIN"):
+            last_1_hour = timezone.now() - timedelta(hours=1)
+            for i in range(30):
+                start_time = last_1_hour
+                end_time = last_1_hour+timedelta(minutes=2)
+                avg_response_time = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(avg=Avg('response_time'))
+                
+                avg = 0
+
+                if  avg_response_time["avg"]!=None:
+                    avg = avg_response_time['avg']
+                
+                response_time.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "avg": avg
+                })
+                
+                # Average success rate
+                success_count = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(
+                        s=Count('success', filter=Q(success=True)), 
+                        f=Count('success', filter=Q(success=False)),
+                        total=Count('pk'),
+                    )
+
+                success_rate.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "success": success_count['s'],
+                    "failed" : success_count['f']
+                })
+
+        elif(self.request.query_params.get("range")=="180MIN"):
+            last_3_hour = timezone.now() - timedelta(hours=3)
+            for i in range(36):
+                start_time = last_3_hour
+                end_time = last_3_hour+timedelta(minutes=5)
+                avg_response_time = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(avg=Avg('response_time'))
+                
+                avg = 0
+
+                if  avg_response_time["avg"]!=None:
+                    avg = avg_response_time['avg']
+                
+                response_time.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "avg": avg
+                })
+                
+                # Average success rate
+                success_count = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(
+                        s=Count('success', filter=Q(success=True)), 
+                        f=Count('success', filter=Q(success=False)),
+                        total=Count('pk'),
+                    )
+
+                success_rate.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "success": success_count['s'],
+                    "failed" : success_count['f']
+                })
+        elif(self.request.query_params.get("range")=="360MIN"):
+            last_6_hour = timezone.now() - timedelta(hours=6)
+            for i in range(36):
+                start_time = last_6_hour
+                end_time = last_6_hour+timedelta(minutes=10)
+                avg_response_time = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(avg=Avg('response_time'))
+                
+                avg = 0
+
+                if  avg_response_time["avg"]!=None:
+                    avg = avg_response_time['avg']
+                
+                response_time.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "avg": avg
+                })
+                
+                # Average success rate
+                success_count = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(
+                        s=Count('success', filter=Q(success=True)), 
+                        f=Count('success', filter=Q(success=False)),
+                        total=Count('pk'),
+                    )
+
+                success_rate.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "success": success_count['s'],
+                    "failed" : success_count['f']
+                })
+        elif(self.request.query_params.get("range")=="720MIN"):
+            last_12_hour = timezone.now() - timedelta(hours=12)
+            for i in range(36):
+                start_time = last_12_hour
+                end_time = last_12_hour+timedelta(minutes=20)
+                avg_response_time = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(avg=Avg('response_time'))
+                
+                avg = 0
+
+                if  avg_response_time["avg"]!=None:
+                    avg = avg_response_time['avg']
+                
+                response_time.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "avg": avg
+                })
+                
+                # Average success rate
+                success_count = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(
+                        s=Count('success', filter=Q(success=True)), 
+                        f=Count('success', filter=Q(success=False)),
+                        total=Count('pk'),
+                    )
+
+                success_rate.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "success": success_count['s'],
+                    "failed" : success_count['f']
+                })
+        elif(self.request.query_params.get("range")=="1440MIN"):
+            last_24_hour = timezone.now() - timedelta(days=1)
+            for i in range(48):
+                start_time = last_24_hour
+                end_time = last_24_hour+timedelta(minutes=30)
+                avg_response_time = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(avg=Avg('response_time'))
+                
+                avg = 0
+
+                if  avg_response_time["avg"]!=None:
+                    avg = avg_response_time['avg']
+                
+                response_time.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "avg": avg
+                })
+                
+                # Average success rate
+                success_count = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(
+                        s=Count('success', filter=Q(success=True)), 
+                        f=Count('success', filter=Q(success=False)),
+                        total=Count('pk'),
+                    )
+
+                success_rate.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "success": success_count['s'],
+                    "failed" : success_count['f']
+                })
+
+        monitor.success_rate=success_rate
+        monitor.response_time=response_time
+        
+        serializer = APIMonitorRetrieveSerializer(monitor)
+
+        return Response(serializer.data)
     
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
@@ -107,3 +337,5 @@ class APIMonitorViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, viewset
         
         serializer = APIMonitorListSerializer(queryset, many=True)
         return Response(serializer.data)
+    
+    
