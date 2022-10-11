@@ -133,7 +133,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
 
         def retrieve_with_param(last_chosen_period_in_hours, n_bar, increment_in_minutes):
             last_chosen_period = timezone.now() - timedelta(hours=last_chosen_period_in_hours)
-            for i in range(n_bar):
+            for _ in range(n_bar):
                 start_time = last_chosen_period
                 end_time = last_chosen_period+timedelta(minutes=increment_in_minutes)
                 avg_response_time = APIMonitorResult.objects \
