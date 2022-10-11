@@ -55,6 +55,19 @@ class APIMonitorSuccessRateHistorySerializer(serializers.Serializer):
     failed = serializers.IntegerField()
 
 
+class APIMonitorDetailSuccessRateSerializer(serializers.Serializer):
+    start_time = serializers.DateTimeField()
+    end_time = serializers.DateTimeField()
+    success = serializers.IntegerField()
+    failed = serializers.IntegerField()
+
+
+class APIMonitorDetailResponseTimeSerializer(serializers.Serializer):
+    start_time = serializers.DateTimeField()
+    end_time = serializers.DateTimeField()
+    avg = serializers.IntegerField()
+
+
 class APIMonitorSerializer(serializers.ModelSerializer):
     query_params = APIMonitorQueryParamSerializer(many=True, required=False, allow_null=True)
     headers = APIMonitorHeaderSerializer(many=True, required=False, allow_null=True)
@@ -116,4 +129,26 @@ class APIMonitorListSerializer(APIMonitorSerializer):
             'avg_response_time',
             'success_rate_history',
             'last_result',
+        ]
+
+
+class APIMonitorRetrieveSerializer(APIMonitorSerializer):
+    success_rate = APIMonitorDetailSuccessRateSerializer(many=True)
+    response_time = APIMonitorDetailResponseTimeSerializer(many=True)
+
+    class Meta:
+        model = APIMonitor
+        fields = [
+            'id',
+            'name',
+            'method',
+            'url',
+            'schedule',
+            'body_type',
+            'query_params',
+            'headers',
+            'body_form',
+            'raw_body',
+            'success_rate',
+            'response_time',
         ]
