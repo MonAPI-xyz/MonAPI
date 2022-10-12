@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta
+from time import time
 import pytz
 
 from django.db.models import Avg, Count, Q
 from django.utils import timezone
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -12,7 +14,8 @@ from apimonitor.models import (APIMonitor, APIMonitorResult, APIMonitorQueryPara
                                APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody)
 from apimonitor.serializers import (APIMonitorSerializer, APIMonitorListSerializer,
                                     APIMonitorQueryParamSerializer, APIMonitorHeaderSerializer,
-                                    APIMonitorBodyFormSerializer, APIMonitorRawBodySerializer)
+                                    APIMonitorBodyFormSerializer, APIMonitorRawBodySerializer,
+                                    APIMonitorRetrieveSerializer,)
 
 
 class APIMonitorViewSet(mixins.ListModelMixin,
@@ -118,6 +121,71 @@ class APIMonitorViewSet(mixins.ListModelMixin,
     def get_queryset(self):
         queryset = APIMonitor.objects.filter(user=self.request.user)
         return queryset
+    
+    def retrieve_with_param(last_chosen_period_in_hours, n_bar, increment_in_minutes, monitor, success_rate, response_time):
+        last_chosen_period = timezone.now() - timedelta(hours=last_chosen_period_in_hours)
+        for _ in range(n_bar):
+            start_time = last_chosen_period
+            end_time = last_chosen_period+timedelta(minutes=increment_in_minutes)
+            avg_response_time = APIMonitorResult.objects \
+                .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                .aggregate(avg=Avg('response_time'))
+
+            avg = 0
+
+            if  avg_response_time["avg"]!=None:
+                avg = avg_response_time['avg']
+
+            response_time.append({
+                "start_time": start_time,
+                "end_time" : end_time,
+                "avg": avg
+            })
+
+            # Average success rate
+            success_count = APIMonitorResult.objects \
+                .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                .aggregate(
+                    s=Count('success', filter=Q(success=True)), 
+                    f=Count('success', filter=Q(success=False)),
+                    total=Count('pk'),
+                )
+
+            success_rate.append({
+                "start_time": start_time,
+                "end_time" : end_time,
+                "success": success_count['s'],
+                "failed" : success_count['f']
+            })
+            last_chosen_period = last_chosen_period+timedelta(minutes=increment_in_minutes)
+
+
+    def retrieve(self, request, pk=None):          
+        queryset = self.filter_queryset(self.get_queryset())
+        monitor = get_object_or_404(queryset,pk=pk)
+
+        response_time = []
+        success_rate = []
+        
+        if(self.request.query_params.get("range")=="30MIN"):
+            APIMonitorViewSet.retrieve_with_param(0.5, 30, 1, monitor, success_rate, response_time)
+        elif(self.request.query_params.get("range")=="60MIN"):
+            APIMonitorViewSet.retrieve_with_param(1, 30, 2, monitor, success_rate, response_time)
+        elif(self.request.query_params.get("range")=="180MIN"):
+            APIMonitorViewSet.retrieve_with_param(3, 36, 5, monitor, success_rate, response_time)
+        elif(self.request.query_params.get("range")=="360MIN"):
+            APIMonitorViewSet.retrieve_with_param(6, 36, 10, monitor, success_rate, response_time)
+        elif(self.request.query_params.get("range")=="720MIN"):
+            APIMonitorViewSet.retrieve_with_param(12, 36, 20, monitor, success_rate, response_time)
+        elif(self.request.query_params.get("range")=="1440MIN"):
+            APIMonitorViewSet.retrieve_with_param(24, 48, 30, monitor, success_rate, response_time)
+
+        monitor.success_rate=success_rate
+        monitor.response_time=response_time
+
+        serializer = APIMonitorRetrieveSerializer(monitor)
+
+        return Response(serializer.data)
     
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
