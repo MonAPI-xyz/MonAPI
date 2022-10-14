@@ -1,10 +1,7 @@
-from datetime import datetime, timedelta
-from time import time
-import pytz
+from datetime import timedelta
 
 from django.db.models import Avg, Count, Q
 from django.utils import timezone
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
@@ -27,6 +24,10 @@ class APIMonitorViewSet(mixins.ListModelMixin,
     serializer_class = APIMonitorSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = "pk"
+    
+    def get_queryset(self):
+        queryset = APIMonitor.objects.filter(user=self.request.user)
+        return queryset
 
     def create(self, request, *args, **kwargs):
         monitor_data = {
@@ -118,10 +119,6 @@ class APIMonitorViewSet(mixins.ListModelMixin,
         else:
             return Response(data={"error": "['Please make sure your [name, method, url, schedule, body_type] is valid']"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def get_queryset(self):
-        queryset = APIMonitor.objects.filter(user=self.request.user)
-        return queryset
-    
     def retrieve_with_param(last_chosen_period_in_hours, n_bar, increment_in_minutes, monitor, success_rate, response_time):
         last_chosen_period = timezone.now() - timedelta(hours=last_chosen_period_in_hours)
         for _ in range(n_bar):
@@ -159,7 +156,6 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             })
             last_chosen_period = last_chosen_period+timedelta(minutes=increment_in_minutes)
 
-
     def retrieve(self, request, pk=None):          
         queryset = self.filter_queryset(self.get_queryset())
         monitor = get_object_or_404(queryset,pk=pk)
@@ -189,12 +185,8 @@ class APIMonitorViewSet(mixins.ListModelMixin,
     
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
-        
-        # Truncate last 24 hours until hour
-        local_timezone = pytz.timezone(settings.TIME_ZONE)
         last_24_hour = timezone.now() - timedelta(days=1)
-        last_24_hour = last_24_hour.replace(hour=last_24_hour.hour + 1, minute=0, second=0, microsecond=0)
-            
+        
         # Append summary to each monitor
         for monitor in queryset:
             # Average response time
@@ -221,48 +213,27 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                 monitor.success_rate = success_count['s'] / (success_count['s'] + success_count['f']) * 100
             
             # Success rate history
-            success_rate_per_hour = APIMonitorResult.objects \
-                .filter(monitor=monitor, execution_time__gte=last_24_hour) \
-                .values('date', 'hour') \
-                .annotate(
-                    s=Count('success', filter=Q(success=True)), 
-                    f=Count('success', filter=Q(success=False)),
-                ) \
-                .order_by('date', 'hour')
-                
-            # Convert query result to dictionary based on datetime
-            success_rate_history_dict = {}
-            for sc_per_hour in success_rate_per_hour:
-                date_time_sc = local_timezone.localize(datetime(
-                    sc_per_hour['date'].year, 
-                    sc_per_hour['date'].month, 
-                    sc_per_hour['date'].day, 
-                    sc_per_hour['hour']
-                ))
-                success_rate_history_dict[date_time_sc.isoformat()] = {
-                    'date': sc_per_hour['date'],
-                    'hour': sc_per_hour['hour'],
-                    'minute': 0,
-                    'success': sc_per_hour['s'],
-                    'failed': sc_per_hour['f'],
-                }
-            
             success_rate_history = []
-            date_time_sc = last_24_hour
+            last_24_hour_per_monitor = last_24_hour
             for _ in range(24):
-                date_time_sc_in_zone = date_time_sc.astimezone()
+                start_time = last_24_hour_per_monitor
+                end_time = last_24_hour_per_monitor + timedelta(hours=1)
                 
-                if date_time_sc_in_zone.isoformat() in success_rate_history_dict:
-                    success_rate_history.append(success_rate_history_dict[date_time_sc_in_zone.isoformat()])
-                else:
-                    success_rate_history.append({
-                        'date': date_time_sc_in_zone.date(),
-                        'hour': date_time_sc_in_zone.hour,
-                        'minute': 0,
-                        'success': 0,
-                        'failed': 0,
-                    })
-                date_time_sc += timedelta(hours=1)
+                success_count = APIMonitorResult.objects \
+                    .filter(monitor=monitor, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(
+                        s=Count('success', filter=Q(success=True)), 
+                        f=Count('success', filter=Q(success=False)),
+                        total=Count('pk'),
+                    )
+            
+                success_rate_history.append({
+                    'start_time': start_time,
+                    'end_time': end_time,
+                    'success': success_count['s'],
+                    'failed': success_count['f'],
+                })
+                last_24_hour_per_monitor += timedelta(hours=1)
            
             monitor.success_rate_history = success_rate_history
             
