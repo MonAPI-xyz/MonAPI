@@ -1,5 +1,3 @@
-import json
-from urllib import response
 import pytz
 from datetime import datetime
 
@@ -55,11 +53,9 @@ class DetailListAPIMonitor(APITestCase):
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour,
-            minute=self.mock_current_time.minute,
             response_time=100,
             success=True,
+            status_code=200,
             log_response='{}'
         )
 
@@ -234,44 +230,36 @@ class ListAPIMonitor(APITestCase):
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour,
-            minute=self.mock_current_time.minute,
             response_time=100,
             success=True,
+            status_code=200,
             log_response='{}'
         )
 
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour,
-            minute=self.mock_current_time.minute,
             response_time=75,
             success=True,
+            status_code=200,
             log_response='{}'
         )
 
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour - 1,
-            minute=self.mock_current_time.minute,
             response_time=100,
             success=True,
+            status_code=200,
             log_response='{}'
         )
 
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour - 1,
-            minute=self.mock_current_time.minute,
             response_time=50,
             success=False,
+            status_code=200,
             log_response='{}'
         )
 
@@ -299,14 +287,13 @@ class ListAPIMonitor(APITestCase):
                 ],
                 "id": 1,
                 "last_result": {
-                    "date": "2022-09-20",
                     "execution_time": "2022-09-20T10:00:00+07:00",
-                    "hour": 9,
                     "id": 4,
+                    "log_error": "",
                     "log_response": "{}",
-                    "minute": 0,
                     "monitor": 1,
                     "response_time": 50,
+                    "status_code": 200,
                     "success": False
                 },
                 "method": "GET",
@@ -328,172 +315,148 @@ class ListAPIMonitor(APITestCase):
                 "success_rate": "75.0",
                 "success_rate_history": [
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T11:00:00+07:00",
                         "failed": 0,
-                        "hour": 11,
-                        "minute": 0,
+                        "start_time": "2022-09-19T10:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T12:00:00+07:00",
                         "failed": 0,
-                        "hour": 12,
-                        "minute": 0,
+                        "start_time": "2022-09-19T11:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T13:00:00+07:00",
                         "failed": 0,
-                        "hour": 13,
-                        "minute": 0,
+                        "start_time": "2022-09-19T12:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T14:00:00+07:00",
                         "failed": 0,
-                        "hour": 14,
-                        "minute": 0,
+                        "start_time": "2022-09-19T13:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T15:00:00+07:00",
                         "failed": 0,
-                        "hour": 15,
-                        "minute": 0,
+                        "start_time": "2022-09-19T14:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T16:00:00+07:00",
                         "failed": 0,
-                        "hour": 16,
-                        "minute": 0,
+                        "start_time": "2022-09-19T15:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T17:00:00+07:00",
                         "failed": 0,
-                        "hour": 17,
-                        "minute": 0,
+                        "start_time": "2022-09-19T16:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T18:00:00+07:00",
                         "failed": 0,
-                        "hour": 18,
-                        "minute": 0,
+                        "start_time": "2022-09-19T17:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T19:00:00+07:00",
                         "failed": 0,
-                        "hour": 19,
-                        "minute": 0,
+                        "start_time": "2022-09-19T18:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T20:00:00+07:00",
                         "failed": 0,
-                        "hour": 20,
-                        "minute": 0,
+                        "start_time": "2022-09-19T19:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T21:00:00+07:00",
                         "failed": 0,
-                        "hour": 21,
-                        "minute": 0,
+                        "start_time": "2022-09-19T20:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T22:00:00+07:00",
                         "failed": 0,
-                        "hour": 22,
-                        "minute": 0,
+                        "start_time": "2022-09-19T21:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T23:00:00+07:00",
                         "failed": 0,
-                        "hour": 23,
-                        "minute": 0,
+                        "start_time": "2022-09-19T22:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T00:00:00+07:00",
                         "failed": 0,
-                        "hour": 0,
-                        "minute": 0,
+                        "start_time": "2022-09-19T23:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T01:00:00+07:00",
                         "failed": 0,
-                        "hour": 1,
-                        "minute": 0,
+                        "start_time": "2022-09-20T00:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T02:00:00+07:00",
                         "failed": 0,
-                        "hour": 2,
-                        "minute": 0,
+                        "start_time": "2022-09-20T01:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T03:00:00+07:00",
                         "failed": 0,
-                        "hour": 3,
-                        "minute": 0,
+                        "start_time": "2022-09-20T02:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T04:00:00+07:00",
                         "failed": 0,
-                        "hour": 4,
-                        "minute": 0,
+                        "start_time": "2022-09-20T03:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T05:00:00+07:00",
                         "failed": 0,
-                        "hour": 5,
-                        "minute": 0,
+                        "start_time": "2022-09-20T04:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T06:00:00+07:00",
                         "failed": 0,
-                        "hour": 6,
-                        "minute": 0,
+                        "start_time": "2022-09-20T05:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T07:00:00+07:00",
                         "failed": 0,
-                        "hour": 7,
-                        "minute": 0,
+                        "start_time": "2022-09-20T06:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T08:00:00+07:00",
                         "failed": 0,
-                        "hour": 8,
-                        "minute": 0,
+                        "start_time": "2022-09-20T07:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T09:00:00+07:00",
+                        "failed": 0,
+                        "start_time": "2022-09-20T08:00:00+07:00",
+                        "success": 0
+                    },
+                    {
+                        "end_time": "2022-09-20T10:00:00+07:00",
                         "failed": 1,
-                        "hour": 9,
-                        "minute": 0,
-                        "success": 1
-                    },
-                    {
-                        "date": "2022-09-20",
-                        "failed": 0,
-                        "hour": 10,
-                        "minute": 0,
-                        "success": 2
+                        "start_time": "2022-09-20T09:00:00+07:00",
+                        "success": 3
                     }
                 ],
                 "url": "Test Path"
@@ -581,171 +544,147 @@ class ListAPIMonitor(APITestCase):
                 "success_rate": "100.0",
                 "success_rate_history": [
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T11:00:00+07:00",
                         "failed": 0,
-                        "hour": 11,
-                        "minute": 0,
+                        "start_time": "2022-09-19T10:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T12:00:00+07:00",
                         "failed": 0,
-                        "hour": 12,
-                        "minute": 0,
+                        "start_time": "2022-09-19T11:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T13:00:00+07:00",
                         "failed": 0,
-                        "hour": 13,
-                        "minute": 0,
+                        "start_time": "2022-09-19T12:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T14:00:00+07:00",
                         "failed": 0,
-                        "hour": 14,
-                        "minute": 0,
+                        "start_time": "2022-09-19T13:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T15:00:00+07:00",
                         "failed": 0,
-                        "hour": 15,
-                        "minute": 0,
+                        "start_time": "2022-09-19T14:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T16:00:00+07:00",
                         "failed": 0,
-                        "hour": 16,
-                        "minute": 0,
+                        "start_time": "2022-09-19T15:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T17:00:00+07:00",
                         "failed": 0,
-                        "hour": 17,
-                        "minute": 0,
+                        "start_time": "2022-09-19T16:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T18:00:00+07:00",
                         "failed": 0,
-                        "hour": 18,
-                        "minute": 0,
+                        "start_time": "2022-09-19T17:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T19:00:00+07:00",
                         "failed": 0,
-                        "hour": 19,
-                        "minute": 0,
+                        "start_time": "2022-09-19T18:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T20:00:00+07:00",
                         "failed": 0,
-                        "hour": 20,
-                        "minute": 0,
+                        "start_time": "2022-09-19T19:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T21:00:00+07:00",
                         "failed": 0,
-                        "hour": 21,
-                        "minute": 0,
+                        "start_time": "2022-09-19T20:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T22:00:00+07:00",
                         "failed": 0,
-                        "hour": 22,
-                        "minute": 0,
+                        "start_time": "2022-09-19T21:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-19",
+                        "end_time": "2022-09-19T23:00:00+07:00",
                         "failed": 0,
-                        "hour": 23,
-                        "minute": 0,
+                        "start_time": "2022-09-19T22:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T00:00:00+07:00",
                         "failed": 0,
-                        "hour": 0,
-                        "minute": 0,
+                        "start_time": "2022-09-19T23:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T01:00:00+07:00",
                         "failed": 0,
-                        "hour": 1,
-                        "minute": 0,
+                        "start_time": "2022-09-20T00:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T02:00:00+07:00",
                         "failed": 0,
-                        "hour": 2,
-                        "minute": 0,
+                        "start_time": "2022-09-20T01:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T03:00:00+07:00",
                         "failed": 0,
-                        "hour": 3,
-                        "minute": 0,
+                        "start_time": "2022-09-20T02:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T04:00:00+07:00",
                         "failed": 0,
-                        "hour": 4,
-                        "minute": 0,
+                        "start_time": "2022-09-20T03:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T05:00:00+07:00",
                         "failed": 0,
-                        "hour": 5,
-                        "minute": 0,
+                        "start_time": "2022-09-20T04:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T06:00:00+07:00",
                         "failed": 0,
-                        "hour": 6,
-                        "minute": 0,
+                        "start_time": "2022-09-20T05:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T07:00:00+07:00",
                         "failed": 0,
-                        "hour": 7,
-                        "minute": 0,
+                        "start_time": "2022-09-20T06:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T08:00:00+07:00",
                         "failed": 0,
-                        "hour": 8,
-                        "minute": 0,
+                        "start_time": "2022-09-20T07:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T09:00:00+07:00",
                         "failed": 0,
-                        "hour": 9,
-                        "minute": 0,
+                        "start_time": "2022-09-20T08:00:00+07:00",
                         "success": 0
                     },
                     {
-                        "date": "2022-09-20",
+                        "end_time": "2022-09-20T10:00:00+07:00",
                         "failed": 0,
-                        "hour": 10,
-                        "minute": 0,
+                        "start_time": "2022-09-20T09:00:00+07:00",
                         "success": 0
                     }
                 ],
@@ -796,21 +735,17 @@ class ListAPIMonitor(APITestCase):
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour,
-            minute=self.mock_current_time.minute,
             response_time=100,
             success=True,
+            status_code=200,
             log_response='{}'
         )
 
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour,
-            minute=self.mock_current_time.minute,
             response_time=75,
+            status_code=200,
             success=True,
             log_response='{}'
         )
@@ -818,21 +753,17 @@ class ListAPIMonitor(APITestCase):
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour - 1,
-            minute=self.mock_current_time.minute,
             response_time=100,
             success=True,
+            status_code=200,
             log_response='{}'
         )
 
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour - 1,
-            minute=self.mock_current_time.minute,
             response_time=50,
+            status_code=200,
             success=False,
             log_response='{}'
         )
@@ -892,10 +823,8 @@ class ListAPIMonitor(APITestCase):
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour,
-            minute=self.mock_current_time.minute,
             response_time=100,
+            status_code=200,
             success=True,
             log_response='{}'
         )
@@ -903,10 +832,8 @@ class ListAPIMonitor(APITestCase):
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour,
-            minute=self.mock_current_time.minute,
             response_time=75,
+            status_code=200,
             success=True,
             log_response='{}'
         )
@@ -914,10 +841,8 @@ class ListAPIMonitor(APITestCase):
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour - 1,
-            minute=self.mock_current_time.minute,
             response_time=100,
+            status_code=200,
             success=True,
             log_response='{}'
         )
@@ -925,10 +850,8 @@ class ListAPIMonitor(APITestCase):
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour - 1,
-            minute=self.mock_current_time.minute,
             response_time=50,
+            status_code=500,
             success=False,
             log_response='{}'
         )

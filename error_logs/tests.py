@@ -55,11 +55,9 @@ class ListErrorLogs(APITestCase):
     APIMonitorResult.objects.create(
         monitor=monitor,
         execution_time=self.mock_current_time,
-        date=self.mock_current_time.date(),
-        hour=self.mock_current_time.hour,
-        minute=self.mock_current_time.minute,
         response_time=100,
         success=False,
+        status_code=500,
         log_response='Log Response',
         log_error='',
     )
@@ -67,11 +65,9 @@ class ListErrorLogs(APITestCase):
     APIMonitorResult.objects.create(
         monitor=monitor,
         execution_time=self.mock_current_time,
-        date=self.mock_current_time.date(),
-        hour=self.mock_current_time.hour,
-        minute=self.mock_current_time.minute,
         response_time=75,
         success=False,
+        status_code=500,
         log_response='',
         log_error='Log Error'
     )
@@ -94,11 +90,9 @@ class ListErrorLogs(APITestCase):
             "raw_body": None
         },
         "execution_time": "2022-09-20T10:00:00+07:00",
-        "date": "2022-09-20",
-        "hour": 10,
-        "minute": 0,
         "response_time": 100,
         "success": False,
+        "status_code": 500,
         "log_response": "Log Response",
         "log_error": "",
       },
@@ -117,11 +111,9 @@ class ListErrorLogs(APITestCase):
               "raw_body": None
           },
           "execution_time": "2022-09-20T10:00:00+07:00",
-          "date": "2022-09-20",
-          "hour": 10,
-          "minute": 0,
           "response_time": 75,
           "success": False,
+          "status_code": 500,
           "log_response": "",
           "log_error": "Log Error",
       },
@@ -145,11 +137,9 @@ class ListErrorLogs(APITestCase):
     APIMonitorResult.objects.create(
         monitor=monitor,
         execution_time=self.mock_current_time,
-        date=self.mock_current_time.date(),
-        hour=self.mock_current_time.hour,
-        minute=self.mock_current_time.minute,
         response_time=100,
         success=False,
+        status_code=500,
         log_response='Log Response',
         log_error='Log Error',
     )
@@ -157,11 +147,9 @@ class ListErrorLogs(APITestCase):
     APIMonitorResult.objects.create(
         monitor=monitor,
         execution_time=self.mock_current_time,
-        date=self.mock_current_time.date(),
-        hour=self.mock_current_time.hour,
-        minute=self.mock_current_time.minute,
         response_time=75,
         success=False,
+        status_code=500,
         log_response='',
         log_error='Log Error'
     )
@@ -186,10 +174,8 @@ class ListErrorLogs(APITestCase):
             "raw_body": None
         },
         "execution_time": "2022-09-20T10:00:00+07:00",
-        "date": "2022-09-20",
-        "hour": 10,
-        "minute": 0,
         "response_time": 100,
+        "status_code": 500,
         "success": False,
         "log_response": "Log Response",
         "log_error": "Log Error",

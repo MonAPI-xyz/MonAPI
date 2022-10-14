@@ -14,6 +14,11 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 import os
+import sys
+
+
+# Testing flag
+TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -128,10 +133,24 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
 }
 
+# Database for testing
+#  Use same db on main db and testing db to 
+#  support threading unit test
+if TESTING: 
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME':  BASE_DIR / 'test.db.sqlite3',
+            'TEST': {
+                'NAME': BASE_DIR / 'test.db.sqlite3'
+            }
+        },
+    }
 
+# Database for production
 if os.getenv('PRODUCTION') == 'True':
     DATABASES = {
         'default': {

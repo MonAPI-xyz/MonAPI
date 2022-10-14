@@ -12,11 +12,9 @@ class ErrorLogsSerializer(serializers.ModelSerializer):
           'id',
           'monitor',
           'execution_time',
-          'date',
-          'hour',
-          'minute',
           'response_time',
           'success',
+          'status_code',
           'log_response',
           'log_error',
       ]

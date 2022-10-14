@@ -10,5 +10,5 @@ Date: 16th September 2022
 Version: v0.1.0<br>
 Date: 25th September 2022
 1. Add all models needed for api monitor
-2. Implement authentication method
+2. Implement authentication method, including login and register
 3. Implement view list api monitor endpoint

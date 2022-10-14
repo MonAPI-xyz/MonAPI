@@ -47,14 +47,6 @@ class APIMonitorRawBodySerializer(serializers.ModelSerializer):
         ]
 
 
-class APIMonitorSuccessRateHistorySerializer(serializers.Serializer):
-    date = serializers.DateField()
-    hour = serializers.IntegerField()
-    minute = serializers.IntegerField()
-    success = serializers.IntegerField()
-    failed = serializers.IntegerField()
-
-
 class APIMonitorDetailSuccessRateSerializer(serializers.Serializer):
     start_time = serializers.DateTimeField()
     end_time = serializers.DateTimeField()
@@ -97,19 +89,18 @@ class APIMonitorResultSerializer(serializers.ModelSerializer):
             'id',
             'monitor',
             'execution_time',
-            'date',
-            'hour',
-            'minute',
             'response_time',
             'success',
+            'status_code',
             'log_response',
+            'log_error',
         ]
 
 
 class APIMonitorListSerializer(APIMonitorSerializer):
     success_rate = serializers.DecimalField(None, decimal_places=1)
     avg_response_time = serializers.IntegerField()
-    success_rate_history = APIMonitorSuccessRateHistorySerializer(many=True)
+    success_rate_history = APIMonitorDetailSuccessRateSerializer(many=True)
     last_result = APIMonitorResultSerializer()
 
     class Meta:

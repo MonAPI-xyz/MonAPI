@@ -1,4 +1,5 @@
-from django.test import TestCase
+import os
+from django.test import TransactionTestCase
 from django.conf import settings
 from django.utils import timezone
 from django.core.management import call_command
@@ -8,6 +9,7 @@ from io import StringIO
 from datetime import datetime
 import pytz
 import requests
+import time
 
 from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, APIMonitorResult
 
@@ -26,7 +28,7 @@ def mocked_request_get_exception(*args, **kwargs):
     raise requests.exceptions.Timeout("Request timed out.")
 
 
-class CronManagementCommand(TestCase):
+class CronManagementCommand(TransactionTestCase):
     local_timezone = pytz.timezone(settings.TIME_ZONE)
     mock_current_time = local_timezone.localize(datetime(2022,9,20,10))
     
@@ -37,27 +39,46 @@ class CronManagementCommand(TestCase):
     
     def call_command(self, *args, **kwargs):
         out = StringIO()
-        call_command(
-            "run_cron",
-            *args,
-            stdout=out,
-            stderr=StringIO(),
-            **kwargs,
-        )
+        call_command("run_cron", *args, stdout=out, stderr=StringIO(), **kwargs)
         return out.getvalue()
     
-    # Mock time sleep to interrupt on each iteration
-    @patch("time.sleep", side_effect=InterruptedError)
+    # Mock interrupt
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     def test_when_not_exists_api_monitor_then_no_change(self, *args):
         try:
             self.call_command()
         except InterruptedError:
             pass
+        time.sleep(0.1)
         
         result = APIMonitorResult.objects.count()
         self.assertEqual(result, 0)
         
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    def test_when_thread_environment_config_invalid_then_use_default(self, *args):
+        os.environ['CRON_THREAD_COUNT'] = 'invalid type'
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        
+        result = APIMonitorResult.objects.count()
+        self.assertEqual(result, 0)
+        del os.environ['CRON_THREAD_COUNT']
+        
     @patch("time.sleep", side_effect=InterruptedError)
+    def test_when_mock_time_sleep_then_interrupt_on_sleep(self, *args):
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+
+        result = APIMonitorResult.objects.count()
+        self.assertEqual(result, 0)
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     def test_when_result_exists_in_given_interval_then_continue(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
         monitor = APIMonitor.objects.create(
@@ -72,11 +93,9 @@ class CronManagementCommand(TestCase):
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour,
-            minute=self.mock_current_time.minute,
             response_time=10,
             success=True,
+            status_code=200,
             log_response='resp',
             log_error='error',
         )
@@ -85,12 +104,12 @@ class CronManagementCommand(TestCase):
             self.call_command()
         except InterruptedError:
             pass
-        
-        
+        time.sleep(0.1)
+
         count = APIMonitorResult.objects.count()
         self.assertEqual(count, 1)
         
-    @patch("time.sleep", side_effect=InterruptedError)
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.get", mocked_request_get)
     def test_when_result_not_exists_in_given_interval_and_empty_body_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -119,18 +138,16 @@ class CronManagementCommand(TestCase):
             self.call_command()
         except InterruptedError:
             pass
-        
+        time.sleep(0.1)
+
         result = APIMonitorResult.objects.all()
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].date, self.mock_current_time.date())
-        self.assertEqual(result[0].hour, self.mock_current_time.hour)
-        self.assertEqual(result[0].minute, self.mock_current_time.minute)
         self.assertEqual(result[0].success, True)
         self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
         self.assertEqual(result[0].log_error, '')
         
         
-    @patch("time.sleep", side_effect=InterruptedError)
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.get", mocked_request_get)
     def test_when_result_not_exists_in_given_interval_and_form_body_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -165,18 +182,16 @@ class CronManagementCommand(TestCase):
             self.call_command()
         except InterruptedError:
             pass
-        
+        time.sleep(0.1)
+
         result = APIMonitorResult.objects.all()
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].date, self.mock_current_time.date())
-        self.assertEqual(result[0].hour, self.mock_current_time.hour)
-        self.assertEqual(result[0].minute, self.mock_current_time.minute)
         self.assertEqual(result[0].success, True)
         self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
         self.assertEqual(result[0].log_error, '')
         
         
-    @patch("time.sleep", side_effect=InterruptedError)
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.get", mocked_request_get)
     def test_when_result_not_exists_in_given_interval_and_raw_body_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -210,18 +225,16 @@ class CronManagementCommand(TestCase):
             self.call_command()
         except InterruptedError:
             pass
-        
+        time.sleep(0.1)
+
         result = APIMonitorResult.objects.all()
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].date, self.mock_current_time.date())
-        self.assertEqual(result[0].hour, self.mock_current_time.hour)
-        self.assertEqual(result[0].minute, self.mock_current_time.minute)
         self.assertEqual(result[0].success, True)
         self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
         self.assertEqual(result[0].log_error, '')
         
         
-    @patch("time.sleep", side_effect=InterruptedError)
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.get", mocked_request_get)
     def test_when_result_not_exists_in_given_interval_and_raw_body_not_exists_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -250,18 +263,16 @@ class CronManagementCommand(TestCase):
             self.call_command()
         except InterruptedError:
             pass
-        
+        time.sleep(0.1)
+
         result = APIMonitorResult.objects.all()
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].date, self.mock_current_time.date())
-        self.assertEqual(result[0].hour, self.mock_current_time.hour)
-        self.assertEqual(result[0].minute, self.mock_current_time.minute)
         self.assertEqual(result[0].success, True)
         self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
         self.assertEqual(result[0].log_error, '')
         
         
-    @patch("time.sleep", side_effect=InterruptedError)
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.get", mocked_request_get_exception)
     def test_when_result_not_exists_in_given_interval_and_error_exception_then_log_exception(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -290,18 +301,16 @@ class CronManagementCommand(TestCase):
             self.call_command()
         except InterruptedError:
             pass
-        
+        time.sleep(0.1)
+
         result = APIMonitorResult.objects.all()
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].date, self.mock_current_time.date())
-        self.assertEqual(result[0].hour, self.mock_current_time.hour)
-        self.assertEqual(result[0].minute, self.mock_current_time.minute)
         self.assertEqual(result[0].success, False)
         self.assertEqual(result[0].log_response, "")
         self.assertEqual(result[0].log_error, 'Request timed out.')
         
            
-    @patch("time.sleep", side_effect=InterruptedError)
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.post", mocked_request_get)
     def test_when_method_post_and_result_not_exists_in_given_interval_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -330,18 +339,16 @@ class CronManagementCommand(TestCase):
             self.call_command()
         except InterruptedError:
             pass
-        
+        time.sleep(0.1)
+
         result = APIMonitorResult.objects.all()
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].date, self.mock_current_time.date())
-        self.assertEqual(result[0].hour, self.mock_current_time.hour)
-        self.assertEqual(result[0].minute, self.mock_current_time.minute)
         self.assertEqual(result[0].success, True)
         self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
         self.assertEqual(result[0].log_error, '')
         
         
-    @patch("time.sleep", side_effect=InterruptedError)
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.patch", mocked_request_get)
     def test_when_method_patch_and_result_not_exists_in_given_interval_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -370,18 +377,16 @@ class CronManagementCommand(TestCase):
             self.call_command()
         except InterruptedError:
             pass
-        
+        time.sleep(0.1)
+
         result = APIMonitorResult.objects.all()
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].date, self.mock_current_time.date())
-        self.assertEqual(result[0].hour, self.mock_current_time.hour)
-        self.assertEqual(result[0].minute, self.mock_current_time.minute)
         self.assertEqual(result[0].success, True)
         self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
         self.assertEqual(result[0].log_error, '')
         
         
-    @patch("time.sleep", side_effect=InterruptedError)
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.put", mocked_request_get)
     def test_when_method_put_and_result_not_exists_in_given_interval_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -410,18 +415,16 @@ class CronManagementCommand(TestCase):
             self.call_command()
         except InterruptedError:
             pass
-        
+        time.sleep(0.1)
+
         result = APIMonitorResult.objects.all()
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].date, self.mock_current_time.date())
-        self.assertEqual(result[0].hour, self.mock_current_time.hour)
-        self.assertEqual(result[0].minute, self.mock_current_time.minute)
         self.assertEqual(result[0].success, True)
         self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
         self.assertEqual(result[0].log_error, '')
         
         
-    @patch("time.sleep", side_effect=InterruptedError)
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.delete", mocked_request_get)
     def test_when_method_delete_and_result_not_exists_in_given_interval_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -450,12 +453,10 @@ class CronManagementCommand(TestCase):
             self.call_command()
         except InterruptedError:
             pass
-        
+        time.sleep(0.1)
+
         result = APIMonitorResult.objects.all()
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].date, self.mock_current_time.date())
-        self.assertEqual(result[0].hour, self.mock_current_time.hour)
-        self.assertEqual(result[0].minute, self.mock_current_time.minute)
         self.assertEqual(result[0].success, True)
         self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
         self.assertEqual(result[0].log_error, '')
