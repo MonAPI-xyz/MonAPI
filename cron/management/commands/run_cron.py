@@ -28,6 +28,7 @@ class Command(BaseCommand):
             except queue.Empty:
                 if self.stop_signal.is_set():
                     return None
+            time.sleep(0.2)
     
     def worker(self):
         while True:
@@ -135,16 +136,14 @@ class Command(BaseCommand):
         
         try:
             while True:
-                current_run_time = timezone.now()
-                next_run_time = current_run_time + timedelta(seconds=60)
-                
                 api_monitors = APIMonitor.objects.all()
                 for monitor in api_monitors:
-                    result_filter_time = current_run_time - timedelta(seconds=schedule_in_seconds[monitor.schedule])
+                    # Minus 1 second adjustment for python process
+                    result_filter_time = timezone.now() - timedelta(seconds=schedule_in_seconds[monitor.schedule]-1)
                     
                     last_result = APIMonitorResult.objects.filter(
                         monitor=monitor, 
-                        execution_time__gte=result_filter_time
+                        execution_time__gt=result_filter_time
                     ).exists()
                     
                     if last_result:
@@ -154,8 +153,7 @@ class Command(BaseCommand):
                     
                 # Add delay before next check
                 mock_cron_interrupt()
-                sleep_in_seconds = (next_run_time - timezone.now()).seconds
-                time.sleep(sleep_in_seconds)  
+                time.sleep(1)  
         except BaseException as e:
             # Gracefully shutdown thread worker
             self.q.join()
