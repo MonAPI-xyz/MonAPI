@@ -1,4 +1,5 @@
 import pytz
+import json
 from datetime import datetime
 
 from django.conf import settings
@@ -35,7 +36,7 @@ class ListErrorLogs(APITestCase):
 
     response = self.client.get(self.url, format='json', **header)
     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    self.assertEqual(response.data, [])
+    self.assertEqual(response.data, {"count": 0, "next": None, "previous": None, "results": []})
   
   def test_when_authenticated_and_data_are_exists_then_view_error_logs_list_success(self):
     # Create dummy user and authenticate
@@ -78,7 +79,8 @@ class ListErrorLogs(APITestCase):
 
     response = self.client.get(self.url, format='json', **header)
     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    self.assertEqual(response.data, [
+    self.assertEqual(response.data['count'], 2)
+    self.assertEqual(response.data['results'], [
       {
         "id": 1,
         "monitor": {
