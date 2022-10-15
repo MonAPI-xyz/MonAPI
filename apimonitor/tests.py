@@ -185,9 +185,7 @@ class StatsAPIMonitor(APITestCase):
         APIMonitorResult.objects.create(
             monitor=monitor,
             execution_time=self.mock_current_time,
-            date=self.mock_current_time.date(),
-            hour=self.mock_current_time.hour,
-            minute=self.mock_current_time.minute,
+            status_code=200,
             response_time=100,
             success=True,
             log_response='{}'

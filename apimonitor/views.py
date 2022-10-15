@@ -6,13 +6,14 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
 
 from apimonitor.models import (APIMonitor, APIMonitorResult, APIMonitorQueryParam,
                                APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody)
 from apimonitor.serializers import (APIMonitorSerializer, APIMonitorListSerializer,
                                     APIMonitorQueryParamSerializer, APIMonitorHeaderSerializer,
                                     APIMonitorBodyFormSerializer, APIMonitorRawBodySerializer,
-                                    APIMonitorRetrieveSerializer,)
+                                    APIMonitorRetrieveSerializer, APIMonitorDashboardSerializer)
 
 
 class APIMonitorViewSet(mixins.ListModelMixin,
@@ -242,4 +243,53 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             monitor.last_result = last_result
        
         serializer = APIMonitorListSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False,methods=["GET"])
+    def stats(self, request):
+
+        queryset = self.filter_queryset(self.get_queryset())
+    
+        response_time= []
+        success_rate = []
+
+        last_chosen_period = timezone.now() - timedelta(hours=24)
+        for _ in range(24):
+            start_time = last_chosen_period
+            end_time = last_chosen_period+timedelta(hours=1)
+            avg_response_time = APIMonitorResult.objects \
+                .filter(monitor__user=request.user, execution_time__gte=start_time, execution_time__lte=end_time) \
+                .aggregate(avg=Avg('response_time'))
+
+            avg = 0
+
+            if  avg_response_time["avg"]!=None:
+                avg = avg_response_time['avg']
+
+            response_time.append({
+                "start_time": start_time,
+                "end_time" : end_time,
+                "avg": avg
+            })
+
+            # Average success rate
+            success_count = APIMonitorResult.objects \
+                .filter(monitor__user=request.user, execution_time__gte=start_time, execution_time__lte=end_time) \
+                .aggregate(
+                    s=Count('success', filter=Q(success=True)), 
+                    f=Count('success', filter=Q(success=False)),
+                    total=Count('pk'),
+                )
+
+            success_rate.append({
+                "start_time": start_time,
+                "end_time" : end_time,
+                "success": success_count['s'],
+                "failed" : success_count['f']
+            })
+            last_chosen_period = last_chosen_period+timedelta(hours=1)
+
+        queryset.success_rate = success_rate
+        queryset.response_time = response_time
+        serializer = APIMonitorDashboardSerializer(queryset)
         return Response(serializer.data)
