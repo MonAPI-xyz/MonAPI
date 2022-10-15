@@ -3,7 +3,6 @@ from rest_framework import serializers
 from apimonitor.models import APIMonitor, APIMonitorQueryParam, APIMonitorHeader, APIMonitorRawBody, \
     APIMonitorResult
 
-
 class APIMonitorQueryParamSerializer(serializers.ModelSerializer):
     class Meta:
         model = APIMonitorQueryParam
@@ -121,6 +120,10 @@ class APIMonitorListSerializer(APIMonitorSerializer):
             'success_rate_history',
             'last_result',
         ]
+
+class APIMonitorDashboardSerializer(serializers.Serializer):
+    success_rate = APIMonitorDetailSuccessRateSerializer(many=True)
+    response_time = APIMonitorDetailResponseTimeSerializer(many=True)
 
 
 class APIMonitorRetrieveSerializer(APIMonitorSerializer):
