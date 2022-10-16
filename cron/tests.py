@@ -23,6 +23,10 @@ class MockResponse:
 def mocked_request_get(*args, **kwargs):
     return MockResponse("{\"key\": \"value\"}", 200)
 
+def mocked_request_get_sleep(*args, **kwargs):
+    time.sleep(3)
+    return MockResponse("{\"key\": \"value\"}", 200)
+
 
 def mocked_request_get_exception(*args, **kwargs):
     raise requests.exceptions.Timeout("Request timed out.")
@@ -139,6 +143,46 @@ class CronManagementCommand(TransactionTestCase):
         except InterruptedError:
             pass
         time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, True)
+        self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
+        self.assertEqual(result[0].log_error, '')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt")
+    @patch("requests.get", mocked_request_get_sleep)
+    def test_when_result_not_exists_in_given_interval_and_checked_twice_then_run_only_once(self, mock_cron, *args):
+        mock_cron.side_effect = [None, InterruptedError]
+        
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorHeader.objects.create(
+            monitor=monitor,
+            key='header key',
+            value='header value',
+        )
+        
+        APIMonitorQueryParam.objects.create(
+            monitor=monitor,
+            key='query key',
+            value='query value',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        
+        time.sleep(4)
 
         result = APIMonitorResult.objects.all()
         self.assertEqual(len(result), 1)
