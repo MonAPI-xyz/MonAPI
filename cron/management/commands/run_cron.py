@@ -108,8 +108,8 @@ class Command(BaseCommand):
                 )
                 print(f"[{timezone.now()}] Done run cron for monitor id:{monitor_id}")
                 self.q.task_done()
-            except:
-                pass
+            except Exception as e:
+                print(e)
 
     def handle(self, *args, **kwargs):
         # Run consumer worker
