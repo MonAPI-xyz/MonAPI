@@ -78,9 +78,7 @@ class Command(BaseCommand):
             text = text.replace(match, value)
         return text
             
-    def run_api_monitor_request(self, monitor_id, monitor_history=None):
-        if monitor_history == None:
-            monitor_history = []
+    def run_api_monitor_request(self, monitor_id, monitor_history):
         monitor_history.append(monitor_id)
         
         monitor = APIMonitor.objects.get(id=monitor_id)
