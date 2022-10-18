@@ -55,16 +55,21 @@ class APIMonitorBodyForm(models.Model):
 
 
 class APIMonitorRawBody(models.Model):
-    monitor = models.ForeignKey(APIMonitor, on_delete=models.CASCADE, related_name='raw_body')
+    monitor = models.OneToOneField(APIMonitor, on_delete=models.CASCADE, related_name='raw_body')
     body = models.TextField()
 
 
 class APIMonitorResult(models.Model):
     monitor = models.ForeignKey(APIMonitor, on_delete=models.CASCADE, related_name='results')
     execution_time = models.DateTimeField()
-    date = models.DateField()
-    hour = models.IntegerField()
-    minute = models.IntegerField()
     response_time = models.IntegerField() # in miliseconds
     success = models.BooleanField()
+    status_code = models.IntegerField()
     log_response = models.TextField()
+    log_error = models.TextField()
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['monitor', 'execution_time'], name='result_time_index'),
+            models.Index(fields=['monitor', 'success'], name='result_success_index'),
+        ]

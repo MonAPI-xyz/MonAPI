@@ -14,6 +14,11 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 import os
+import sys
+
+
+# Testing flag
+TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -59,10 +64,12 @@ INSTALLED_APPS = [
     
     # App module
     'apimonitor',
+    'cron',
     'logout',
     'register',
     'password_validators',
     'login',
+    'error_logs',
 ]
 
 MIDDLEWARE = [
@@ -82,7 +89,9 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 
 if os.getenv('PRODUCTION', '') == 'True':
@@ -95,7 +104,9 @@ if os.getenv('PRODUCTION', '') == 'True':
         ],
         'DEFAULT_RENDERER_CLASSES': (
             'rest_framework.renderers.JSONRenderer',
-        )
+        ),
+        'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+        'PAGE_SIZE': 10,
     }
 
 ROOT_URLCONF = 'monapi.urls'
@@ -126,10 +137,24 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
 }
 
+# Database for testing
+#  Use same db on main db and testing db to 
+#  support threading unit test
+if TESTING: 
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME':  BASE_DIR / 'test.db.sqlite3',
+            'TEST': {
+                'NAME': BASE_DIR / 'test.db.sqlite3'
+            }
+        },
+    }
 
+# Database for production
 if os.getenv('PRODUCTION') == 'True':
     DATABASES = {
         'default': {

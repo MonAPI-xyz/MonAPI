@@ -28,4 +28,5 @@ urlpatterns = [
     path('logout/', include('logout.urls')),
     path('monitor/', include('apimonitor.urls')),
     path('login/', include('login.urls')),
+    path('error-logs/', include('error_logs.urls')),
 ]
