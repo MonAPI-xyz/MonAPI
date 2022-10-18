@@ -41,7 +41,7 @@ class Command(BaseCommand):
         if not isinstance(source, dict):
             return False
         
-        array_idx = re.findall("\[[0-9]\]$", current_key)
+        array_idx = re.findall("\[\d\]$", current_key)
         if len(array_idx) == 1:
             current_key = current_key.replace(array_idx[0], '')
             if current_key not in source:
@@ -78,9 +78,12 @@ class Command(BaseCommand):
             text = text.replace(match, value)
         return text
             
-    def run_api_monitor_request(self, monitor_id, monitor_history=[]):
-        monitor = APIMonitor.objects.get(id=monitor_id)
+    def run_api_monitor_request(self, monitor_id, monitor_history=None):
+        if monitor_history == None:
+            monitor_history = []
         monitor_history.append(monitor_id)
+        
+        monitor = APIMonitor.objects.get(id=monitor_id)
         previous_json = None
         result = APIMonitorResult(
             monitor=monitor,
