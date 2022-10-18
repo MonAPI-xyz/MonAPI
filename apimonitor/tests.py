@@ -230,7 +230,6 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(response.data, {
             "detail": "Authentication credentials were not provided."
         })
-
     def test_when_authenticated_and_empty_monitor_then_return_success_empty_monitor(self):
         # Create dummy user and authenticate
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -246,7 +245,6 @@ class ListAPIMonitor(APITestCase):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
         token = Token.objects.create(user=user)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
-
         monitor = APIMonitor.objects.create(
             user=user,
             name='Test Monitor',
@@ -255,25 +253,21 @@ class ListAPIMonitor(APITestCase):
             schedule='10MIN',
             body_type='FORM',
         )
-
         APIMonitorQueryParam.objects.create(
             monitor=monitor,
             key='Test Key Query',
             value='Test Value Query',
         )
-
         APIMonitorHeader.objects.create(
             monitor=monitor,
             key='Test Key Header',
             value='Test Value Header',
         )
-
         APIMonitorBodyForm.objects.create(
             monitor=monitor,
             key='Test Key Body',
             value='Test Value Body',
         )
-
         APIMonitorRawBody.objects.create(
             monitor=monitor,
             body='Test Body',
@@ -514,13 +508,11 @@ class ListAPIMonitor(APITestCase):
                 "url": "Test Path"
             }
         ])
-
     def test_when_authenticated_and_empty_monitor_result_then_return_one_hunderd_success_rate(self):
         # Create dummy user and authenticate
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
         token = Token.objects.create(user=user)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
-
         monitor = APIMonitor.objects.create(
             user=user,
             name='Test Monitor',
@@ -529,30 +521,25 @@ class ListAPIMonitor(APITestCase):
             schedule='10MIN',
             body_type='FORM',
         )
-
         APIMonitorQueryParam.objects.create(
             monitor=monitor,
             key='Test Key Query',
             value='Test Value Query',
         )
-
         APIMonitorHeader.objects.create(
             monitor=monitor,
             key='Test Key Header',
             value='Test Value Header',
         )
-
         APIMonitorBodyForm.objects.create(
             monitor=monitor,
             key='Test Key Body',
             value='Test Value Body',
         )
-
         APIMonitorRawBody.objects.create(
             monitor=monitor,
             body='Test Body',
         )
-
         response = self.client.get(self.test_url, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [
