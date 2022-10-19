@@ -862,7 +862,7 @@ class CronManagementCommand(TransactionTestCase):
             url='https://monapinonjson.xyz',
             schedule='60MIN',
             body_type='RAW',
-            assetion_type='TEXT',
+            assertion_type='TEXT',
             assertion_value='',
         )
         
@@ -890,7 +890,7 @@ class CronManagementCommand(TransactionTestCase):
             url='https://monapinonjson.xyz',
             schedule='60MIN',
             body_type='RAW',
-            assetion_type='JSON',
+            assertion_type='JSON',
             assertion_value='{\"key\": \"value\"}',
         )
         
@@ -918,7 +918,7 @@ class CronManagementCommand(TransactionTestCase):
             url='https://monapi.xyz',
             schedule='60MIN',
             body_type='RAW',
-            assetion_type='JSON',
+            assertion_type='JSON',
             assertion_value='Invalid JSON',
         )
         
@@ -946,7 +946,7 @@ class CronManagementCommand(TransactionTestCase):
             url='https://monapi.xyz',
             schedule='60MIN',
             body_type='RAW',
-            assetion_type='JSON',
+            assertion_type='JSON',
             assertion_value='{\"key\": \"value2\"}',
         )
         
@@ -974,7 +974,7 @@ class CronManagementCommand(TransactionTestCase):
             url='https://monapi.xyz',
             schedule='60MIN',
             body_type='RAW',
-            assetion_type='JSON',
+            assertion_type='JSON',
             assertion_value='{\"key\": \"value2\"}',
             is_assert_json_schema_only=True,
         )
@@ -1003,7 +1003,7 @@ class CronManagementCommand(TransactionTestCase):
             url='https://monapi.xyz',
             schedule='60MIN',
             body_type='RAW',
-            assetion_type='JSON',
+            assertion_type='JSON',
             assertion_value='{\"key\": \"value2\"}',
         )
         
@@ -1036,7 +1036,7 @@ class CronManagementCommand(TransactionTestCase):
             url='https://monapi.xyz',
             schedule='60MIN',
             body_type='RAW',
-            assetion_type='JSON',
+            assertion_type='JSON',
             assertion_value='{\"key\": 1}',
         )
         
@@ -1064,7 +1064,7 @@ class CronManagementCommand(TransactionTestCase):
             url='https://monapi.xyz',
             schedule='60MIN',
             body_type='RAW',
-            assetion_type='JSON',
+            assertion_type='JSON',
             assertion_value='{"key2": "value"}',
         )
         
@@ -1092,7 +1092,7 @@ class CronManagementCommand(TransactionTestCase):
             url='https://mockiterable.xyz',
             schedule='60MIN',
             body_type='RAW',
-            assetion_type='JSON',
+            assertion_type='JSON',
             assertion_value='{"key":[] , "key2":[{"key":"value"}]}',
         )
         
@@ -1121,7 +1121,7 @@ class CronManagementCommand(TransactionTestCase):
             url='https://mockiterable.xyz',
             schedule='60MIN',
             body_type='RAW',
-            assetion_type='JSON',
+            assertion_type='JSON',
             assertion_value='{"key":[] , "key2":[{"key":"value"}]}',
         )
         
