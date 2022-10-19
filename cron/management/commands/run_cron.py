@@ -243,11 +243,13 @@ class Command(BaseCommand):
         if resp is not None:
             if resp.status_code >= 200 and resp.status_code <= 299:
                 result.success = True
+            else:
+                result.log_error += 'Error code not in acceptable range 2xx'
             result.log_response = resp.content.decode('utf-8', errors='ignore')
             result.status_code = resp.status_code
             
-        # Run assertions only on root monitor
-        if len(monitor_history) == 1:
+        # Run assertions only when successful and only on root monitor
+        if result.success and len(monitor_history) == 1:
             try:
                 self.run_api_monitor_assertions(monitor.id, result.log_response)
             except AssertionError as e:

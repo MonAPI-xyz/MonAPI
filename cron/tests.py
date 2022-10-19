@@ -24,6 +24,8 @@ class MockResponse:
 def mocked_request_get(*args, **kwargs):
     if args[0] == 'https://monapitestprev.xyz':
         return MockResponse('{"testing": "testing value"}', 200)
+    elif args[0] == 'https://mockerrorstatuscode.xyz':
+        return MockResponse('{"testing": "testing value"}', 400)
     elif args[0] == 'https://monapinonjson.xyz':
         return MockResponse('NonJSON response', 200)
     elif args[0] == 'https://mockiterable.xyz':
@@ -557,6 +559,43 @@ class CronManagementCommand(TransactionTestCase):
         self.assertEqual(result[0].success, True)
         self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
         self.assertEqual(result[0].log_error, '')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.delete", mocked_request_get)
+    def test_when_status_code_not_2xx_then_test_success_false(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='DELETE',
+            url='https://mockerrorstatuscode.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+        )
+        
+        APIMonitorHeader.objects.create(
+            monitor=monitor,
+            key='header key',
+            value='header value',
+        )
+        
+        APIMonitorQueryParam.objects.create(
+            monitor=monitor,
+            key='query key',
+            value='query value',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, False)
+        self.assertEqual(result[0].log_response, "{\"testing\": \"testing value\"}")
+        self.assertEqual(result[0].log_error, 'Error code not in acceptable range 2xx')
         
     @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.get", mocked_request_get)
