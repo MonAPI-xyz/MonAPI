@@ -1,5 +1,5 @@
 import os
-from django.test import TransactionTestCase
+from django.test import TestCase, TransactionTestCase
 from django.conf import settings
 from django.utils import timezone
 from django.core.management import call_command
@@ -12,6 +12,7 @@ import requests
 import time
 
 from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, APIMonitorResult
+from cron.management.commands.run_cron import Command
 
 
 class MockResponse:
@@ -21,6 +22,10 @@ class MockResponse:
 
 
 def mocked_request_get(*args, **kwargs):
+    if args[0] == 'https://monapitestprev.xyz':
+        return MockResponse('{"testing": "testing value"}', 200)
+    elif args[0] == 'https://monapinonjson.xyz':
+        return MockResponse('NonJSON response', 200)
     return MockResponse("{\"key\": \"value\"}", 200)
 
 def mocked_request_get_sleep(*args, **kwargs):
@@ -30,6 +35,52 @@ def mocked_request_get_sleep(*args, **kwargs):
 
 def mocked_request_get_exception(*args, **kwargs):
     raise requests.exceptions.Timeout("Request timed out.")
+
+class CronAccessDictWithKey(TestCase):
+    def test_when_key_exists_then_replace_string(self):
+        command = Command()
+        res = command.replace_string_with_json_result("Token {{test}}", {"test": "value"})
+        self.assertEqual(res, "Token value")
+        
+    def test_when_key_not_exists_then_raise_key_error(self):
+        command = Command()
+        with self.assertRaises(KeyError) as context:
+            res = command.replace_string_with_json_result("Token {{not_exists_key}}", {"test": "value"})
+        
+        self.assertTrue('Value not found while accessing with key "not_exists_key"' in str(context.exception))
+        
+    def test_when_key_using_array_index_then_replace_with_value(self):
+        command = Command()
+        res = command.replace_string_with_json_result("Token {{testarray[0]}}", {"testarray": ["value"]})
+        self.assertEqual(res, "Token value")
+        
+    def test_when_nested_array_key_not_exists_then_raise_key_error(self):
+        command = Command()
+        with self.assertRaises(KeyError) as context:
+            res = command.replace_string_with_json_result("Token {{testarray.testarray3[0]}}", {"testarray": {"testarray2": ["value"]}})
+            
+        self.assertTrue('Value not found while accessing with key "testarray.testarray3[0]"' in str(context.exception))
+        
+    def test_when_nested_array_not_list_type_then_raise_key_error(self):
+        command = Command()
+        with self.assertRaises(KeyError) as context:
+            res = command.replace_string_with_json_result("Token {{testarray.testarray2[0]}}", {"testarray": {"testarray2": "value"}})
+            
+        self.assertTrue('Value not found while accessing with key "testarray.testarray2[0]"' in str(context.exception))
+        
+    def test_when_nested_array_index_out_of_range_then_raise_key_error(self):
+        command = Command()
+        with self.assertRaises(KeyError) as context:
+            res = command.replace_string_with_json_result("Token {{testarray.testarray2[1]}}", {"testarray": {"testarray2": ["value"]}})
+            
+        self.assertTrue('Value not found while accessing with key "testarray.testarray2[1]"' in str(context.exception))
+        
+    def test_when_nested_not_found_then_raise_key_error(self):
+        command = Command()
+        with self.assertRaises(KeyError) as context:
+            res = command.replace_string_with_json_result("Token {{testarray.testarray2[0].testarray3}}", {"testarray": {"testarray2": ["value"]}})
+            
+        self.assertTrue('Value not found while accessing with key "testarray.testarray2[0].testarray3"' in str(context.exception))
 
 
 class CronManagementCommand(TransactionTestCase):
@@ -504,4 +555,296 @@ class CronManagementCommand(TransactionTestCase):
         self.assertEqual(result[0].success, True)
         self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
         self.assertEqual(result[0].log_error, '')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_with_previous_step_then_run_previous_step_first(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        monitor_prev = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapitestprev.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor_prev,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=True,
+            status_code=200,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            previous_step=monitor_prev,
+        )
+        
+        APIMonitorHeader.objects.create(
+            monitor=monitor,
+            key='header key',
+            value='header value',
+        )
+        
+        APIMonitorQueryParam.objects.create(
+            monitor=monitor,
+            key='query key',
+            value='{{testing}}',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[1].success, True)
+        self.assertEqual(result[1].log_response, "{\"key\": \"value\"}")
+        self.assertEqual(result[1].log_error, '')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_with_previous_step_over_10_monitor_then_return_error(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        monitor_prev = None
+        for i in range(11):
+            monitor_prev = APIMonitor.objects.create(
+                user=user,
+                name='apimonitor',
+                method='GET',
+                url='https://monapitestprev.xyz',
+                schedule='60MIN',
+                body_type='RAW',
+                previous_step=monitor_prev,
+            )
+            
+            APIMonitorResult.objects.create(
+                monitor=monitor_prev,
+                execution_time=self.mock_current_time,
+                response_time=10,
+                success=True,
+                status_code=200,
+                log_response='resp',
+                log_error='error',
+            )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            previous_step=monitor_prev,
+        )
+        
+        APIMonitorHeader.objects.create(
+            monitor=monitor,
+            key='header key',
+            value='header value',
+        )
+        
+        APIMonitorQueryParam.objects.create(
+            monitor=monitor,
+            key='query key',
+            value='{{testing}}',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 12)
+        self.assertEqual(result[11].success, False)
+        self.assertEqual(result[11].log_response, "")
+        self.assertIn('Depth limit of previous step API monitor reached (maximum: 10)', result[11].log_error)
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_with_recursion_then_return_error(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        monitor_prev = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapitestprev.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor_prev,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=True,
+            status_code=200,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            previous_step=monitor_prev,
+        )
+        
+        monitor_prev.previous_step = monitor
+        monitor_prev.save()
+        
+        APIMonitorHeader.objects.create(
+            monitor=monitor,
+            key='header key',
+            value='header value',
+        )
+        
+        APIMonitorQueryParam.objects.create(
+            monitor=monitor,
+            key='query key',
+            value='{{testing}}',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[1].success, False)
+        self.assertEqual(result[1].log_response, "")
+        self.assertIn('Request aborted due to recursion of API monitor steps', result[1].log_error)
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_key_not_exists_then_return_error(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        monitor_prev = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapitestprev.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor_prev,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=True,
+            status_code=200,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            previous_step=monitor_prev,
+        )
+        
+        APIMonitorHeader.objects.create(
+            monitor=monitor,
+            key='header key',
+            value='header value',
+        )
+        
+        APIMonitorQueryParam.objects.create(
+            monitor=monitor,
+            key='query key',
+            value='{{testing.testing}}',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[1].success, False)
+        self.assertEqual(result[1].log_response, "{\"testing\": \"testing value\"}")
+        self.assertIn('Error while preparing API monitor params: \'Value not found while accessing with key "testing.testing"\'', result[1].log_error)
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_return_non_json_then_return_success(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        
+        monitor_prev = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapinonjson.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor_prev,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=True,
+            status_code=200,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapinonjson.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            previous_step=monitor_prev,
+        )
+
+        APIMonitorHeader.objects.create(
+            monitor=monitor,
+            key='header key',
+            value='header value',
+        )
+        
+        APIMonitorQueryParam.objects.create(
+            monitor=monitor,
+            key='query key',
+            value='query value',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[1].success, True)
+        self.assertEqual(result[1].log_response, "NonJSON response")
+        self.assertEqual(result[1].log_error, '')
         
