@@ -9,8 +9,9 @@ from datetime import timedelta
 
 from django.utils import timezone
 from django.core.management.base import BaseCommand
+from deepdiff import DeepDiff
 
-from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, APIMonitorResult
+from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, APIMonitorResult, AssertionExcludeKey
 
 # Mock this function to interrupt the cron function
 def mock_cron_interrupt():
@@ -77,6 +78,58 @@ class Command(BaseCommand):
                 raise KeyError(f"Value not found while accessing with key \"{key}\"")
             text = text.replace(match, value)
         return text
+
+    def run_api_monitor_assertions(self, monitor_id, response):
+        monitor = APIMonitor.objects.get(id=monitor_id)
+        if monitor.assertion_type == 'TEXT' and response != monitor.assertion_value:
+            raise AssertionError('Assertion text failed')
+        elif monitor.assertion_type == 'JSON':
+            try:
+                api_response = json.loads(response) 
+            except json.decoder.JSONDecodeError:
+                raise AssertionError('Failed to decode JSON api response')
+            
+            try:
+                assertion_value = json.loads(monitor.assertion_value)
+            except json.decoder.JSONDecodeError:
+                raise AssertionError('Failed to decode JSON monitor assertions value')
+            
+            # Assertion exclude keys
+            ddiff_exclude_path = []
+            exclude_keys = AssertionExcludeKey.objects.filter(monitor=monitor)
+            for key in exclude_keys:
+                key = key.exclude_key.split('.')
+                res_key = 'root'
+                for key_part in key:
+                    array_idx = re.findall("\[[\d]\]$", key_part)
+                    if len(array_idx) == 1:
+                        key_part = key_part.replace(array_idx[0], '')
+                        res_key += f"['{key_part}']{array_idx[0]}"
+                    else:
+                        res_key += f"['{key_part}']"
+                ddiff_exclude_path.append(res_key)
+            
+            ddiff = DeepDiff(assertion_value, api_response, exclude_paths=ddiff_exclude_path)
+            
+            diff_result = ""
+            if not monitor.is_assert_json_schema_only:
+                if 'type_changes' in ddiff:
+                    for k,v in ddiff['type_changes'].items():
+                        diff_result += f"Different type detected on {k}, expected \"{v['old_value']}\" ({v['old_type']}) but found \"{v['new_value']}\" ({v['new_type']})\n"
+                if 'values_changed' in ddiff:
+                    for k,v in ddiff['values_changed'].items():
+                        diff_result += f"Different value detected on {k}, expected \"{v['old_value']}\" but found \"{v['new_value']}\"\n"
+            if 'dictionary_item_added' in ddiff:
+                diff_result += f"New key detected with keys {ddiff['dictionary_item_added']}\n"
+            if 'dictionary_item_removed' in ddiff:
+                diff_result += f"Missing key detected with keys {ddiff['dictionary_item_removed']}\n"
+            if 'iterable_item_added' in ddiff:
+                diff_result += f"Found iterable item added with keys {ddiff['iterable_item_added'].keys()}\n"
+            if 'iterable_item_removed' in ddiff:
+                diff_result += f"Found iterable item removed with keys {ddiff['iterable_item_removed'].keys()}\n"
+
+            if diff_result != "":
+                raise AssertionError(diff_result.strip('\n'))
             
     def run_api_monitor_request(self, monitor_id, monitor_history):
         monitor_history.append(monitor_id)
@@ -190,9 +243,19 @@ class Command(BaseCommand):
         if resp is not None:
             if resp.status_code >= 200 and resp.status_code <= 299:
                 result.success = True
+            else:
+                result.log_error += 'Error code not in acceptable range 2xx'
             result.log_response = resp.content.decode('utf-8', errors='ignore')
             result.status_code = resp.status_code
             
+        # Run assertions only when successful and only on root monitor
+        if result.success and len(monitor_history) == 1:
+            try:
+                self.run_api_monitor_assertions(monitor.id, result.log_response)
+            except AssertionError as e:
+                result.success = False
+                result.log_error = str(e)
+                
         return result
     
     
