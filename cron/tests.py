@@ -11,7 +11,7 @@ import pytz
 import requests
 import time
 
-from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, APIMonitorResult
+from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, APIMonitorResult, AssertionExcludeKey
 from cron.management.commands.run_cron import Command
 
 
@@ -24,8 +24,12 @@ class MockResponse:
 def mocked_request_get(*args, **kwargs):
     if args[0] == 'https://monapitestprev.xyz':
         return MockResponse('{"testing": "testing value"}', 200)
+    elif args[0] == 'https://mockerrorstatuscode.xyz':
+        return MockResponse('{"testing": "testing value"}', 400)
     elif args[0] == 'https://monapinonjson.xyz':
         return MockResponse('NonJSON response', 200)
+    elif args[0] == 'https://mockiterable.xyz':
+        return MockResponse('{"key": [{"key":"value"}], "key2":[]}', 200)
     return MockResponse("{\"key\": \"value\"}", 200)
 
 def mocked_request_get_sleep(*args, **kwargs):
@@ -557,6 +561,43 @@ class CronManagementCommand(TransactionTestCase):
         self.assertEqual(result[0].log_error, '')
         
     @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.delete", mocked_request_get)
+    def test_when_status_code_not_2xx_then_test_success_false(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='DELETE',
+            url='https://mockerrorstatuscode.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+        )
+        
+        APIMonitorHeader.objects.create(
+            monitor=monitor,
+            key='header key',
+            value='header value',
+        )
+        
+        APIMonitorQueryParam.objects.create(
+            monitor=monitor,
+            key='query key',
+            value='query value',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, False)
+        self.assertEqual(result[0].log_response, "{\"testing\": \"testing value\"}")
+        self.assertEqual(result[0].log_error, 'Error code not in acceptable range 2xx')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_with_previous_step_then_run_previous_step_first(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -847,4 +888,302 @@ class CronManagementCommand(TransactionTestCase):
         self.assertEqual(result[1].success, True)
         self.assertEqual(result[1].log_response, "NonJSON response")
         self.assertEqual(result[1].log_error, '')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_assert_text_failure_then_error(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapinonjson.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            assertion_type='TEXT',
+            assertion_value='',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, False)
+        self.assertEqual(result[0].log_response, "NonJSON response")
+        self.assertEqual(result[0].log_error, 'Assertion text failed')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_assert_json_invalid_response_then_error(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapinonjson.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            assertion_type='JSON',
+            assertion_value='{\"key\": \"value\"}',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, False)
+        self.assertEqual(result[0].log_response, "NonJSON response")
+        self.assertEqual(result[0].log_error, 'Failed to decode JSON api response')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_assert_json_invalid_assert_value_then_error(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            assertion_type='JSON',
+            assertion_value='Invalid JSON',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, False)
+        self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
+        self.assertEqual(result[0].log_error, 'Failed to decode JSON monitor assertions value')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_assert_json_different_value_then_error(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            assertion_type='JSON',
+            assertion_value='{\"key\": \"value2\"}',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, False)
+        self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
+        self.assertEqual(result[0].log_error, 'Different value detected on root[\'key\'], expected "value2" but found "value"')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_assert_json_key_only_then_success(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            assertion_type='JSON',
+            assertion_value='{\"key\": \"value2\"}',
+            is_assert_json_schema_only=True,
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, True)
+        self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
+        self.assertEqual(result[0].log_error, '')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_assert_json_exclude_keys_then_success(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            assertion_type='JSON',
+            assertion_value='{\"key\": \"value2\"}',
+        )
+        
+        AssertionExcludeKey.objects.create(
+            monitor=monitor,
+            exclude_key='key',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, True)
+        self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
+        self.assertEqual(result[0].log_error, '')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_assert_json_different_type_then_error(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            assertion_type='JSON',
+            assertion_value='{\"key\": 1}',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, False)
+        self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
+        self.assertEqual(result[0].log_error, 'Different type detected on root[\'key\'], expected "1" (<class \'int\'>) but found "value" (<class \'str\'>)')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_assert_json_dict_add_remove_then_error(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            assertion_type='JSON',
+            assertion_value='{"key2": "value"}',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, False)
+        self.assertEqual(result[0].log_response, "{\"key\": \"value\"}")
+        self.assertEqual(result[0].log_error, 'New key detected with keys [root[\'key\']]\nMissing key detected with keys [root[\'key2\']]')
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_assert_json_iterable_add_remove_then_error(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://mockiterable.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            assertion_type='JSON',
+            assertion_value='{"key":[] , "key2":[{"key":"value"}]}',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, False)
+        self.assertEqual(result[0].log_response, '{"key": [{"key":"value"}], "key2":[]}')
+        self.assertEqual(result[0].log_error, 'Found iterable item added with keys dict_keys(["root[\'key\'][0]"])\nFound iterable item removed with keys dict_keys(["root[\'key2\'][0]"])')
+        
+        
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_assert_json_iterable_exclude_then_success(self, *args):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://mockiterable.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            assertion_type='JSON',
+            assertion_value='{"key":[] , "key2":[{"key":"value"}]}',
+        )
+        
+        AssertionExcludeKey.objects.create(
+            monitor=monitor,
+            exclude_key='key[0]',
+        )
+        
+        AssertionExcludeKey.objects.create(
+            monitor=monitor,
+            exclude_key='key2[0]',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, True)
+        self.assertEqual(result[0].log_response, '{"key": [{"key":"value"}], "key2":[]}')
+        self.assertEqual(result[0].log_error, '')
+        
         

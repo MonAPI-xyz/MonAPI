@@ -42,7 +42,7 @@ class APIMonitor(models.Model):
     schedule = models.CharField(max_length=64, choices=schedule_choices)
     body_type = models.CharField(max_length=16, choices=body_type_choices)
     previous_step = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True)
-    assetion_type = models.CharField(max_length=16, choices=assertion_type_choices, default='DISABLED')
+    assertion_type = models.CharField(max_length=16, choices=assertion_type_choices, default='DISABLED')
     assertion_value = models.TextField(blank=True)
     is_assert_json_schema_only = models.BooleanField(default=False)
     
