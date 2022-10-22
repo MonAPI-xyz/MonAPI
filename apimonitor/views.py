@@ -8,9 +8,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 
-from apimonitor.models import (APIMonitor, APIMonitorResult, APIMonitorQueryParam,
+from .models import (APIMonitor, APIMonitorResult, APIMonitorQueryParam,
                                APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody)
-from apimonitor.serializers import (APIMonitorSerializer, APIMonitorListSerializer,
+from .serializers import (APIMonitorSerializer, APIMonitorListSerializer,
                                     APIMonitorQueryParamSerializer, APIMonitorHeaderSerializer,
                                     APIMonitorBodyFormSerializer, APIMonitorRawBodySerializer,
                                     APIMonitorRetrieveSerializer, APIMonitorDashboardSerializer)
@@ -18,6 +18,7 @@ from apimonitor.serializers import (APIMonitorSerializer, APIMonitorListSerializ
 
 class APIMonitorViewSet(mixins.ListModelMixin,
                         mixins.CreateModelMixin,
+                        mixins.UpdateModelMixin,
                         mixins.DestroyModelMixin,
                         viewsets.GenericViewSet):
 
@@ -29,6 +30,76 @@ class APIMonitorViewSet(mixins.ListModelMixin,
     def get_queryset(self):
         queryset = APIMonitor.objects.filter(user=self.request.user)
         return queryset
+
+    # PBI-15-edit-api-monitor-backend
+    def update(self, request, *args, **kwargs):
+        monitor_data = {
+            'user': request.user,
+            'name': request.data.get('name'),
+            'method': request.data.get('method'),
+            'url': request.data.get('url'),
+            'schedule': request.data.get('schedule'),
+            'body_type': request.data.get('body_type')
+        }
+        api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
+        monitor_obj = APIMonitor.objects.get(pk=kwargs['pk'])
+        if (api_monitor_serializer.is_valid()):
+            # Saved
+            monitor_obj.name = monitor_data['name']
+            monitor_obj.method = monitor_data['method']
+            monitor_obj.url = monitor_data['url']
+            monitor_obj.schedule = monitor_data['schedule']
+            monitor_obj.body_type = monitor_data['body_type']
+            monitor_obj.save()
+
+            # Delete old objects
+            APIMonitorQueryParam.objects.filter(monitor=kwargs['pk']).delete()
+            APIMonitorHeader.objects.filter(monitor=kwargs['pk']).delete()
+            APIMonitorBodyForm.objects.filter(monitor=kwargs['pk']).delete()
+            APIMonitorRawBody.objects.filter(monitor=kwargs['pk']).delete()
+
+            # Create new query param
+            for i in range(len(request.data.get('query_params'))):
+                # Empty key or value will never reach backend, thanks Hugo
+                key = request.data.get('query_params')[i]['key']
+                value = request.data.get('query_params')[i]['value']
+                record = {
+                    "monitor": monitor_obj,
+                    "key": key,
+                    "value": value
+                }
+                APIMonitorQueryParam.objects.create(**record)
+
+            for i in range(len(request.data.get('headers'))):
+                key = request.data.get('headers')[i]['key']
+                value = request.data.get('headers')[i]['value']
+                record = {
+                    "monitor": monitor_obj,
+                    "key": key,
+                    "value": value
+                }
+                APIMonitorHeader.objects.create(**record)
+
+            if (monitor_data['body_type'] == "FORM"):
+                for i in range(len(request.data.get('body_form'))):
+                    key = request.data.get('body_form')[i]['key']
+                    value = request.data.get('body_form')[i]['value']
+                    record = {
+                        "monitor": monitor_obj,
+                        "key": key,
+                        "value": value
+                    }
+                    APIMonitorBodyForm.objects.create(**record)
+            elif (monitor_data['body_type'] == "RAW"):
+                record = {
+                    'monitor': monitor_obj,
+                    'body': request.data['raw_body']
+                }
+                APIMonitorRawBody.objects.create(**record)
+            serializer = APIMonitorSerializer(monitor_obj)
+            return Response(serializer.data)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
         monitor_data = {
