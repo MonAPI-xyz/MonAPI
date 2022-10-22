@@ -1832,7 +1832,6 @@ class ListAPIMonitor(APITestCase):
 
         received_json = {
             'name': monitor_value['name'],
-            'method': monitor_value['method'],
             'url': monitor_value['url'],
             'schedule': monitor_value['schedule'],
             'body_type': monitor_value['body_type'],
