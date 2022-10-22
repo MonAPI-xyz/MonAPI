@@ -59,7 +59,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             APIMonitorRawBody.objects.filter(monitor=kwargs['pk']).delete()
 
             # Create new query param
-            for i in range(len(request.data.get('query_params'))):
+            for i in range(len(request.data.get('query_params', []))):
                 # Empty key or value will never reach backend, thanks Hugo
                 key = request.data.get('query_params')[i]['key']
                 value = request.data.get('query_params')[i]['value']
@@ -70,7 +70,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                 }
                 APIMonitorQueryParam.objects.create(**record)
 
-            for i in range(len(request.data.get('headers'))):
+            for i in range(len(request.data.get('headers', []))):
                 key = request.data.get('headers')[i]['key']
                 value = request.data.get('headers')[i]['value']
                 record = {
@@ -81,7 +81,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                 APIMonitorHeader.objects.create(**record)
 
             if (monitor_data['body_type'] == "FORM"):
-                for i in range(len(request.data.get('body_form'))):
+                for i in range(len(request.data.get('body_form', []))):
                     key = request.data.get('body_form')[i]['key']
                     value = request.data.get('body_form')[i]['value']
                     record = {
