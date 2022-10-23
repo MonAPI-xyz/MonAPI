@@ -1265,6 +1265,141 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(APIMonitorBodyForm.objects.all().count(), 0)
         self.assertEqual(APIMonitorRawBody.objects.all().count(), 1)
 
+    def test_user_can_create_api_monitor_without_previous_step(self):
+            # Create a user object
+            user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+            token = Token.objects.create(user=user)
+            header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+            monitor_value = {
+                'user': 'test@test.com',
+                'name': 'Test Name',
+                'method': 'GET',
+                'url': 'Test Path',
+                'schedule': '10MIN',
+                'body_type': 'EMPTY',
+            }
+
+            # Expected JSON from frontend
+            received_json = {
+                'name': monitor_value['name'],
+                'method': monitor_value['method'],
+                'url': monitor_value['url'],
+                'schedule': monitor_value['schedule'],
+                'body_type': monitor_value['body_type'],
+            }
+
+            # Get path
+            create_new_monitor_test_path = reverse('api-monitor-list')
+            response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.assertEqual(APIMonitor.objects.all().count(), 1)
+            self.assertEqual(response.data,
+                {
+                    "id": 1,
+                    "name": "Test Name",
+                    "method": "GET",
+                    "url": "Test Path",
+                    "schedule": "10MIN",
+                    "body_type": "EMPTY",
+                    "query_params": [],
+                    "headers": [],
+                    "body_form": [],
+                    "raw_body": None,
+                    "previous_step_id": None
+                }
+            )
+            
+    def test_user_can_create_api_monitor_with_valid_previous_step(self):
+            # Create a user object
+            user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+            token = Token.objects.create(user=user)
+            header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+            monitor_value = {
+                'user': 'test@test.com',
+                'name': 'Test Monitor',
+                'method': 'GET',
+                'url': 'Test Path',
+                'schedule': '10MIN',
+                'previous_step_id': 1,
+                'body_type': 'EMPTY',
+            }
+
+            received_json_1 = {
+                'name': monitor_value['name'],
+                'method': monitor_value['method'],
+                'url': monitor_value['url'],
+                'schedule': monitor_value['schedule'],
+                'body_type': monitor_value['body_type'],
+            }
+
+            # Expected JSON from frontend
+            received_json_2 = {
+                'name': monitor_value['name'],
+                'method': monitor_value['method'],
+                'url': monitor_value['url'],
+                'schedule': monitor_value['schedule'],
+                'previous_step_id': monitor_value['previous_step_id'],
+                'body_type': monitor_value['body_type'],
+            }
+
+            # Get path
+            create_new_monitor_test_path = reverse('api-monitor-list')
+            self.client.post(create_new_monitor_test_path, data=received_json_1, format='json', **header)
+            response = self.client.post(create_new_monitor_test_path, data=received_json_2, format='json', **header)
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.assertEqual(APIMonitor.objects.all().count(), 2)
+            self.assertEqual(response.data,
+                {
+                    "id": 2,
+                    "name": "Test Monitor",
+                    "method": "GET",
+                    "url": "Test Path",
+                    "schedule": "10MIN",
+                    "body_type": "EMPTY",
+                    "query_params": [],
+                    "headers": [],
+                    "body_form": [],
+                    "raw_body": None,
+                    "previous_step_id": 1
+                }
+            )
+            
+                            
+    def test_user_can_create_api_monitor_with_invalid_previous_step(self):
+        # Create a user object
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'previous_step_id': -1,
+            'body_type': 'EMPTY',
+        }
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'previous_step_id': monitor_value['previous_step_id'],
+            'body_type': monitor_value['body_type'],
+        }
+
+        # Get path
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], "Please make sure your [previous step id] is valid!")
+        self.assertEqual(APIMonitor.objects.all().count(), 0)
+
     def test_bad_monitor_data_shouldnt_be_created(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
