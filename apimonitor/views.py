@@ -37,13 +37,20 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             'method': request.data.get('method'),
             'url': request.data.get('url'),
             'schedule': request.data.get('schedule'),
-            'body_type': request.data.get('body_type')
+            'body_type': request.data.get('body_type'),
+            'previous_step_id': request.data.get('previous_step_id'),
         }
         api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
         if api_monitor_serializer.is_valid():
-            monitor_obj = APIMonitor.objects.create(**monitor_data)
+            
             error_log = []
-            try:
+            try:    
+                if request.data.get('previous_step_id') == None or APIMonitor.objects.filter(id=request.data.get('previous_step_id')).exists():
+                    monitor_obj = APIMonitor.objects.create(**monitor_data)
+                else:
+                    error_log += ["Please make sure your [previous step id] is valid!"]
+                    return Response(data={"error": f"{error_log[0]}"}, status=status.HTTP_400_BAD_REQUEST)
+
                 if request.data.get('query_params'):
                     for key_value_pair in request.data.get('query_params'):
                         if 'key' in key_value_pair and 'value' in key_value_pair:

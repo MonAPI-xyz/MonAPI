@@ -64,7 +64,7 @@ class APIMonitorSerializer(serializers.ModelSerializer):
     headers = APIMonitorHeaderSerializer(many=True, required=False, allow_null=True)
     body_form = APIMonitorBodyFormSerializer(many=True, required=False, allow_null=True)
     raw_body = APIMonitorRawBodySerializer(required=False, allow_null=True)
-    
+    previous_step_id = serializers.PrimaryKeyRelatedField(read_only=True, many=False)
     class Meta:
         model = APIMonitor
         fields = [
@@ -78,6 +78,7 @@ class APIMonitorSerializer(serializers.ModelSerializer):
             'headers',
             'body_form',
             'raw_body',
+            'previous_step_id',
         ]
 
 
