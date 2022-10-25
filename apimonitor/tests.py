@@ -1478,6 +1478,8 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['error'], "['Please make sure your [body form] key and value are valid strings!']")
 
+
+class EditAPIMonitor(APITestCase):
     # PBI-15-edit-api-monitor-backend
     def test_user_can_edit_api_monitor_simple(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
