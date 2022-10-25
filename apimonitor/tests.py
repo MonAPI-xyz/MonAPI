@@ -4077,3 +4077,93 @@ class EditAPIMonitor(APITestCase):
         edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
         response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_user_can_edit_assertion_fields(self):
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+            "assertion_type": "JSON",
+            "assertion_value": "{\"test\":\"hao\"}",
+            "is_assert_json_schema_only": True,
+            "exclude_keys": [
+                {
+                    "key": "test"
+                }
+            ]
+        }
+
+        queryparam_value = [
+            {
+                'key': 'key1',
+                'value': 'value1',
+            },
+            {
+                'key': 'key2',
+                'value': 'value2'
+            }
+        ]
+        monitorheader_value = [{
+            'key': 'key3',
+            'value': 'value3'
+        }]
+        monitorbodyform_value = "This doesn't matter since body type is FORM"
+        monitorrawbody_value = "Valid raw body"
+
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'assertion_type': monitor_value['assertion_type'],
+            'assertion_value': monitor_value['assertion_value'],
+            'is_assert_json_schema_only': monitor_value['is_assert_json_schema_only'],
+            'exclude_keys': monitor_value['exclude_keys'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # 1. Create Object
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+
+        # 2. Update Object
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'assertion_type': monitor_value['assertion_type'],
+            'assertion_value': monitor_value['assertion_value'],
+            'is_assert_json_schema_only': monitor_value['is_assert_json_schema_only'],
+            # 'exclude_keys': monitor_value['exclude_keys'], # Exclude keys removed
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
+        response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(len(response.data['exclude_keys']), 0)
+
+        received_json['exclude_keys'] = [
+            {
+                'key': 'test'
+            },
+            {
+                'key': 'future key'
+            }
+        ]
+        response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(len(response.data['exclude_keys']), 2)
