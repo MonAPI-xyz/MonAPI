@@ -89,7 +89,11 @@ class ListErrorLogs(APITestCase):
             "query_params": [],
             "headers": [],
             "body_form": [],
-            "raw_body": None
+            "raw_body": None,
+             "assertion_type": "DISABLED",
+            "assertion_value": "",
+            "is_assert_json_schema_only": False,
+            "exclude_keys": []
         },
         "execution_time": "2022-09-20T10:00:00+07:00",
         "response_time": 100,
@@ -110,7 +114,11 @@ class ListErrorLogs(APITestCase):
               "query_params": [],
               "headers": [],
               "body_form": [],
-              "raw_body": None
+              "raw_body": None,
+              "assertion_type": "DISABLED",
+              "assertion_value": "",
+              "is_assert_json_schema_only": False,
+              "exclude_keys": []
           },
           "execution_time": "2022-09-20T10:00:00+07:00",
           "response_time": 75,
@@ -173,7 +181,11 @@ class ListErrorLogs(APITestCase):
             "query_params": [],
             "headers": [],
             "body_form": [],
-            "raw_body": None
+            "raw_body": None,
+            "assertion_type": "DISABLED",
+            "assertion_value": "",
+            "is_assert_json_schema_only": False,
+            "exclude_keys": []
         },
         "execution_time": "2022-09-20T10:00:00+07:00",
         "response_time": 100,
