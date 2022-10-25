@@ -40,7 +40,10 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             'method': request.data.get('method'),
             'url': request.data.get('url'),
             'schedule': request.data.get('schedule'),
-            'body_type': request.data.get('body_type')
+            'body_type': request.data.get('body_type'),
+            'assertion_type': request.data.get('assertion_type', "DISABLED"),
+            'assertion_value': request.data.get('assertion_value', ""),
+            'is_assert_json_schema_only': request.data.get('is_assert_json_schema_only', False)
         }
         api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
         monitor_obj = APIMonitor.objects.get(pk=kwargs['pk'])
@@ -51,6 +54,9 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             monitor_obj.url = monitor_data['url']
             monitor_obj.schedule = monitor_data['schedule']
             monitor_obj.body_type = monitor_data['body_type']
+            monitor_obj.assertion_type = monitor_data['assertion_type']
+            monitor_obj.assertion_value = monitor_data['assertion_value']
+            monitor_obj.is_assert_json_schema_only = monitor_data['is_assert_json_schema_only']
             monitor_obj.save()
 
             # Delete old objects
@@ -58,6 +64,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             APIMonitorHeader.objects.filter(monitor=kwargs['pk']).delete()
             APIMonitorBodyForm.objects.filter(monitor=kwargs['pk']).delete()
             APIMonitorRawBody.objects.filter(monitor=kwargs['pk']).delete()
+            AssertionExcludeKey.objects.filter(monitor=kwargs['pk']).delete()
 
             # Create new query param
             for i in range(len(request.data.get('query_params', []))):
@@ -97,6 +104,15 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                     'body': request.data['raw_body']
                 }
                 APIMonitorRawBody.objects.create(**record)
+
+            for i in range(len(request.data.get('exclude_keys', []))):
+                key = request.data.get('exclude_keys')[i]['key']
+                record = {
+                    "monitor": monitor_obj,
+                    "exclude_key": key
+                }
+                AssertionExcludeKey.objects.create(**record)
+
             serializer = APIMonitorSerializer(monitor_obj)
             return Response(serializer.data)
         else:
