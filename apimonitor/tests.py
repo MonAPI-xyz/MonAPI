@@ -3400,9 +3400,8 @@ class ListAPIMonitor(APITestCase):
         create_new_monitor_test_path = reverse('api-monitor-list')
         response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['error'],
-                         "['Please make sure your [body form] key and value are valid strings!']")
-
+        self.assertEqual(response.data['error'], "['Please make sure your [body form] key and value are valid strings!']")
+    
     def test_user_can_create_new_api_monitor_with_text_assertion(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
@@ -3416,7 +3415,7 @@ class ListAPIMonitor(APITestCase):
             'url': 'Test Path',
             'schedule': '10MIN',
             'body_type': 'FORM',
-            "assertion_type": "TEXT",
+            "assertion_type":"TEXT",
             "assertion_value": "value",
             "is_assert_json_schema_only": False,
         }
@@ -3480,7 +3479,7 @@ class ListAPIMonitor(APITestCase):
             'url': 'Test Path',
             'schedule': '10MIN',
             'body_type': 'EMPTY',
-            "assertion_type": "JSON",
+            "assertion_type":"JSON",
             "assertion_value": "{\"key\":\"value\"}",
             "is_assert_json_schema_only": False,
         }
@@ -3516,7 +3515,7 @@ class ListAPIMonitor(APITestCase):
             'url': 'Test Path',
             'schedule': '10MIN',
             'body_type': 'EMPTY',
-            "assertion_type": "JSON",
+            "assertion_type":"JSON",
             "assertion_value": "{\"key\":\"value\", \"key2\":\"value2\"}",
             "is_assert_json_schema_only": True,
         }
@@ -3563,7 +3562,7 @@ class ListAPIMonitor(APITestCase):
             'url': 'Test Path',
             'schedule': '10MIN',
             'body_type': 'EMPTY',
-            "assertion_type": "JSON",
+            "assertion_type":"JSON",
             "assertion_value": "{\"key\":\"value\", \"key2\":\"value2\"}",
             "is_assert_json_schema_only": True,
         }
@@ -3607,7 +3606,7 @@ class ListAPIMonitor(APITestCase):
             'url': 'Test Path',
             'schedule': '10MIN',
             'body_type': 'EMPTY',
-            "assertion_type": "DISABLED",
+            "assertion_type":"DISABLED",
         }
 
         # Expected JSON from frontend
@@ -4078,4 +4077,3 @@ class EditAPIMonitor(APITestCase):
         edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
         response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
