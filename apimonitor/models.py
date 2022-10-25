@@ -87,7 +87,7 @@ class APIMonitorResult(models.Model):
         
         
 class AssertionExcludeKey(models.Model):
-    monitor = models.ForeignKey(APIMonitor, on_delete=models.CASCADE)
+    monitor = models.ForeignKey(APIMonitor, on_delete=models.CASCADE, related_name='exclude_keys')
     exclude_key = models.CharField(max_length=1024)
     
 
