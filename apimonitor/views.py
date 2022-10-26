@@ -116,7 +116,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             serializer = APIMonitorSerializer(monitor_obj)
             return Response(serializer.data)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"error": "['Please make sure your [name, method, url, schedule, body_type] is valid']"},status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
         monitor_data = {
