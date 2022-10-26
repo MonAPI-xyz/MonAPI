@@ -1306,7 +1306,11 @@ class ListAPIMonitor(APITestCase):
                     "headers": [],
                     "body_form": [],
                     "raw_body": None,
-                    "previous_step_id": None
+                    "previous_step_id": None,
+                    "assertion_type": "DISABLED",
+                    "assertion_value": "",
+                    "is_assert_json_schema_only": False,
+                    "exclude_keys": []
                 }
             )
             
@@ -1362,7 +1366,11 @@ class ListAPIMonitor(APITestCase):
                     "headers": [],
                     "body_form": [],
                     "raw_body": None,
-                    "previous_step_id": 1
+                    "previous_step_id": 1,
+                    "assertion_type": "DISABLED",
+                    "assertion_value": "",
+                    "is_assert_json_schema_only": False,
+                    "exclude_keys": []
                 }
             )
             
