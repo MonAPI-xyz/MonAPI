@@ -1,5 +1,5 @@
 def try_parse_int(string):
     try:
         return int(string)
-    except:
+    except ValueError:
         return False
