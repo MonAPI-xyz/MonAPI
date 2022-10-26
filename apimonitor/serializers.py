@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apimonitor.models import APIMonitor, APIMonitorQueryParam, APIMonitorHeader, APIMonitorRawBody, \
-    APIMonitorResult
+    APIMonitorResult, AssertionExcludeKey
 
 class APIMonitorQueryParamSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,6 +46,17 @@ class APIMonitorRawBodySerializer(serializers.ModelSerializer):
         ]
 
 
+
+class AssertionExcludeKeySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssertionExcludeKey
+        fields = [
+            'id',
+            'monitor',
+            'exclude_key',
+        ]
+
+
 class APIMonitorDetailSuccessRateSerializer(serializers.Serializer):
     start_time = serializers.DateTimeField()
     end_time = serializers.DateTimeField()
@@ -65,6 +76,8 @@ class APIMonitorSerializer(serializers.ModelSerializer):
     body_form = APIMonitorBodyFormSerializer(many=True, required=False, allow_null=True)
     raw_body = APIMonitorRawBodySerializer(required=False, allow_null=True)
     previous_step_id = serializers.PrimaryKeyRelatedField(read_only=True, many=False)
+    exclude_keys = AssertionExcludeKeySerializer(many=True, required=False, allow_null=True)
+    
     class Meta:
         model = APIMonitor
         fields = [
@@ -79,6 +92,10 @@ class APIMonitorSerializer(serializers.ModelSerializer):
             'body_form',
             'raw_body',
             'previous_step_id',
+            'assertion_type',
+            'assertion_value',
+            'is_assert_json_schema_only',
+            'exclude_keys',
         ]
 
 

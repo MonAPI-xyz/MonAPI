@@ -9,11 +9,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 
 from apimonitor.models import (APIMonitor, APIMonitorResult, APIMonitorQueryParam,
-                               APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody)
+                               APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody, AssertionExcludeKey)
 from apimonitor.serializers import (APIMonitorSerializer, APIMonitorListSerializer,
                                     APIMonitorQueryParamSerializer, APIMonitorHeaderSerializer,
                                     APIMonitorBodyFormSerializer, APIMonitorRawBodySerializer,
-                                    APIMonitorRetrieveSerializer, APIMonitorDashboardSerializer)
+                                    APIMonitorRetrieveSerializer, APIMonitorDashboardSerializer,
+                                    AssertionExcludeKeySerializer)
 
 
 class APIMonitorViewSet(mixins.ListModelMixin,
@@ -39,6 +40,9 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             'schedule': request.data.get('schedule'),
             'body_type': request.data.get('body_type'),
             'previous_step_id': request.data.get('previous_step_id'),
+            'assertion_type': request.data.get('assertion_type', "DISABLED"),
+            'assertion_value': request.data.get('assertion_value', ""),
+            'is_assert_json_schema_only': request.data.get('is_assert_json_schema_only', False),
         }
         api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
         if api_monitor_serializer.is_valid():
@@ -117,7 +121,23 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                         APIMonitorRawBody.objects.create(**record)
                     else:
                         error_log += ["Please make sure your [raw body] is a valid string or JSON!"]
-
+                if request.data.get('exclude_keys'):
+                    for key_json in request.data.get('exclude_keys'):
+                        if 'key' in key_json:
+                            key = key_json['key']
+                        else:
+                            error_log += ["Please make sure you submit correct [exclude key]"]
+                            break
+                        record = {
+                            'monitor': monitor_obj.id,
+                            'exclude_key': key,
+                        }
+                        if AssertionExcludeKeySerializer(data=record).is_valid():
+                            record['monitor'] = monitor_obj
+                            AssertionExcludeKey.objects.create(**record)
+                        else:
+                            error_log += ["Please make sure your [exclude key] valid strings!"]
+                            break
                 assert len(error_log) == 0, error_log
                 serialized_obj = APIMonitorSerializer(monitor_obj)
                 return Response(data=serialized_obj.data, status=status.HTTP_201_CREATED)
