@@ -188,7 +188,9 @@ class DetailListAPIMonitor(APITestCase):
                              {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T09:59:00+07:00",
                               "avg": 0},
                              {"start_time": "2022-09-20T09:59:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
-                              "avg": 100}]})
+                              "avg": 100}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_30_min_without_result(self):
         response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self,
@@ -316,7 +318,9 @@ class DetailListAPIMonitor(APITestCase):
                              {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T09:59:00+07:00",
                               "avg": 0},
                              {"start_time": "2022-09-20T09:59:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
-                              "avg": 0}]})
+                              "avg": 0}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_1_hour_with_result(self):
         response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self, "60MIN")
@@ -445,7 +449,9 @@ class DetailListAPIMonitor(APITestCase):
                              {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:58:00+07:00",
                               "avg": 0},
                              {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
-                              "avg": 100}]})
+                              "avg": 100}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_1_hour_without_result(self):
         response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self, "60MIN")
@@ -575,7 +581,9 @@ class DetailListAPIMonitor(APITestCase):
                              {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:58:00+07:00",
                               "avg": 0},
                              {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
-                              "avg": 0}]})
+                              "avg": 0}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_3_hours_with_result(self):
         response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self, "180MIN")
@@ -728,7 +736,9 @@ class DetailListAPIMonitor(APITestCase):
                              {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:55:00+07:00",
                               "avg": 0},
                              {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
-                              "avg": 100}]})
+                              "avg": 100}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_3_hours_without_result(self):
         response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self, "180MIN")
@@ -879,7 +889,9 @@ class DetailListAPIMonitor(APITestCase):
                              {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:55:00+07:00",
                               "avg": 0},
                              {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
-                              "avg": 0}]})
+                              "avg": 0}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_6_hours_with_result(self):
         response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self, "360MIN")
@@ -1031,7 +1043,9 @@ class DetailListAPIMonitor(APITestCase):
                              {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
                               "avg": 0},
                              {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
-                              "avg": 100}]})
+                              "avg": 100}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_6_hours_without_result(self):
         response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self, "360MIN")
@@ -1183,7 +1197,9 @@ class DetailListAPIMonitor(APITestCase):
                              {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
                               "avg": 0},
                              {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
-                              "avg": 0}]})
+                              "avg": 0}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_12_hours_with_result(self):
         response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self, "720MIN")
@@ -1336,7 +1352,9 @@ class DetailListAPIMonitor(APITestCase):
                              {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
                               "avg": 0},
                              {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
-                              "avg": 100}]})
+                              "avg": 100}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_12_hours_without_result(self):
         response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self, "720MIN")
@@ -1489,7 +1507,9 @@ class DetailListAPIMonitor(APITestCase):
                              {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
                               "avg": 0},
                              {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
-                              "avg": 0}]})
+                              "avg": 0}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_24_hours_with_result(self):
         response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self, "1440MIN")
@@ -1739,7 +1759,9 @@ class DetailListAPIMonitor(APITestCase):
                                                                                   "avg": 0}, {
                                                                                   "start_time": "2022-09-20T09:30:00+07:00",
                                                                                   "end_time": "2022-09-20T10:00:00+07:00",
-                                                                                  "avg": 100}]})
+                                                                                  "avg": 100}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+        })
 
     def test_retrieve_24_hours_without_result(self):
         response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self, "1440MIN")
@@ -1940,7 +1962,9 @@ class DetailListAPIMonitor(APITestCase):
                              {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
                               "avg": 0},
                              {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
-                              "avg": 0}]})
+                              "avg": 0}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
 
 class StatsAPIMonitor(APITestCase):
