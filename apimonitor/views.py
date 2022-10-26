@@ -39,7 +39,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             'url': request.data.get('url'),
             'schedule': request.data.get('schedule'),
             'body_type': request.data.get('body_type'),
-            'previous_step_id': request.data.get('previous_step_id'),
+            'previous_step_id': None if request.data.get('previous_step_id') == '-' else request.data.get('previous_step_id') ,
             'assertion_type': request.data.get('assertion_type', "DISABLED"),
             'assertion_value': request.data.get('assertion_value', ""),
             'is_assert_json_schema_only': request.data.get('is_assert_json_schema_only', False),
@@ -49,7 +49,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             
             error_log = []
             try:    
-                if request.data.get('previous_step_id') == None or APIMonitor.objects.filter(id=request.data.get('previous_step_id')).exists():
+                if monitor_data['previous_step_id'] == None or APIMonitor.objects.filter(id=monitor_data['previous_step_id']).exists():
                     monitor_obj = APIMonitor.objects.create(**monitor_data)
                 else:
                     error_log += ["Please make sure your [previous step id] is valid!"]
