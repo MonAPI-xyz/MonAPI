@@ -4076,6 +4076,8 @@ class EditAPIMonitor(APITestCase):
         target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
         edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
         response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(response.data['error'],
+                         "['Please make sure your [name, method, url, schedule, body_type] is valid']")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_user_can_edit_assertion_fields(self):
