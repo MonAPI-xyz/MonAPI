@@ -12,8 +12,9 @@ from rest_framework.authtoken.models import Token
 from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, \
     APIMonitorResult, AssertionExcludeKey
 
+
 class DetailListAPIMonitor(APITestCase):
-    test_url = reverse('api-monitor-detail',args=[1])
+    test_url = reverse('api-monitor-detail', args=[1])
     local_timezone = pytz.timezone(settings.TIME_ZONE)
     mock_current_time = local_timezone.localize(datetime(2022, 9, 20, 10))
 
@@ -34,7 +35,7 @@ class DetailListAPIMonitor(APITestCase):
             body_type='FORM',
         )
 
-        response = self.client.get(self.test_url,{"range":range_schedule},format="json",**header)
+        response = self.client.get(self.test_url, {"range": range_schedule}, format="json", **header)
         return response
 
     def init_for_test_retrieve_with_result(self, range_schedule):
@@ -59,107 +60,1912 @@ class DetailListAPIMonitor(APITestCase):
             log_response='{}'
         )
 
-        response = self.client.get(self.test_url,{"range":range_schedule},format="json",**header)
+        response = self.client.get(self.test_url, {"range": range_schedule}, format="json", **header)
         return response
 
     def test_retrieve_30_min_with_result(self):
-        response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self,"30MIN")
+        response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self, "30MIN")
 
-        self.assertEqual(response.data,{"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "30MIN", "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": 
-None, "success_rate": [{"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:31:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:31:00+07:00", "end_time": "2022-09-20T09:32:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:33:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:33:00+07:00", "end_time": "2022-09-20T09:34:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:34:00+07:00", "end_time": 
-"2022-09-20T09:35:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:36:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:37:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:37:00+07:00", "end_time": "2022-09-20T09:38:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:39:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:39:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:41:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:41:00+07:00", "end_time": "2022-09-20T09:42:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:43:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:43:00+07:00", "end_time": "2022-09-20T09:44:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:45:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:46:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:47:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:47:00+07:00", "end_time": "2022-09-20T09:48:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:49:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:49:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:51:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:51:00+07:00", "end_time": "2022-09-20T09:52:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:53:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:53:00+07:00", "end_time": "2022-09-20T09:54:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:55:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T09:56:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:57:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:57:00+07:00", "end_time": "2022-09-20T09:58:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T09:59:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:59:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 1, "failed": 0}], "response_time": [{"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:31:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:31:00+07:00", "end_time": "2022-09-20T09:32:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:33:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:33:00+07:00", "end_time": "2022-09-20T09:34:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:34:00+07:00", "end_time": "2022-09-20T09:35:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:36:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:37:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:37:00+07:00", "end_time": "2022-09-20T09:38:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:39:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:39:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:41:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:41:00+07:00", "end_time": "2022-09-20T09:42:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:43:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:43:00+07:00", "end_time": "2022-09-20T09:44:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:45:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:46:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:47:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:47:00+07:00", "end_time": "2022-09-20T09:48:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:49:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:49:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:51:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:51:00+07:00", "end_time": "2022-09-20T09:52:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:53:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:53:00+07:00", "end_time": "2022-09-20T09:54:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:55:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T09:56:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:57:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:57:00+07:00", "end_time": "2022-09-20T09:58:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T09:59:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:59:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 100}]})
+        self.assertEqual(response.data,
+                         {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "30MIN",
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body":
+                              None, "success_rate": [
+                             {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:31:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:31:00+07:00", "end_time": "2022-09-20T09:32:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:33:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:33:00+07:00", "end_time": "2022-09-20T09:34:00+07:00",
+                              "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:34:00+07:00", "end_time":
+                                 "2022-09-20T09:35:00+07:00", "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:36:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:37:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:37:00+07:00", "end_time": "2022-09-20T09:38:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:39:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:39:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:41:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:41:00+07:00", "end_time": "2022-09-20T09:42:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:43:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:43:00+07:00", "end_time": "2022-09-20T09:44:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:45:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:46:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:47:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:47:00+07:00", "end_time": "2022-09-20T09:48:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:49:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:49:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:51:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:51:00+07:00", "end_time": "2022-09-20T09:52:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:53:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:53:00+07:00", "end_time": "2022-09-20T09:54:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:55:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T09:56:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:57:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:57:00+07:00", "end_time": "2022-09-20T09:58:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T09:59:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:59:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "success": 1, "failed": 0}], "response_time": [
+                             {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:31:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:31:00+07:00", "end_time": "2022-09-20T09:32:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:33:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:33:00+07:00", "end_time": "2022-09-20T09:34:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:34:00+07:00", "end_time": "2022-09-20T09:35:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:36:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:37:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:37:00+07:00", "end_time": "2022-09-20T09:38:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:39:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:39:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:41:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:41:00+07:00", "end_time": "2022-09-20T09:42:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:43:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:43:00+07:00", "end_time": "2022-09-20T09:44:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:45:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:46:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:47:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:47:00+07:00", "end_time": "2022-09-20T09:48:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:49:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:49:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:51:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:51:00+07:00", "end_time": "2022-09-20T09:52:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:53:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:53:00+07:00", "end_time": "2022-09-20T09:54:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:55:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T09:56:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:57:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:57:00+07:00", "end_time": "2022-09-20T09:58:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T09:59:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:59:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "avg": 100}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_30_min_without_result(self):
-        response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self,"30MIN")   # print(json.dumps(response.data))
+        response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self,
+                                                                              "30MIN")  # print(json.dumps(response.data))
 
-        self.assertEqual(response.data,{"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "30MIN", "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": 
-None, "success_rate": [{"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:31:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:31:00+07:00", "end_time": "2022-09-20T09:32:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:33:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:33:00+07:00", "end_time": "2022-09-20T09:34:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:34:00+07:00", "end_time": 
-"2022-09-20T09:35:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:36:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:37:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:37:00+07:00", "end_time": "2022-09-20T09:38:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:39:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:39:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:41:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:41:00+07:00", "end_time": "2022-09-20T09:42:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:43:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:43:00+07:00", "end_time": "2022-09-20T09:44:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:45:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:46:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:47:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:47:00+07:00", "end_time": "2022-09-20T09:48:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:49:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:49:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:51:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:51:00+07:00", "end_time": "2022-09-20T09:52:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:53:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:53:00+07:00", "end_time": "2022-09-20T09:54:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:55:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T09:56:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:57:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:57:00+07:00", "end_time": "2022-09-20T09:58:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T09:59:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:59:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 0, "failed": 0}], "response_time": [{"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:31:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:31:00+07:00", "end_time": "2022-09-20T09:32:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:33:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:33:00+07:00", "end_time": "2022-09-20T09:34:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:34:00+07:00", "end_time": "2022-09-20T09:35:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:36:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:37:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:37:00+07:00", "end_time": "2022-09-20T09:38:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:39:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:39:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:41:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:41:00+07:00", "end_time": "2022-09-20T09:42:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:43:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:43:00+07:00", "end_time": "2022-09-20T09:44:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:45:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:46:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:47:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:47:00+07:00", "end_time": "2022-09-20T09:48:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:49:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:49:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:51:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:51:00+07:00", "end_time": "2022-09-20T09:52:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:53:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:53:00+07:00", "end_time": "2022-09-20T09:54:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:55:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T09:56:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:57:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:57:00+07:00", "end_time": "2022-09-20T09:58:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T09:59:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:59:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 0}]})
-    
-    
+        self.assertEqual(response.data,
+                         {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "30MIN",
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body":
+                              None, "success_rate": [
+                             {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:31:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:31:00+07:00", "end_time": "2022-09-20T09:32:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:33:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:33:00+07:00", "end_time": "2022-09-20T09:34:00+07:00",
+                              "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:34:00+07:00", "end_time":
+                                 "2022-09-20T09:35:00+07:00", "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:36:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:37:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:37:00+07:00", "end_time": "2022-09-20T09:38:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:39:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:39:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:41:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:41:00+07:00", "end_time": "2022-09-20T09:42:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:43:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:43:00+07:00", "end_time": "2022-09-20T09:44:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:45:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:46:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:47:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:47:00+07:00", "end_time": "2022-09-20T09:48:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:49:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:49:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:51:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:51:00+07:00", "end_time": "2022-09-20T09:52:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:53:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:53:00+07:00", "end_time": "2022-09-20T09:54:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:55:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T09:56:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:57:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:57:00+07:00", "end_time": "2022-09-20T09:58:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T09:59:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:59:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "success": 0, "failed": 0}], "response_time": [
+                             {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:31:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:31:00+07:00", "end_time": "2022-09-20T09:32:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:33:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:33:00+07:00", "end_time": "2022-09-20T09:34:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:34:00+07:00", "end_time": "2022-09-20T09:35:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:36:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:37:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:37:00+07:00", "end_time": "2022-09-20T09:38:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:39:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:39:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:41:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:41:00+07:00", "end_time": "2022-09-20T09:42:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:43:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:43:00+07:00", "end_time": "2022-09-20T09:44:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:45:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:46:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:47:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:47:00+07:00", "end_time": "2022-09-20T09:48:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:49:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:49:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:51:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:51:00+07:00", "end_time": "2022-09-20T09:52:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:53:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:53:00+07:00", "end_time": "2022-09-20T09:54:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:55:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T09:56:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:57:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:57:00+07:00", "end_time": "2022-09-20T09:58:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T09:59:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:59:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "avg": 0}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
+
     def test_retrieve_1_hour_with_result(self):
-        response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self,"60MIN")
+        response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self, "60MIN")
 
-        self.assertEqual(response.data,{"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "60MIN", "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, "success_rate": [{"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:02:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:02:00+07:00", "end_time": "2022-09-20T09:04:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:04:00+07:00", "end_time": "2022-09-20T09:06:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:06:00+07:00", "end_time": "2022-09-20T09:08:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:08:00+07:00", "end_time": "2022-09-20T09:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:12:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:12:00+07:00", "end_time": "2022-09-20T09:14:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:14:00+07:00", "end_time": "2022-09-20T09:16:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:16:00+07:00", "end_time": "2022-09-20T09:18:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:18:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:22:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:22:00+07:00", "end_time": "2022-09-20T09:24:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:24:00+07:00", "end_time": "2022-09-20T09:26:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:26:00+07:00", "end_time": "2022-09-20T09:28:00+07:00", "success": 0, 
-"failed": 0}, {"start_time": "2022-09-20T09:28:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:32:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:34:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:34:00+07:00", "end_time": "2022-09-20T09:36:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:38:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:42:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:44:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:46:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:48:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:52:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:54:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:56:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:58:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 1, "failed": 0}], "response_time": [{"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:02:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:02:00+07:00", "end_time": "2022-09-20T09:04:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:04:00+07:00", "end_time": "2022-09-20T09:06:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:06:00+07:00", "end_time": "2022-09-20T09:08:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:08:00+07:00", "end_time": "2022-09-20T09:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:12:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:12:00+07:00", "end_time": "2022-09-20T09:14:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:14:00+07:00", "end_time": "2022-09-20T09:16:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:16:00+07:00", "end_time": "2022-09-20T09:18:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:18:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:22:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:22:00+07:00", "end_time": "2022-09-20T09:24:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:24:00+07:00", "end_time": "2022-09-20T09:26:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:26:00+07:00", "end_time": "2022-09-20T09:28:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:28:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:32:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:34:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:34:00+07:00", "end_time": "2022-09-20T09:36:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:38:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:42:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:44:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:46:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:48:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:52:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:54:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:56:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:58:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 100}]})
+        self.assertEqual(response.data,
+                         {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "60MIN",
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "success_rate": [
+                              {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:02:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:02:00+07:00", "end_time": "2022-09-20T09:04:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:04:00+07:00", "end_time": "2022-09-20T09:06:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:06:00+07:00", "end_time": "2022-09-20T09:08:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:08:00+07:00", "end_time": "2022-09-20T09:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:12:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:12:00+07:00", "end_time": "2022-09-20T09:14:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:14:00+07:00", "end_time": "2022-09-20T09:16:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:16:00+07:00", "end_time": "2022-09-20T09:18:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:18:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:22:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:22:00+07:00", "end_time": "2022-09-20T09:24:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:24:00+07:00", "end_time": "2022-09-20T09:26:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:26:00+07:00", "end_time": "2022-09-20T09:28:00+07:00",
+                               "success": 0,
+                               "failed": 0},
+                              {"start_time": "2022-09-20T09:28:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:32:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:34:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:34:00+07:00", "end_time": "2022-09-20T09:36:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:38:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:42:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:44:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:46:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:48:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:52:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:54:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:56:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:58:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                               "success": 1, "failed": 0}], "response_time": [
+                             {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:02:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:02:00+07:00", "end_time": "2022-09-20T09:04:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:04:00+07:00", "end_time": "2022-09-20T09:06:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:06:00+07:00", "end_time": "2022-09-20T09:08:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:08:00+07:00", "end_time": "2022-09-20T09:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:12:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:12:00+07:00", "end_time": "2022-09-20T09:14:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:14:00+07:00", "end_time": "2022-09-20T09:16:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:16:00+07:00", "end_time": "2022-09-20T09:18:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:18:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:22:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:22:00+07:00", "end_time": "2022-09-20T09:24:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:24:00+07:00", "end_time": "2022-09-20T09:26:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:26:00+07:00", "end_time": "2022-09-20T09:28:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:28:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:32:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:34:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:34:00+07:00", "end_time": "2022-09-20T09:36:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:38:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:42:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:44:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:46:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:48:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:52:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:54:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:56:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:58:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "avg": 100}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_1_hour_without_result(self):
-        response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self,"60MIN")
+        response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self, "60MIN")
 
-        self.assertEqual(response.data,{"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "60MIN", "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, "success_rate": [{"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:02:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:02:00+07:00", "end_time": "2022-09-20T09:04:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:04:00+07:00", "end_time": "2022-09-20T09:06:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:06:00+07:00", "end_time": "2022-09-20T09:08:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:08:00+07:00", "end_time": "2022-09-20T09:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:12:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:12:00+07:00", "end_time": "2022-09-20T09:14:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:14:00+07:00", "end_time": "2022-09-20T09:16:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:16:00+07:00", "end_time": "2022-09-20T09:18:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:18:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:22:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:22:00+07:00", "end_time": "2022-09-20T09:24:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:24:00+07:00", "end_time": "2022-09-20T09:26:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:26:00+07:00", "end_time": "2022-09-20T09:28:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:28:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:32:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:34:00+07:00", "success": 0, "failed": 0}, 
-{"start_time": "2022-09-20T09:34:00+07:00", "end_time": "2022-09-20T09:36:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:38:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "success": 0, "failed": 0}, {"start_time": 
-"2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:42:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:44:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:46:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:48:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:52:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:54:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:56:00+07:00", "success": 0, "failed": 
-0}, {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:58:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 0, "failed": 0}], "response_time": [{"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:02:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:02:00+07:00", "end_time": "2022-09-20T09:04:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:04:00+07:00", "end_time": "2022-09-20T09:06:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:06:00+07:00", "end_time": "2022-09-20T09:08:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:08:00+07:00", "end_time": "2022-09-20T09:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:12:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:12:00+07:00", "end_time": "2022-09-20T09:14:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:14:00+07:00", "end_time": "2022-09-20T09:16:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:16:00+07:00", "end_time": "2022-09-20T09:18:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:18:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:22:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:22:00+07:00", "end_time": "2022-09-20T09:24:00+07:00", "avg": 0}, {"start_time": 
-"2022-09-20T09:24:00+07:00", "end_time": "2022-09-20T09:26:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:26:00+07:00", "end_time": "2022-09-20T09:28:00+07:00", "avg": 0}, 
-{"start_time": "2022-09-20T09:28:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:32:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:34:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:34:00+07:00", "end_time": "2022-09-20T09:36:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:38:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:42:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:44:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:46:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:48:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:52:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:54:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:56:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:58:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 0}]})
-    
-    
+        self.assertEqual(response.data,
+                         {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "60MIN",
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "success_rate": [
+                              {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:02:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:02:00+07:00", "end_time": "2022-09-20T09:04:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:04:00+07:00", "end_time": "2022-09-20T09:06:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:06:00+07:00", "end_time": "2022-09-20T09:08:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:08:00+07:00", "end_time": "2022-09-20T09:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:12:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:12:00+07:00", "end_time": "2022-09-20T09:14:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:14:00+07:00", "end_time": "2022-09-20T09:16:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:16:00+07:00", "end_time": "2022-09-20T09:18:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:18:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:22:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:22:00+07:00", "end_time": "2022-09-20T09:24:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:24:00+07:00", "end_time": "2022-09-20T09:26:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:26:00+07:00", "end_time": "2022-09-20T09:28:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:28:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:32:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:34:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:34:00+07:00", "end_time": "2022-09-20T09:36:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:38:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                               "success": 0, "failed": 0}, {"start_time":
+                                                                "2022-09-20T09:40:00+07:00",
+                                                            "end_time": "2022-09-20T09:42:00+07:00", "success": 0,
+                                                            "failed": 0},
+                              {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:44:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:46:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:48:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:52:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:54:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:56:00+07:00",
+                               "success": 0, "failed":
+                                   0},
+                              {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:58:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                               "success": 0, "failed": 0}], "response_time": [
+                             {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:02:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:02:00+07:00", "end_time": "2022-09-20T09:04:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:04:00+07:00", "end_time": "2022-09-20T09:06:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:06:00+07:00", "end_time": "2022-09-20T09:08:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:08:00+07:00", "end_time": "2022-09-20T09:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:12:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:12:00+07:00", "end_time": "2022-09-20T09:14:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:14:00+07:00", "end_time": "2022-09-20T09:16:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:16:00+07:00", "end_time": "2022-09-20T09:18:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:18:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:22:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:22:00+07:00", "end_time": "2022-09-20T09:24:00+07:00",
+                              "avg": 0}, {"start_time":
+                                              "2022-09-20T09:24:00+07:00", "end_time": "2022-09-20T09:26:00+07:00",
+                                          "avg": 0},
+                             {"start_time": "2022-09-20T09:26:00+07:00", "end_time": "2022-09-20T09:28:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:28:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:32:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:32:00+07:00", "end_time": "2022-09-20T09:34:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:34:00+07:00", "end_time": "2022-09-20T09:36:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:36:00+07:00", "end_time": "2022-09-20T09:38:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:38:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:42:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:42:00+07:00", "end_time": "2022-09-20T09:44:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:44:00+07:00", "end_time": "2022-09-20T09:46:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:46:00+07:00", "end_time": "2022-09-20T09:48:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:48:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:52:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:52:00+07:00", "end_time": "2022-09-20T09:54:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:54:00+07:00", "end_time": "2022-09-20T09:56:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:56:00+07:00", "end_time": "2022-09-20T09:58:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:58:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "avg": 0}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
+
     def test_retrieve_3_hours_with_result(self):
-        response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self,"180MIN")
+        response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self, "180MIN")
 
-        self.assertEqual(response.data,{"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "180MIN", "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, "success_rate": [{"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:05:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:05:00+07:00", "end_time": "2022-09-20T07:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:15:00+07:00", "success": 
-0, "failed": 0}, {"start_time": "2022-09-20T07:15:00+07:00", "end_time": "2022-09-20T07:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:25:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:25:00+07:00", "end_time": "2022-09-20T07:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:35:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:35:00+07:00", "end_time": "2022-09-20T07:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:45:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:45:00+07:00", "end_time": "2022-09-20T07:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T07:55:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:55:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:05:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:05:00+07:00", "end_time": "2022-09-20T08:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:15:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:15:00+07:00", "end_time": "2022-09-20T08:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:25:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:25:00+07:00", "end_time": "2022-09-20T08:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:35:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:35:00+07:00", "end_time": "2022-09-20T08:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:45:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:45:00+07:00", "end_time": "2022-09-20T08:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T08:55:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:55:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:05:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:05:00+07:00", "end_time": "2022-09-20T09:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:15:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:15:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:25:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:25:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:35:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:45:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:55:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 1, "failed": 0}], "response_time": [{"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:05:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:05:00+07:00", "end_time": "2022-09-20T07:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:15:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:15:00+07:00", "end_time": "2022-09-20T07:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:25:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:25:00+07:00", "end_time": "2022-09-20T07:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:35:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:35:00+07:00", "end_time": "2022-09-20T07:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:45:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:45:00+07:00", "end_time": "2022-09-20T07:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T07:55:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:55:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:05:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:05:00+07:00", "end_time": "2022-09-20T08:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:15:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:15:00+07:00", "end_time": "2022-09-20T08:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:25:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:25:00+07:00", "end_time": "2022-09-20T08:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:35:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:35:00+07:00", "end_time": "2022-09-20T08:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:45:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:45:00+07:00", "end_time": "2022-09-20T08:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T08:55:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:55:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:05:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:05:00+07:00", "end_time": "2022-09-20T09:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:15:00+07:00", "avg": 0}, {"start_time": 
-"2022-09-20T09:15:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:25:00+07:00", "avg": 0}, 
-{"start_time": "2022-09-20T09:25:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:35:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:45:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:55:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 100}]})
+        self.assertEqual(response.data,
+                         {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "180MIN",
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "success_rate": [
+                              {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:05:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:05:00+07:00", "end_time": "2022-09-20T07:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:15:00+07:00",
+                               "success":
+                                   0, "failed": 0},
+                              {"start_time": "2022-09-20T07:15:00+07:00", "end_time": "2022-09-20T07:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:25:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:25:00+07:00", "end_time": "2022-09-20T07:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:35:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:35:00+07:00", "end_time": "2022-09-20T07:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:45:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:45:00+07:00", "end_time": "2022-09-20T07:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T07:55:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:55:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:05:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:05:00+07:00", "end_time": "2022-09-20T08:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:15:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:15:00+07:00", "end_time": "2022-09-20T08:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:25:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:25:00+07:00", "end_time": "2022-09-20T08:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:35:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:35:00+07:00", "end_time": "2022-09-20T08:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:45:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:45:00+07:00", "end_time": "2022-09-20T08:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T08:55:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:55:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:05:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:05:00+07:00", "end_time": "2022-09-20T09:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:15:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:15:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:25:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:25:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:35:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:45:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:55:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                               "success": 1, "failed": 0}], "response_time": [
+                             {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:05:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:05:00+07:00", "end_time": "2022-09-20T07:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:15:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:15:00+07:00", "end_time": "2022-09-20T07:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:25:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:25:00+07:00", "end_time": "2022-09-20T07:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:35:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:35:00+07:00", "end_time": "2022-09-20T07:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:45:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:45:00+07:00", "end_time": "2022-09-20T07:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T07:55:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:55:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:05:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:05:00+07:00", "end_time": "2022-09-20T08:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:15:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:15:00+07:00", "end_time": "2022-09-20T08:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:25:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:25:00+07:00", "end_time": "2022-09-20T08:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:35:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:35:00+07:00", "end_time": "2022-09-20T08:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:45:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:45:00+07:00", "end_time": "2022-09-20T08:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T08:55:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:55:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:05:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:05:00+07:00", "end_time": "2022-09-20T09:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:15:00+07:00",
+                              "avg": 0}, {"start_time":
+                                              "2022-09-20T09:15:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                                          "avg": 0},
+                             {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:25:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:25:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:35:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:45:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:55:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "avg": 100}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_3_hours_without_result(self):
-        response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self,"180MIN")
+        response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self, "180MIN")
 
-        self.assertEqual(response.data,{"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "180MIN", "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, "success_rate": [{"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:05:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:05:00+07:00", "end_time": "2022-09-20T07:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:15:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:15:00+07:00", "end_time": "2022-09-20T07:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:25:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:25:00+07:00", "end_time": "2022-09-20T07:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:35:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:35:00+07:00", "end_time": "2022-09-20T07:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:45:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:45:00+07:00", "end_time": "2022-09-20T07:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T07:55:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:55:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:05:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:05:00+07:00", "end_time": "2022-09-20T08:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:15:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:15:00+07:00", "end_time": "2022-09-20T08:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:25:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:25:00+07:00", "end_time": "2022-09-20T08:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:35:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:35:00+07:00", "end_time": "2022-09-20T08:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:45:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:45:00+07:00", "end_time": "2022-09-20T08:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T08:55:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:55:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:05:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:05:00+07:00", "end_time": "2022-09-20T09:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:15:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:15:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:25:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:25:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:35:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:45:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:55:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 0, "failed": 0}], "response_time": [{"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:05:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:05:00+07:00", "end_time": "2022-09-20T07:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:15:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:15:00+07:00", "end_time": "2022-09-20T07:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:25:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:25:00+07:00", "end_time": "2022-09-20T07:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:35:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:35:00+07:00", "end_time": "2022-09-20T07:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:45:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:45:00+07:00", "end_time": "2022-09-20T07:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T07:55:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:55:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:05:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:05:00+07:00", "end_time": "2022-09-20T08:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:15:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:15:00+07:00", "end_time": "2022-09-20T08:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:25:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:25:00+07:00", "end_time": "2022-09-20T08:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:35:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:35:00+07:00", "end_time": "2022-09-20T08:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:45:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:45:00+07:00", "end_time": "2022-09-20T08:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T08:55:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:55:00+07:00", 
-"end_time": "2022-09-20T09:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:05:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:05:00+07:00", "end_time": "2022-09-20T09:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:15:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:15:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:25:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:25:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:35:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:45:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:55:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 0}]})
-    
-    
+        self.assertEqual(response.data,
+                         {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "180MIN",
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "success_rate": [
+                              {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:05:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:05:00+07:00", "end_time": "2022-09-20T07:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:15:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:15:00+07:00", "end_time": "2022-09-20T07:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:25:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:25:00+07:00", "end_time": "2022-09-20T07:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:35:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:35:00+07:00", "end_time": "2022-09-20T07:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:45:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:45:00+07:00", "end_time": "2022-09-20T07:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T07:55:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:55:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:05:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:05:00+07:00", "end_time": "2022-09-20T08:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:15:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:15:00+07:00", "end_time": "2022-09-20T08:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:25:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:25:00+07:00", "end_time": "2022-09-20T08:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:35:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:35:00+07:00", "end_time": "2022-09-20T08:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:45:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:45:00+07:00", "end_time": "2022-09-20T08:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T08:55:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:55:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:05:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:05:00+07:00", "end_time": "2022-09-20T09:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:15:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:15:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:25:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:25:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:35:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:45:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:55:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                               "success": 0, "failed": 0}], "response_time": [
+                             {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:05:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:05:00+07:00", "end_time": "2022-09-20T07:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:15:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:15:00+07:00", "end_time": "2022-09-20T07:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:25:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:25:00+07:00", "end_time": "2022-09-20T07:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:35:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:35:00+07:00", "end_time": "2022-09-20T07:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:45:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:45:00+07:00", "end_time": "2022-09-20T07:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T07:55:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:55:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:05:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:05:00+07:00", "end_time": "2022-09-20T08:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:15:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:15:00+07:00", "end_time": "2022-09-20T08:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:25:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:25:00+07:00", "end_time": "2022-09-20T08:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:35:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:35:00+07:00", "end_time": "2022-09-20T08:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:45:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:45:00+07:00", "end_time": "2022-09-20T08:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T08:55:00+07:00",
+                              "avg": 0}, {"start_time": "2022-09-20T08:55:00+07:00",
+                                          "end_time": "2022-09-20T09:00:00+07:00", "avg": 0},
+                             {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:05:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:05:00+07:00", "end_time": "2022-09-20T09:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:15:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:15:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:25:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:25:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:35:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:35:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:45:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:45:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T09:55:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:55:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "avg": 0}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
+
     def test_retrieve_6_hours_with_result(self):
-        response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self,"360MIN")
-       
-        self.assertEqual(response.data,{"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "360MIN", "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, "success_rate": [{"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:10:00+07:00", "end_time": "2022-09-20T04:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T04:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T04:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:50:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "success": 0, "failed": 
-0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:10:00+07:00", "end_time": "2022-09-20T05:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T05:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T05:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:50:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:10:00+07:00", "end_time": "2022-09-20T06:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T06:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T06:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:50:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": 
-"2022-09-20T07:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 1, "failed": 0}], "response_time": [{"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:10:00+07:00", "end_time": "2022-09-20T04:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T04:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T04:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:50:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:10:00+07:00", "end_time": "2022-09-20T05:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T05:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T05:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:50:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:10:00+07:00", "end_time": "2022-09-20T06:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T06:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T06:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:50:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 100}]})
+        response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self, "360MIN")
+
+        self.assertEqual(response.data,
+                         {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "360MIN",
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "success_rate": [
+                              {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:10:00+07:00", "end_time": "2022-09-20T04:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T04:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T04:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:50:00+07:00", "end_time": "2022-09-20T05:00:00+07:00",
+                               "success": 0, "failed":
+                                   0},
+                              {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:10:00+07:00", "end_time": "2022-09-20T05:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T05:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T05:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:50:00+07:00", "end_time": "2022-09-20T06:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:10:00+07:00", "end_time": "2022-09-20T06:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T06:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T06:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:50:00+07:00", "end_time": "2022-09-20T07:00:00+07:00",
+                               "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time":
+                                  "2022-09-20T07:10:00+07:00", "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:10:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                               "success": 1, "failed": 0}], "response_time": [
+                             {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:10:00+07:00", "end_time": "2022-09-20T04:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T04:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T04:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:50:00+07:00", "end_time": "2022-09-20T05:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:10:00+07:00", "end_time": "2022-09-20T05:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T05:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T05:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:50:00+07:00", "end_time": "2022-09-20T06:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:10:00+07:00", "end_time": "2022-09-20T06:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T06:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T06:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:50:00+07:00", "end_time": "2022-09-20T07:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "avg": 100}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_6_hours_without_result(self):
-        response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self,"360MIN")
+        response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self, "360MIN")
 
-        self.assertEqual(response.data,{"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "360MIN", "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], 
-"raw_body": None, "success_rate": [{"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:10:00+07:00", "end_time": "2022-09-20T04:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T04:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:40:00+07:00", 
-"end_time": "2022-09-20T04:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:50:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:10:00+07:00", "end_time": "2022-09-20T05:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T05:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T05:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:50:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:10:00+07:00", "end_time": "2022-09-20T06:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T06:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T06:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:50:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:10:00+07:00", 
-"success": 0, "failed": 0}, {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:10:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 0, "failed": 0}], "response_time": [{"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:10:00+07:00", "end_time": "2022-09-20T04:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:30:00+07:00", "avg": 0}, {"start_time": 
-"2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T04:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T04:50:00+07:00", "avg": 0}, 
-{"start_time": "2022-09-20T04:50:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:10:00+07:00", "end_time": "2022-09-20T05:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T05:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T05:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:50:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:10:00+07:00", "end_time": "2022-09-20T06:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T06:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T06:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:50:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:10:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:50:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 0}]})
-    
-    
+        self.assertEqual(response.data,
+                         {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "360MIN",
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [],
+                          "raw_body": None, "success_rate": [
+                             {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:10:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T04:10:00+07:00", "end_time": "2022-09-20T04:20:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:30:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T04:40:00+07:00",
+                              "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:40:00+07:00",
+                                                           "end_time": "2022-09-20T04:50:00+07:00", "success": 0,
+                                                           "failed": 0},
+                             {"start_time": "2022-09-20T04:50:00+07:00", "end_time": "2022-09-20T05:00:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:10:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T05:10:00+07:00", "end_time": "2022-09-20T05:20:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:30:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T05:40:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T05:50:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T05:50:00+07:00", "end_time": "2022-09-20T06:00:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:10:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T06:10:00+07:00", "end_time": "2022-09-20T06:20:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:30:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T06:40:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T06:50:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T06:50:00+07:00", "end_time": "2022-09-20T07:00:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:10:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:20:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:30:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:40:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:50:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:10:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:20:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:30:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:40:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:50:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:10:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                              "success": 0, "failed": 0},
+                             {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "success": 0, "failed": 0}], "response_time": [
+                             {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:10:00+07:00", "end_time": "2022-09-20T04:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:30:00+07:00",
+                              "avg": 0}, {"start_time":
+                                              "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T04:40:00+07:00",
+                                          "avg": 0},
+                             {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T04:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:50:00+07:00", "end_time": "2022-09-20T05:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:10:00+07:00", "end_time": "2022-09-20T05:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T05:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T05:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:50:00+07:00", "end_time": "2022-09-20T06:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:10:00+07:00", "end_time": "2022-09-20T06:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T06:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T06:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:50:00+07:00", "end_time": "2022-09-20T07:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:10:00+07:00", "end_time": "2022-09-20T07:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T07:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T07:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:50:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:10:00+07:00", "end_time": "2022-09-20T08:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T08:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T08:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:50:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:10:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:10:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T09:50:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:50:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "avg": 0}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
+
     def test_retrieve_12_hours_with_result(self):
-        response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self,"720MIN")
+        response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self, "720MIN")
 
-        self.assertEqual(response.data,{"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "720MIN", "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, "success_rate": [{"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T22:20:00+07:00", "end_time": "2022-09-19T22:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T22:40:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T23:20:00+07:00", "end_time": "2022-09-19T23:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T23:40:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T00:20:00+07:00", "end_time": "2022-09-20T00:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T00:40:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T01:20:00+07:00", "end_time": "2022-09-20T01:40:00+07:00", 
-"success": 0, "failed": 0}, {"start_time": "2022-09-20T01:40:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T02:20:00+07:00", "end_time": "2022-09-20T02:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T02:40:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T03:20:00+07:00", "end_time": "2022-09-20T03:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T03:40:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:20:00+07:00", "success": 
-0, "failed": 0}, {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 1, "failed": 0}], "response_time": [{"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:20:00+07:00", "avg": 0}, {"start_time": "2022-09-19T22:20:00+07:00", "end_time": "2022-09-19T22:40:00+07:00", "avg": 0}, {"start_time": "2022-09-19T22:40:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:20:00+07:00", "avg": 0}, {"start_time": "2022-09-19T23:20:00+07:00", "end_time": "2022-09-19T23:40:00+07:00", "avg": 0}, {"start_time": "2022-09-19T23:40:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:20:00+07:00", "avg": 
-0}, {"start_time": "2022-09-20T00:20:00+07:00", "end_time": "2022-09-20T00:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T00:40:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T01:20:00+07:00", "end_time": "2022-09-20T01:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T01:40:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T02:20:00+07:00", "end_time": "2022-09-20T02:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T02:40:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T03:20:00+07:00", "end_time": "2022-09-20T03:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T03:40:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 100}]})
+        self.assertEqual(response.data,
+                         {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "720MIN",
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "success_rate": [
+                              {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T22:20:00+07:00", "end_time": "2022-09-19T22:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T22:40:00+07:00", "end_time": "2022-09-19T23:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T23:20:00+07:00", "end_time": "2022-09-19T23:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T23:40:00+07:00", "end_time": "2022-09-20T00:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T00:20:00+07:00", "end_time": "2022-09-20T00:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T00:40:00+07:00", "end_time": "2022-09-20T01:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T01:20:00+07:00", "end_time": "2022-09-20T01:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T01:40:00+07:00", "end_time": "2022-09-20T02:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T02:20:00+07:00", "end_time": "2022-09-20T02:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T02:40:00+07:00", "end_time": "2022-09-20T03:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T03:20:00+07:00", "end_time": "2022-09-20T03:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T03:40:00+07:00", "end_time": "2022-09-20T04:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T05:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T06:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:20:00+07:00",
+                               "success":
+                                   0, "failed": 0},
+                              {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T07:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                               "success": 1, "failed": 0}], "response_time": [
+                             {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T22:20:00+07:00", "end_time": "2022-09-19T22:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T22:40:00+07:00", "end_time": "2022-09-19T23:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T23:20:00+07:00", "end_time": "2022-09-19T23:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T23:40:00+07:00", "end_time": "2022-09-20T00:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:20:00+07:00", "avg":
+                                 0},
+                             {"start_time": "2022-09-20T00:20:00+07:00", "end_time": "2022-09-20T00:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T00:40:00+07:00", "end_time": "2022-09-20T01:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T01:20:00+07:00", "end_time": "2022-09-20T01:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T01:40:00+07:00", "end_time": "2022-09-20T02:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T02:20:00+07:00", "end_time": "2022-09-20T02:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T02:40:00+07:00", "end_time": "2022-09-20T03:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T03:20:00+07:00", "end_time": "2022-09-20T03:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T03:40:00+07:00", "end_time": "2022-09-20T04:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T05:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T06:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T07:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "avg": 100}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
 
     def test_retrieve_12_hours_without_result(self):
-        response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self,"720MIN")
+        response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self, "720MIN")
 
-        self.assertEqual(response.data,{"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "720MIN", "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, "success_rate": [{"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T22:20:00+07:00", "end_time": "2022-09-19T22:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T22:40:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T23:20:00+07:00", "end_time": "2022-09-19T23:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T23:40:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T00:20:00+07:00", "end_time": "2022-09-20T00:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T00:40:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T01:20:00+07:00", "end_time": "2022-09-20T01:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T01:40:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T02:20:00+07:00", "end_time": "2022-09-20T02:40:00+07:00", "success": 0, 
-"failed": 0}, {"start_time": "2022-09-20T02:40:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T03:20:00+07:00", "end_time": "2022-09-20T03:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T03:40:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 0, "failed": 0}], "response_time": [{"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:20:00+07:00", "avg": 0}, {"start_time": "2022-09-19T22:20:00+07:00", "end_time": "2022-09-19T22:40:00+07:00", "avg": 0}, {"start_time": "2022-09-19T22:40:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:20:00+07:00", "avg": 0}, {"start_time": "2022-09-19T23:20:00+07:00", "end_time": "2022-09-19T23:40:00+07:00", "avg": 0}, {"start_time": "2022-09-19T23:40:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T00:20:00+07:00", "end_time": "2022-09-20T00:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T00:40:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T01:20:00+07:00", "end_time": "2022-09-20T01:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T01:40:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T02:20:00+07:00", "end_time": "2022-09-20T02:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T02:40:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T03:20:00+07:00", "end_time": "2022-09-20T03:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T03:40:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:20:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:40:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 0}]})
-    
-    
+        self.assertEqual(response.data,
+                         {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "720MIN",
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "success_rate": [
+                              {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T22:20:00+07:00", "end_time": "2022-09-19T22:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T22:40:00+07:00", "end_time": "2022-09-19T23:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T23:20:00+07:00", "end_time": "2022-09-19T23:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T23:40:00+07:00", "end_time": "2022-09-20T00:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T00:20:00+07:00", "end_time": "2022-09-20T00:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T00:40:00+07:00", "end_time": "2022-09-20T01:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T01:20:00+07:00", "end_time": "2022-09-20T01:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T01:40:00+07:00", "end_time": "2022-09-20T02:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T02:20:00+07:00", "end_time": "2022-09-20T02:40:00+07:00",
+                               "success": 0,
+                               "failed": 0},
+                              {"start_time": "2022-09-20T02:40:00+07:00", "end_time": "2022-09-20T03:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T03:20:00+07:00", "end_time": "2022-09-20T03:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T03:40:00+07:00", "end_time": "2022-09-20T04:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T05:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T06:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T07:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                               "success": 0, "failed": 0}], "response_time": [
+                             {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T22:20:00+07:00", "end_time": "2022-09-19T22:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T22:40:00+07:00", "end_time": "2022-09-19T23:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T23:20:00+07:00", "end_time": "2022-09-19T23:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T23:40:00+07:00", "end_time": "2022-09-20T00:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T00:20:00+07:00", "end_time": "2022-09-20T00:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T00:40:00+07:00", "end_time": "2022-09-20T01:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T01:20:00+07:00", "end_time": "2022-09-20T01:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T01:40:00+07:00", "end_time": "2022-09-20T02:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T02:20:00+07:00", "end_time": "2022-09-20T02:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T02:40:00+07:00", "end_time": "2022-09-20T03:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T03:20:00+07:00", "end_time": "2022-09-20T03:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T03:40:00+07:00", "end_time": "2022-09-20T04:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:20:00+07:00", "end_time": "2022-09-20T04:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:40:00+07:00", "end_time": "2022-09-20T05:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:20:00+07:00", "end_time": "2022-09-20T05:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:40:00+07:00", "end_time": "2022-09-20T06:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:20:00+07:00", "end_time": "2022-09-20T06:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:40:00+07:00", "end_time": "2022-09-20T07:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:20:00+07:00", "end_time": "2022-09-20T07:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:40:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:20:00+07:00", "end_time": "2022-09-20T08:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:40:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:20:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:20:00+07:00", "end_time": "2022-09-20T09:40:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:40:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "avg": 0}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
+
     def test_retrieve_24_hours_with_result(self):
-        response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self,"1440MIN")
-        
-        self.assertEqual(response.data,{"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "1440MIN", "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, "success_rate": [{"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T10:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T10:30:00+07:00", "end_time": "2022-09-19T11:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T11:30:00+07:00", "success": 0, 
-"failed": 0}, {"start_time": "2022-09-19T11:30:00+07:00", "end_time": "2022-09-19T12:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T12:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T12:30:00+07:00", "end_time": "2022-09-19T13:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T13:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T13:30:00+07:00", "end_time": "2022-09-19T14:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T14:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T14:30:00+07:00", "end_time": "2022-09-19T15:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T15:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T15:30:00+07:00", "end_time": "2022-09-19T16:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T16:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T16:30:00+07:00", "end_time": "2022-09-19T17:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T17:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T17:30:00+07:00", "end_time": "2022-09-19T18:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T18:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T18:30:00+07:00", "end_time": "2022-09-19T19:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T19:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T19:30:00+07:00", "end_time": "2022-09-19T20:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T20:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T20:30:00+07:00", "end_time": "2022-09-19T21:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T21:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T21:30:00+07:00", "end_time": "2022-09-19T22:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T22:30:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T23:30:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T00:30:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T01:30:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T02:30:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T03:30:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 1, "failed": 0}], "response_time": [{"start_time": 
-"2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T10:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T10:30:00+07:00", "end_time": "2022-09-19T11:00:00+07:00", "avg": 0}, 
-{"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T11:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T11:30:00+07:00", "end_time": "2022-09-19T12:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T12:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T12:30:00+07:00", "end_time": "2022-09-19T13:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T13:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T13:30:00+07:00", "end_time": "2022-09-19T14:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T14:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T14:30:00+07:00", "end_time": "2022-09-19T15:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T15:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T15:30:00+07:00", "end_time": "2022-09-19T16:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T16:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T16:30:00+07:00", "end_time": "2022-09-19T17:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T17:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T17:30:00+07:00", "end_time": "2022-09-19T18:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T18:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T18:30:00+07:00", "end_time": "2022-09-19T19:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T19:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T19:30:00+07:00", "end_time": "2022-09-19T20:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T20:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T20:30:00+07:00", "end_time": "2022-09-19T21:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T21:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T21:30:00+07:00", "end_time": "2022-09-19T22:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T22:30:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T23:30:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T00:30:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T01:30:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T02:30:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T03:30:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 100}]})
+        response = DetailListAPIMonitor.init_for_test_retrieve_with_result(self, "1440MIN")
+
+        self.assertEqual(response.data,
+                         {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "1440MIN",
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "success_rate": [
+                              {"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T10:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T10:30:00+07:00", "end_time": "2022-09-19T11:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T11:30:00+07:00",
+                               "success": 0,
+                               "failed": 0},
+                              {"start_time": "2022-09-19T11:30:00+07:00", "end_time": "2022-09-19T12:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T12:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T12:30:00+07:00", "end_time": "2022-09-19T13:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T13:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T13:30:00+07:00", "end_time": "2022-09-19T14:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T14:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T14:30:00+07:00", "end_time": "2022-09-19T15:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T15:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T15:30:00+07:00", "end_time": "2022-09-19T16:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T16:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T16:30:00+07:00", "end_time": "2022-09-19T17:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T17:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T17:30:00+07:00", "end_time": "2022-09-19T18:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T18:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T18:30:00+07:00", "end_time": "2022-09-19T19:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T19:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T19:30:00+07:00", "end_time": "2022-09-19T20:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T20:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T20:30:00+07:00", "end_time": "2022-09-19T21:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T21:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T21:30:00+07:00", "end_time": "2022-09-19T22:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T22:30:00+07:00", "end_time": "2022-09-19T23:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T23:30:00+07:00", "end_time": "2022-09-20T00:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T00:30:00+07:00", "end_time": "2022-09-20T01:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T01:30:00+07:00", "end_time": "2022-09-20T02:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T02:30:00+07:00", "end_time": "2022-09-20T03:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T03:30:00+07:00", "end_time": "2022-09-20T04:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T05:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T06:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T07:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                               "success": 1, "failed": 0}], "response_time": [{"start_time":
+                                                                                   "2022-09-19T10:00:00+07:00",
+                                                                               "end_time": "2022-09-19T10:30:00+07:00",
+                                                                               "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T10:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T11:00:00+07:00",
+                                                                                  "avg": 0},
+                                                                              {
+                                                                                  "start_time": "2022-09-19T11:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T11:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T11:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T12:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T12:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T12:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T12:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T13:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T13:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T13:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T13:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T14:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T14:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T14:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T14:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T15:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T15:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T15:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T15:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T16:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T16:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T16:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T16:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T17:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T17:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T17:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T17:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T18:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T18:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T18:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T18:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T19:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T19:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T19:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T19:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T20:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T20:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T20:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T20:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T21:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T21:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T21:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T21:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T22:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T22:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T22:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T22:30:00+07:00",
+                                                                                  "end_time": "2022-09-19T23:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T23:00:00+07:00",
+                                                                                  "end_time": "2022-09-19T23:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-19T23:30:00+07:00",
+                                                                                  "end_time": "2022-09-20T00:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T00:00:00+07:00",
+                                                                                  "end_time": "2022-09-20T00:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T00:30:00+07:00",
+                                                                                  "end_time": "2022-09-20T01:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T01:00:00+07:00",
+                                                                                  "end_time": "2022-09-20T01:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T01:30:00+07:00",
+                                                                                  "end_time": "2022-09-20T02:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T02:00:00+07:00",
+                                                                                  "end_time": "2022-09-20T02:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T02:30:00+07:00",
+                                                                                  "end_time": "2022-09-20T03:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T03:00:00+07:00",
+                                                                                  "end_time": "2022-09-20T03:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T03:30:00+07:00",
+                                                                                  "end_time": "2022-09-20T04:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T04:00:00+07:00",
+                                                                                  "end_time": "2022-09-20T04:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T04:30:00+07:00",
+                                                                                  "end_time": "2022-09-20T05:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T05:00:00+07:00",
+                                                                                  "end_time": "2022-09-20T05:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T05:30:00+07:00",
+                                                                                  "end_time": "2022-09-20T06:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T06:00:00+07:00",
+                                                                                  "end_time": "2022-09-20T06:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T06:30:00+07:00",
+                                                                                  "end_time": "2022-09-20T07:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T07:00:00+07:00",
+                                                                                  "end_time": "2022-09-20T07:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T07:30:00+07:00",
+                                                                                  "end_time": "2022-09-20T08:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T08:00:00+07:00",
+                                                                                  "end_time": "2022-09-20T08:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T08:30:00+07:00",
+                                                                                  "end_time": "2022-09-20T09:00:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T09:00:00+07:00",
+                                                                                  "end_time": "2022-09-20T09:30:00+07:00",
+                                                                                  "avg": 0}, {
+                                                                                  "start_time": "2022-09-20T09:30:00+07:00",
+                                                                                  "end_time": "2022-09-20T10:00:00+07:00",
+                                                                                  "avg": 100}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+        })
 
     def test_retrieve_24_hours_without_result(self):
-        response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self,"1440MIN")
-        
-        self.assertEqual(response.data,{"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "1440MIN", "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, "success_rate": [{"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T10:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T10:30:00+07:00", "end_time": "2022-09-19T11:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T11:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T11:30:00+07:00", "end_time": "2022-09-19T12:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T12:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T12:30:00+07:00", "end_time": "2022-09-19T13:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T13:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T13:30:00+07:00", "end_time": "2022-09-19T14:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T14:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T14:30:00+07:00", "end_time": "2022-09-19T15:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T15:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T15:30:00+07:00", "end_time": "2022-09-19T16:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T16:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T16:30:00+07:00", "end_time": "2022-09-19T17:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T17:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T17:30:00+07:00", "end_time": "2022-09-19T18:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T18:30:00+07:00", "success": 0, "failed": 0}, 
-{"start_time": "2022-09-19T18:30:00+07:00", "end_time": "2022-09-19T19:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T19:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T19:30:00+07:00", "end_time": "2022-09-19T20:00:00+07:00", "success": 0, "failed": 0}, {"start_time": 
-"2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T20:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T20:30:00+07:00", "end_time": "2022-09-19T21:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T21:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T21:30:00+07:00", "end_time": "2022-09-19T22:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T22:30:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T23:30:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "success": 0, "failed": 
-0}, {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T00:30:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T01:30:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T02:30:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T03:30:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": 
-"2022-09-20T06:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 0, "failed": 0}], "response_time": [{"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T10:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T10:30:00+07:00", "end_time": "2022-09-19T11:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T11:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T11:30:00+07:00", "end_time": "2022-09-19T12:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T12:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T12:30:00+07:00", "end_time": "2022-09-19T13:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T13:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T13:30:00+07:00", "end_time": "2022-09-19T14:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T14:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T14:30:00+07:00", "end_time": "2022-09-19T15:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T15:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T15:30:00+07:00", "end_time": "2022-09-19T16:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T16:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T16:30:00+07:00", "end_time": "2022-09-19T17:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T17:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T17:30:00+07:00", "end_time": "2022-09-19T18:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T18:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T18:30:00+07:00", "end_time": "2022-09-19T19:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T19:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T19:30:00+07:00", "end_time": "2022-09-19T20:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T20:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T20:30:00+07:00", "end_time": "2022-09-19T21:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T21:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T21:30:00+07:00", "end_time": "2022-09-19T22:00:00+07:00", "avg": 0}, {"start_time": 
-"2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T22:30:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "avg": 0}, 
-{"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:30:00+07:00", "avg": 0}, {"start_time": "2022-09-19T23:30:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T00:30:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T01:30:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T02:30:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T03:30:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:30:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 0}]})
+        response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self, "1440MIN")
+
+        self.assertEqual(response.data,
+                         {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "1440MIN",
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "success_rate": [
+                              {"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T10:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T10:30:00+07:00", "end_time": "2022-09-19T11:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T11:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T11:30:00+07:00", "end_time": "2022-09-19T12:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T12:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T12:30:00+07:00", "end_time": "2022-09-19T13:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T13:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T13:30:00+07:00", "end_time": "2022-09-19T14:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T14:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T14:30:00+07:00", "end_time": "2022-09-19T15:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T15:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T15:30:00+07:00", "end_time": "2022-09-19T16:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T16:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T16:30:00+07:00", "end_time": "2022-09-19T17:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T17:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T17:30:00+07:00", "end_time": "2022-09-19T18:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T18:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T18:30:00+07:00", "end_time": "2022-09-19T19:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T19:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T19:30:00+07:00", "end_time": "2022-09-19T20:00:00+07:00",
+                               "success": 0, "failed": 0}, {"start_time":
+                                                                "2022-09-19T20:00:00+07:00",
+                                                            "end_time": "2022-09-19T20:30:00+07:00", "success": 0,
+                                                            "failed": 0},
+                              {"start_time": "2022-09-19T20:30:00+07:00", "end_time": "2022-09-19T21:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T21:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T21:30:00+07:00", "end_time": "2022-09-19T22:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T22:30:00+07:00", "end_time": "2022-09-19T23:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-19T23:30:00+07:00", "end_time": "2022-09-20T00:00:00+07:00",
+                               "success": 0, "failed":
+                                   0},
+                              {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T00:30:00+07:00", "end_time": "2022-09-20T01:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T01:30:00+07:00", "end_time": "2022-09-20T02:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T02:30:00+07:00", "end_time": "2022-09-20T03:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T03:30:00+07:00", "end_time": "2022-09-20T04:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T05:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T06:00:00+07:00",
+                               "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time":
+                                  "2022-09-20T06:30:00+07:00", "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T07:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                               "success": 0, "failed": 0},
+                              {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                               "success": 0, "failed": 0}], "response_time": [
+                             {"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T10:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T10:30:00+07:00", "end_time": "2022-09-19T11:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T11:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T11:30:00+07:00", "end_time": "2022-09-19T12:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T12:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T12:30:00+07:00", "end_time": "2022-09-19T13:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T13:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T13:30:00+07:00", "end_time": "2022-09-19T14:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T14:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T14:30:00+07:00", "end_time": "2022-09-19T15:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T15:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T15:30:00+07:00", "end_time": "2022-09-19T16:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T16:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T16:30:00+07:00", "end_time": "2022-09-19T17:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T17:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T17:30:00+07:00", "end_time": "2022-09-19T18:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T18:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T18:30:00+07:00", "end_time": "2022-09-19T19:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T19:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T19:30:00+07:00", "end_time": "2022-09-19T20:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T20:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T20:30:00+07:00", "end_time": "2022-09-19T21:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T21:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T21:30:00+07:00", "end_time": "2022-09-19T22:00:00+07:00",
+                              "avg": 0}, {"start_time":
+                                              "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:30:00+07:00",
+                                          "avg": 0},
+                             {"start_time": "2022-09-19T22:30:00+07:00", "end_time": "2022-09-19T23:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-19T23:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-19T23:30:00+07:00", "end_time": "2022-09-20T00:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T00:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T00:30:00+07:00", "end_time": "2022-09-20T01:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T01:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T01:30:00+07:00", "end_time": "2022-09-20T02:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T02:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T02:30:00+07:00", "end_time": "2022-09-20T03:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T03:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T03:30:00+07:00", "end_time": "2022-09-20T04:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T04:30:00+07:00", "end_time": "2022-09-20T05:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T05:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T05:30:00+07:00", "end_time": "2022-09-20T06:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T06:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T06:30:00+07:00", "end_time": "2022-09-20T07:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T07:30:00+07:00", "end_time": "2022-09-20T08:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T08:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T08:30:00+07:00", "end_time": "2022-09-20T09:00:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:30:00+07:00",
+                              "avg": 0},
+                             {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
+                              "avg": 0}],
+                          'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
+                          })
+
 
 class StatsAPIMonitor(APITestCase):
     test_url = reverse('api-monitor-stats')
@@ -169,7 +1975,7 @@ class StatsAPIMonitor(APITestCase):
     def setUp(self):
         # Mock time function
         timezone.now = lambda: self.mock_current_time
-    
+
     def test_stats_with_result(self):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
         token = Token.objects.create(user=user)
@@ -191,10 +1997,79 @@ class StatsAPIMonitor(APITestCase):
             log_response='{}'
         )
 
-        response = self.client.get(self.test_url,format="json",**header)
-        self.assertEqual(response.data,{"success_rate": [{"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T11:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T12:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T13:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T14:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T15:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T16:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T17:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T18:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T19:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T20:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T21:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T22:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:00:00+07:00", 
-"end_time": "2022-09-20T05:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 1, "failed": 0}], "response_time": [{"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T11:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T12:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T13:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T14:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T15:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T16:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T17:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T18:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T19:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T20:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T21:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T22:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 100}]})
-
+        response = self.client.get(self.test_url, format="json", **header)
+        self.assertEqual(response.data, {"success_rate": [
+            {"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T11:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T12:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T13:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T14:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T15:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T16:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T17:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T18:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T19:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T20:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T21:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T22:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "success": 0,
+             "failed": 0}, {"start_time": "2022-09-20T04:00:00+07:00",
+                            "end_time": "2022-09-20T05:00:00+07:00", "success": 0, "failed": 0},
+            {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 1,
+             "failed": 0}], "response_time": [
+            {"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T11:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T12:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T13:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T14:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T15:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T16:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T17:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T18:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T19:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T20:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T21:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T22:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 100}]})
 
     def test_stats_without_result(self):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -209,10 +2084,79 @@ class StatsAPIMonitor(APITestCase):
             body_type='FORM',
         )
 
-        response = self.client.get(self.test_url,format="json",**header)
-        self.assertEqual(response.data,{"success_rate": [{"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T11:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T12:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T13:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T14:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T15:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T16:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T17:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T18:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T19:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T20:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T21:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T22:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": 
-"2022-09-20T08:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "success": 0, "failed": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 0, "failed": 0}], "response_time": [{"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T11:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T12:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T13:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T14:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T15:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T16:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T17:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T18:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T19:00:00+07:00", 
-"avg": 0}, {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T20:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T21:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T22:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "avg": 0}, {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "avg": 0}, {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 0}]})
+        response = self.client.get(self.test_url, format="json", **header)
+        self.assertEqual(response.data, {"success_rate": [
+            {"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T11:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T12:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T13:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T14:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T15:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T16:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T17:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T18:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T19:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T20:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T21:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T22:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "success": 0,
+             "failed": 0}, {"start_time": "2022-09-20T07:00:00+07:00", "end_time":
+                "2022-09-20T08:00:00+07:00", "success": 0, "failed": 0},
+            {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "success": 0,
+             "failed": 0},
+            {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "success": 0,
+             "failed": 0}], "response_time": [
+            {"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T11:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T11:00:00+07:00", "end_time": "2022-09-19T12:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T12:00:00+07:00", "end_time": "2022-09-19T13:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T13:00:00+07:00", "end_time": "2022-09-19T14:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T14:00:00+07:00", "end_time": "2022-09-19T15:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T15:00:00+07:00", "end_time": "2022-09-19T16:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T16:00:00+07:00", "end_time": "2022-09-19T17:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T17:00:00+07:00", "end_time": "2022-09-19T18:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T18:00:00+07:00", "end_time": "2022-09-19T19:00:00+07:00",
+             "avg": 0}, {"start_time": "2022-09-19T19:00:00+07:00", "end_time": "2022-09-19T20:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T20:00:00+07:00", "end_time": "2022-09-19T21:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T22:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T23:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-19T23:00:00+07:00", "end_time": "2022-09-20T00:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T00:00:00+07:00", "end_time": "2022-09-20T01:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T01:00:00+07:00", "end_time": "2022-09-20T02:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T02:00:00+07:00", "end_time": "2022-09-20T03:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T03:00:00+07:00", "end_time": "2022-09-20T04:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T05:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T05:00:00+07:00", "end_time": "2022-09-20T06:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T06:00:00+07:00", "end_time": "2022-09-20T07:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T08:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T08:00:00+07:00", "end_time": "2022-09-20T09:00:00+07:00", "avg": 0},
+            {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T10:00:00+07:00", "avg": 0}]})
 
 
 class ListAPIMonitor(APITestCase):
@@ -230,6 +2174,7 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(response.data, {
             "detail": "Authentication credentials were not provided."
         })
+
     def test_when_authenticated_and_empty_monitor_then_return_success_empty_monitor(self):
         # Create dummy user and authenticate
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -508,6 +2453,7 @@ class ListAPIMonitor(APITestCase):
                 "url": "Test Path"
             }
         ])
+
     def test_when_authenticated_and_empty_monitor_result_then_return_one_hunderd_success_rate(self):
         # Create dummy user and authenticate
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
@@ -1585,7 +3531,8 @@ class ListAPIMonitor(APITestCase):
         create_new_monitor_test_path = reverse('api-monitor-list')
         response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['error'], "['Please make sure your [name, method, url, schedule, body_type] is valid']")
+        self.assertEqual(response.data['error'],
+                         "['Please make sure your [name, method, url, schedule, body_type] is valid']")
 
     def test_query_params_is_not_valid(self):
         # Create a user object
@@ -1636,7 +3583,8 @@ class ListAPIMonitor(APITestCase):
         create_new_monitor_test_path = reverse('api-monitor-list')
         response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['error'], "['Please make sure your [query params] key and value are valid strings!']")
+        self.assertEqual(response.data['error'],
+                         "['Please make sure your [query params] key and value are valid strings!']")
 
     def test_header_is_not_valid(self):
         # Create a user object
@@ -2016,7 +3964,7 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['error'], "['Please make sure your [exclude key] valid strings!']")
 
-    def  test_failed_attempt_because_exclude_keys_doesnt_create_object(self):
+    def test_failed_attempt_because_exclude_keys_doesnt_create_object(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         token = Token.objects.create(user=user)
@@ -2058,3 +4006,461 @@ class ListAPIMonitor(APITestCase):
         response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['error'], "['Please make sure you submit correct [exclude key]']")
+
+class EditAPIMonitor(APITestCase):
+    # PBI-15-edit-api-monitor-backend
+    def test_user_can_edit_api_monitor_simple(self):
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+        }
+
+        queryparam_value = [
+            {
+                'key': 'key1',
+                'value': 'value1',
+            },
+            {
+                'key': 'key2',
+                'value': 'value2'
+            }
+        ]
+        monitorheader_value = [{
+            'key': 'key3',
+            'value': 'value3'
+        }]
+        monitorbodyform_value = "This doesn't matter since body type is FORM"
+        monitorrawbody_value = "Valid raw body"
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # 1. Create Object
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+
+        # 2. Update Object
+        monitor_value = {
+            'name': 'UPDATED Test Monitor',
+            'method': 'POST',
+            'url': 'Test Path',
+            'schedule': '30MIN',
+            'body_type': 'RAW',
+        }
+        queryparam_value = [
+            {
+                'key': 'ONLY key',
+                'value': 'ONLY value',
+            }
+        ]
+        monitorheader_value = [
+            {
+                'key': 'key3',
+                'value': 'value3'
+            },
+            {
+                'key': 'NEW FROM UPDATE key',
+                'value': 'NEW FROM UPDATE value'
+            }
+        ]
+        monitorbodyform_value = "This doesn't matter since body type is FORM"
+        monitorrawbody_value = "Valid raw body"
+
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
+        response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], 'UPDATED Test Monitor')
+        self.assertEqual(response.data['method'], 'POST')
+        self.assertEqual(response.data['url'], 'Test Path')
+        self.assertEqual(response.data['schedule'], '30MIN')
+        self.assertEqual(response.data['body_type'], 'RAW')
+        self.assertEqual(len(response.data['query_params']), 1)
+        self.assertEqual(len(response.data['headers']), 2)
+        self.assertEqual(len(response.data['body_form']), 0)
+        self.assertEqual(response.data['raw_body']['body'], "Valid raw body")
+
+    def test_user_can_edit_api_monitor_simple_body_form(self):
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+        }
+
+        queryparam_value = [
+            {
+                'key': 'key1',
+                'value': 'value1',
+            },
+            {
+                'key': 'key2',
+                'value': 'value2'
+            }
+        ]
+        monitorheader_value = [{
+            'key': 'key3',
+            'value': 'value3'
+        }]
+        monitorbodyform_value = "This doesn't matter since body type is FORM"
+        monitorrawbody_value = "Valid raw body"
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # 1. Create Object
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+
+        # 2. Update Object
+        monitor_value = {
+            'name': 'UPDATED Test Monitor',
+            'method': 'POST',
+            'url': 'Test Path',
+            'schedule': '30MIN',
+            'body_type': 'FORM',
+        }
+        queryparam_value = [
+            {
+                'key': 'ONLY key',
+                'value': 'ONLY value',
+            }
+        ]
+        monitorheader_value = [
+            {
+                'key': 'key3',
+                'value': 'value3'
+            },
+            {
+                'key': 'NEW FROM UPDATE key',
+                'value': 'NEW FROM UPDATE value'
+            }
+        ]
+        monitorbodyform_value = [
+            {
+                'key': 'body form key UPDATED',
+                'value': 'body form value UPDATED'
+            }
+        ]
+        monitorrawbody_value = "This doesn't matter since body type is RAW"
+
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
+        response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], 'UPDATED Test Monitor')
+        self.assertEqual(response.data['method'], 'POST')
+        self.assertEqual(response.data['url'], 'Test Path')
+        self.assertEqual(response.data['schedule'], '30MIN')
+        self.assertEqual(response.data['body_type'], 'FORM')
+        self.assertEqual(len(response.data['query_params']), 1)
+        self.assertEqual(len(response.data['headers']), 2)
+        self.assertEqual(len(response.data['body_form']), 1)
+        self.assertEqual(response.data['raw_body'], None)
+
+    def test_user_can_edit_api_monitor_without_optional_params(self):
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+        }
+
+        queryparam_value = [
+            {
+                'key': 'key1',
+                'value': 'value1',
+            },
+            {
+                'key': 'key2',
+                'value': 'value2'
+            }
+        ]
+        monitorheader_value = [{
+            'key': 'key3',
+            'value': 'value3'
+        }]
+        monitorbodyform_value = "This doesn't matter since body type is FORM"
+        monitorrawbody_value = "Valid raw body"
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # 1. Create Object
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+
+        # 2. Update Object
+        monitor_value = {
+            'name': 'UPDATED Test Monitor',
+            'method': 'POST',
+            'url': 'Test Path',
+            'schedule': '30MIN',
+            'body_type': 'FORM',
+        }
+        monitorbodyform_value = [
+            {
+                'key': 'body form key UPDATED',
+                'value': 'body form value UPDATED'
+            }
+        ]
+
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'body_form': monitorbodyform_value
+        }
+
+        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
+        response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], 'UPDATED Test Monitor')
+        self.assertEqual(response.data['method'], 'POST')
+        self.assertEqual(response.data['url'], 'Test Path')
+        self.assertEqual(response.data['schedule'], '30MIN')
+        self.assertEqual(response.data['body_type'], 'FORM')
+        self.assertEqual(len(response.data['query_params']), 0)
+        self.assertEqual(len(response.data['headers']), 0)
+        self.assertEqual(len(response.data['body_form']), 1)
+        self.assertEqual(response.data['raw_body'], None)
+
+    def test_user_can_not_edit_api_monitor_without_required_fields(self):
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+        }
+
+        queryparam_value = [
+            {
+                'key': 'key1',
+                'value': 'value1',
+            },
+            {
+                'key': 'key2',
+                'value': 'value2'
+            }
+        ]
+        monitorheader_value = [{
+            'key': 'key3',
+            'value': 'value3'
+        }]
+        monitorbodyform_value = "This doesn't matter since body type is FORM"
+        monitorrawbody_value = "Valid raw body"
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # 1. Create Object
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+
+        # 2. Update Object
+        monitor_value = {
+            'name': 'UPDATED Test Monitor',
+            'url': 'Test Path',
+            'schedule': '30MIN',
+            'body_type': 'FORM',
+        }
+        monitorbodyform_value = [
+            {
+                'key': 'body form key UPDATED',
+                'value': 'body form value UPDATED'
+            }
+        ]
+
+        received_json = {
+            'name': monitor_value['name'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'body_form': monitorbodyform_value
+        }
+
+        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
+        response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(response.data['error'],
+                         "['Please make sure your [name, method, url, schedule, body_type] is valid']")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_user_can_edit_assertion_fields(self):
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+            "assertion_type": "JSON",
+            "assertion_value": "{\"test\":\"hao\"}",
+            "is_assert_json_schema_only": True,
+            "exclude_keys": [
+                {
+                    "key": "test"
+                }
+            ]
+        }
+
+        queryparam_value = [
+            {
+                'key': 'key1',
+                'value': 'value1',
+            },
+            {
+                'key': 'key2',
+                'value': 'value2'
+            }
+        ]
+        monitorheader_value = [{
+            'key': 'key3',
+            'value': 'value3'
+        }]
+        monitorbodyform_value = "This doesn't matter since body type is FORM"
+        monitorrawbody_value = "Valid raw body"
+
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'assertion_type': monitor_value['assertion_type'],
+            'assertion_value': monitor_value['assertion_value'],
+            'is_assert_json_schema_only': monitor_value['is_assert_json_schema_only'],
+            'exclude_keys': monitor_value['exclude_keys'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # 1. Create Object
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+
+        # 2. Update Object
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'assertion_type': monitor_value['assertion_type'],
+            'assertion_value': monitor_value['assertion_value'],
+            'is_assert_json_schema_only': monitor_value['is_assert_json_schema_only'],
+            # 'exclude_keys': monitor_value['exclude_keys'], # Exclude keys removed
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
+        response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(len(response.data['exclude_keys']), 0)
+
+        received_json['exclude_keys'] = [
+            {
+                'key': 'test'
+            },
+            {
+                'key': 'future key'
+            }
+        ]
+        response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(len(response.data['exclude_keys']), 2)
