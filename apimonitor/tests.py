@@ -69,7 +69,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "30MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body":
-                              None, "success_rate": [
+                              None, 'previous_step_id': None, "success_rate": [
                              {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:31:00+07:00",
                               "success": 0, "failed": 0},
                              {"start_time": "2022-09-20T09:31:00+07:00", "end_time": "2022-09-20T09:32:00+07:00",
@@ -199,7 +199,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "30MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body":
-                              None, "success_rate": [
+                              None, 'previous_step_id': None, "success_rate": [
                              {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:31:00+07:00",
                               "success": 0, "failed": 0},
                              {"start_time": "2022-09-20T09:31:00+07:00", "end_time": "2022-09-20T09:32:00+07:00",
@@ -327,7 +327,7 @@ class DetailListAPIMonitor(APITestCase):
 
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "60MIN",
-                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:02:00+07:00",
                                "success": 0, "failed": 0},
@@ -458,7 +458,7 @@ class DetailListAPIMonitor(APITestCase):
 
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "60MIN",
-                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:02:00+07:00",
                                "success": 0, "failed": 0},
@@ -590,7 +590,7 @@ class DetailListAPIMonitor(APITestCase):
 
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "180MIN",
-                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:05:00+07:00",
                                "success": 0, "failed": 0},
@@ -745,7 +745,7 @@ class DetailListAPIMonitor(APITestCase):
 
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "180MIN",
-                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:05:00+07:00",
                                "success": 0, "failed": 0},
@@ -898,7 +898,7 @@ class DetailListAPIMonitor(APITestCase):
 
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "360MIN",
-                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:10:00+07:00",
                                "success": 0, "failed": 0},
@@ -1053,7 +1053,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "360MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [],
-                          "raw_body": None, "success_rate": [
+                          "raw_body": None, 'previous_step_id': None, "success_rate": [
                              {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:10:00+07:00",
                               "success": 0, "failed": 0},
                              {"start_time": "2022-09-20T04:10:00+07:00", "end_time": "2022-09-20T04:20:00+07:00",
@@ -1206,7 +1206,7 @@ class DetailListAPIMonitor(APITestCase):
 
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "720MIN",
-                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:20:00+07:00",
                                "success": 0, "failed": 0},
@@ -1361,7 +1361,7 @@ class DetailListAPIMonitor(APITestCase):
 
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "720MIN",
-                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:20:00+07:00",
                                "success": 0, "failed": 0},
@@ -1516,7 +1516,7 @@ class DetailListAPIMonitor(APITestCase):
 
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "1440MIN",
-                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T10:30:00+07:00",
                                "success": 0, "failed": 0},
@@ -1768,7 +1768,7 @@ class DetailListAPIMonitor(APITestCase):
 
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "1440MIN",
-                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None,
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T10:30:00+07:00",
                                "success": 0, "failed": 0},
