@@ -47,7 +47,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             'is_assert_json_schema_only': request.data.get('is_assert_json_schema_only', False)
         }
 
-        if not (monitor_data['previous_step_id'] is None):
+        if monitor_data['previous_step_id'] is not None:
             if try_parse_int(monitor_data['previous_step_id']):
                 monitor_data['previous_step_obj'] = APIMonitor.objects.get(pk=int(monitor_data['previous_step_id']))
             else:
