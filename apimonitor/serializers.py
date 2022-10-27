@@ -163,4 +163,8 @@ class APIMonitorRetrieveSerializer(APIMonitorSerializer):
             'raw_body',
             'success_rate',
             'response_time',
+            'assertion_type',
+            'assertion_value',
+            'is_assert_json_schema_only',
+            'exclude_keys',
         ]
