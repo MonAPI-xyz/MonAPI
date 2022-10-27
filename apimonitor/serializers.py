@@ -161,6 +161,7 @@ class APIMonitorRetrieveSerializer(APIMonitorSerializer):
             'headers',
             'body_form',
             'raw_body',
+            'previous_step_id',
             'success_rate',
             'response_time',
             'assertion_type',
