@@ -7,7 +7,7 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
-
+from utils import try_parse_int
 from apimonitor.models import (APIMonitor, APIMonitorResult, APIMonitorQueryParam,
                                APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody, AssertionExcludeKey)
 from apimonitor.serializers import (APIMonitorSerializer, APIMonitorListSerializer,
@@ -39,15 +39,21 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             'url': request.data.get('url'),
             'schedule': request.data.get('schedule'),
             'body_type': request.data.get('body_type'),
+            'previous_step_id': None if request.data.get('previous_step_id') == '-' else request.data.get('previous_step_id') ,
             'assertion_type': request.data.get('assertion_type', "DISABLED"),
             'assertion_value': request.data.get('assertion_value', ""),
             'is_assert_json_schema_only': request.data.get('is_assert_json_schema_only', False),
         }
         api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
         if api_monitor_serializer.is_valid():
-            monitor_obj = APIMonitor.objects.create(**monitor_data)
             error_log = []
-            try:
+            try:    
+                if monitor_data['previous_step_id'] == None or ( try_parse_int(monitor_data['previous_step_id']) and APIMonitor.objects.filter(id=monitor_data['previous_step_id'], user=request.user).exists()):
+                    monitor_obj = APIMonitor.objects.create(**monitor_data)
+                else:
+                    error_log += ["Please make sure your [previous step id] is valid and exist!"]
+                    return Response(data={"error": f"{error_log[0]}"}, status=status.HTTP_400_BAD_REQUEST)
+
                 if request.data.get('query_params'):
                     for key_value_pair in request.data.get('query_params'):
                         if 'key' in key_value_pair and 'value' in key_value_pair:
