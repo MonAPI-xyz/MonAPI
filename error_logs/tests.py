@@ -50,6 +50,7 @@ class ListErrorLogs(APITestCase):
       method='GET',
       url='Test Path',
       schedule='10MIN',
+      previous_step=None,
       body_type='EMPTY',
     )
 
@@ -90,6 +91,7 @@ class ListErrorLogs(APITestCase):
             "headers": [],
             "body_form": [],
             "raw_body": None,
+            "previous_step_id": None,
              "assertion_type": "DISABLED",
             "assertion_value": "",
             "is_assert_json_schema_only": False,
@@ -115,6 +117,7 @@ class ListErrorLogs(APITestCase):
               "headers": [],
               "body_form": [],
               "raw_body": None,
+              "previous_step_id": None,
               "assertion_type": "DISABLED",
               "assertion_value": "",
               "is_assert_json_schema_only": False,
@@ -141,6 +144,7 @@ class ListErrorLogs(APITestCase):
       method='GET',
       url='Test Path',
       schedule='10MIN',
+      previous_step=None,
       body_type='EMPTY',
     )
 
@@ -182,6 +186,7 @@ class ListErrorLogs(APITestCase):
             "headers": [],
             "body_form": [],
             "raw_body": None,
+            "previous_step_id": None,
             "assertion_type": "DISABLED",
             "assertion_value": "",
             "is_assert_json_schema_only": False,
