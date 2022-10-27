@@ -41,10 +41,21 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             'url': request.data.get('url'),
             'schedule': request.data.get('schedule'),
             'body_type': request.data.get('body_type'),
+            'previous_step_id': None if request.data.get('previous_step_id') == '-' else request.data.get('previous_step_id', None),
             'assertion_type': request.data.get('assertion_type', "DISABLED"),
             'assertion_value': request.data.get('assertion_value', ""),
             'is_assert_json_schema_only': request.data.get('is_assert_json_schema_only', False)
         }
+
+        if not (monitor_data['previous_step_id'] is None):
+            if try_parse_int(monitor_data['previous_step_id']):
+                monitor_data['previous_step_obj'] = APIMonitor.objects.get(pk=int(monitor_data['previous_step_id']))
+            else:
+                return Response(data={"error": ["Please make sure your [previous step id] is valid and exist!"]},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            monitor_data['previous_step_obj'] = None
+
         api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
         monitor_obj = APIMonitor.objects.get(pk=kwargs['pk'])
         if (api_monitor_serializer.is_valid()):
@@ -54,6 +65,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             monitor_obj.url = monitor_data['url']
             monitor_obj.schedule = monitor_data['schedule']
             monitor_obj.body_type = monitor_data['body_type']
+            monitor_obj.previous_step = monitor_data['previous_step_obj']
             monitor_obj.assertion_type = monitor_data['assertion_type']
             monitor_obj.assertion_value = monitor_data['assertion_value']
             monitor_obj.is_assert_json_schema_only = monitor_data['is_assert_json_schema_only']
