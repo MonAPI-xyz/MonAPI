@@ -4464,3 +4464,121 @@ class EditAPIMonitor(APITestCase):
         ]
         response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
         self.assertEqual(len(response.data['exclude_keys']), 2)
+
+    def test_user_can_edit_previous_step(self):
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+        }
+
+        queryparam_value = [
+            {
+                'key': 'key1',
+                'value': 'value1',
+            },
+            {
+                'key': 'key2',
+                'value': 'value2'
+            }
+        ]
+        monitorheader_value = [{
+            'key': 'key3',
+            'value': 'value3'
+        }]
+        monitorbodyform_value = "This doesn't matter since body type is FORM"
+        monitorrawbody_value = "Valid raw body"
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # 1. Create Object id = 1
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+
+        # 2. Create Object id = 2
+        received_json['name'] = 'Test Monitor 2'
+        self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+
+        # 3. Edit object id = 2's prev step to 1
+        received_json['previous_step_id'] = 1
+        target_monitor_id = APIMonitor.objects.filter(user=user)[1].id
+        edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
+        response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(response.data['id'], 2)
+        self.assertEqual(response.data['previous_step_id'], 1)
+
+    def test_user_must_put_valid_previous_step(self):
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        token = Token.objects.create(user=user)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+        }
+
+        queryparam_value = [
+            {
+                'key': 'key1',
+                'value': 'value1',
+            },
+            {
+                'key': 'key2',
+                'value': 'value2'
+            }
+        ]
+        monitorheader_value = [{
+            'key': 'key3',
+            'value': 'value3'
+        }]
+        monitorbodyform_value = "This doesn't matter since body type is FORM"
+        monitorrawbody_value = "Valid raw body"
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # 1. Create Object id = 1
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+
+        # 2. Create Object id = 2
+        received_json['name'] = 'Test Monitor 2'
+        self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+
+        # 3. Edit object id = 2's prev step to "abc" --> invalid prev_step_id
+        received_json['previous_step_id'] = "abc"
+        target_monitor_id = APIMonitor.objects.filter(user=user)[1].id
+        edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
+        response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(response.data['error'], ['Please make sure your [previous step id] is valid and exist!'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
