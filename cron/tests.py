@@ -915,7 +915,7 @@ class CronManagementCommand(TransactionTestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].success, False)
         self.assertEqual(result[0].log_response, "NonJSON response")
-        self.assertEqual(result[0].log_error, 'Assertion text failed')
+        self.assertEqual(result[0].log_error, 'Assertion text failed.\nExpected: ""\nGot: "NonJSON response"')
         
     @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.get", mocked_request_get)

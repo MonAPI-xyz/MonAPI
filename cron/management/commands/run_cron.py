@@ -82,7 +82,7 @@ class Command(BaseCommand):
     def run_api_monitor_assertions(self, monitor_id, response):
         monitor = APIMonitor.objects.get(id=monitor_id)
         if monitor.assertion_type == 'TEXT' and response != monitor.assertion_value:
-            raise AssertionError('Assertion text failed')
+            raise AssertionError(f'Assertion text failed.\nExpected: "{monitor.assertion_value}"\nGot: "{response}"')
         elif monitor.assertion_type == 'JSON':
             try:
                 api_response = json.loads(response) 
