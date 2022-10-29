@@ -116,3 +116,5 @@ class AlertsConfiguration(models.Model):
     email_port = models.IntegerField(null=True, blank=True)
     email_username = models.CharField(max_length=1024, blank=True, default="")
     email_password = models.CharField(max_length=1024, blank=True, default="")
+    email_use_tls = models.BooleanField(default=False)
+    email_use_ssl = models.BooleanField(default=False)
