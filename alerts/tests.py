@@ -50,7 +50,9 @@ class AlertsConfigurationTestCase(APITestCase):
             "email_host": "",
             "email_port": None,
             "email_username": "",
-            "email_password": ""
+            "email_password": "",
+            "email_use_tls": False,
+            "email_use_ssl": False,
         })
         
         count = AlertsConfiguration.objects.count()
@@ -86,7 +88,9 @@ class AlertsConfigurationTestCase(APITestCase):
             "email_host": "",
             "email_port": None,
             "email_username": "",
-            "email_password": ""
+            "email_password": "",
+            "email_use_tls": False,
+            "email_use_ssl": False,
         })
     
     def test_when_authenticated_update_config_then_save_configuration(self):
@@ -109,7 +113,9 @@ class AlertsConfigurationTestCase(APITestCase):
             "email_host": "",
             "email_port": None,
             "email_username": "",
-            "email_password": ""
+            "email_password": "",
+            "email_use_tls": False,
+            "email_use_ssl": False,
         }
         
         response = self.client.post(self.test_url, data=req_body, format='json', **header)
@@ -129,7 +135,9 @@ class AlertsConfigurationTestCase(APITestCase):
             "email_host": "",
             "email_port": None,
             "email_username": "",
-            "email_password": ""
+            "email_password": "",
+            "email_use_tls": False,
+            "email_use_ssl": False,
         })
         
         config = AlertsConfiguration.objects.get(user=user)
