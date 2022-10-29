@@ -21,4 +21,6 @@ class AlertsConfigurationSerializer(serializers.ModelSerializer):
             'email_port',
             'email_username',
             'email_password',
+            'email_use_tls',
+            'email_use_ssl',
         ]
