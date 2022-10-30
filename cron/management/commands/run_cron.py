@@ -166,19 +166,19 @@ class Command(BaseCommand):
                     log_error=f"Request aborted due to recursion of API monitor steps"
                 )
                 
-            result = self.run_api_monitor_request(monitor.previous_step.id, monitor_history)
-            if not result.success:
+            prev_result = self.run_api_monitor_request(monitor.previous_step.id, monitor_history)
+            if not prev_result.success:
                 return APIMonitorResult(
                     monitor=monitor,
                     success=False,
                     status_code=result.status_code,
                     log_response=result.log_response,
-                    log_error=f"Error on previous step: {result.monitor.name}\n" + result.log_error,
+                    log_error=f"Error on previous step: {prev_result.monitor.name}\n" + prev_result.log_error,
                 )
                 
             # Extract json from log response if possible
             try:
-                previous_json = json.loads(result.log_response)
+                previous_json = json.loads(prev_result.log_response)
             except json.decoder.JSONDecodeError:
                 pass
         
