@@ -828,7 +828,7 @@ class CronManagementCommand(TransactionTestCase):
         result = APIMonitorResult.objects.all()
         self.assertEqual(len(result), 2)
         self.assertEqual(result[1].success, False)
-        self.assertEqual(result[1].log_response, "{\"testing\": \"testing value\"}")
+        self.assertEqual(result[1].log_response, "")
         self.assertIn('Error while preparing API monitor params: \'Value not found while accessing with key "testing.testing"\'', result[1].log_error)
         
     @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
