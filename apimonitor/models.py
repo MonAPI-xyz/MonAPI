@@ -128,7 +128,7 @@ class AlertsConfiguration(models.Model):
         ('12H', '12 Hour'),
         ('24H', '24 Hour')
     ]
-    threshold_pct = models.IntegerField(null=True, blank=True, default=100, validators=[
+    threshold_pct = models.IntegerField(default=100, validators=[
         MinValueValidator(1),
         MaxValueValidator(100)
     ])
