@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from apimonitor.models import AlertsConfiguration
-from alerts.models import ThresholdConfig
 
 class AlertsConfigurationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,13 +23,6 @@ class AlertsConfigurationSerializer(serializers.ModelSerializer):
             'email_password',
             'email_use_tls',
             'email_use_ssl',
-        ]
-
-class ThresholdConfigSerialzier(serializers.ModelSerializer):
-    class Meta:
-        model = ThresholdConfig
-        fields = [
-            'user',
             'threshold_pct',
             'time_window',
         ]
