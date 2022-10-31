@@ -10,6 +10,7 @@ from rest_framework.authtoken.models import Token
 from datetime import datetime
 
 from apimonitor.models import AlertsConfiguration
+from alerts.models import ThresholdConfig
 
 
 class AlertsConfigurationTestCase(APITestCase):
@@ -158,3 +159,16 @@ class AlertsConfigurationTestCase(APITestCase):
         response = self.client.post(self.test_url, data=req_body, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {"is_slack_active": ["This field may not be null."]})
+
+class ThresholdConfigTest(APITestCase):
+    def test_threshold_config_can_be_created(self):
+        # 1. Create User
+        user = User.objects.create_user(username="Test", email="test@test.com", password="test1234")
+        # 2. Create Threshold Config
+        data = {
+            'user': user
+        }
+        ThresholdConfig.objects.create(**data)
+        # 3. Check
+        self.assertEqual(ThresholdConfig.objects.all().count(), 1)
+
