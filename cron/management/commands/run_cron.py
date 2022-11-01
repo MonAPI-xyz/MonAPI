@@ -296,6 +296,8 @@ class Command(BaseCommand):
         except ValueError:
             pass
         
+        cron_interval = int(os.environ.get('CRON_INTERVAL_IN_SECONDS', 60))
+        
         for _ in range(consumer_count):
             consumer = threading.Thread(target=self.worker)
             consumer.start()
@@ -335,7 +337,7 @@ class Command(BaseCommand):
                     
                 # Add delay before next check
                 mock_cron_interrupt()
-                next_run = last_run + timedelta(seconds=60) 
+                next_run = last_run + timedelta(seconds=cron_interval) 
                 sleep_duration = (next_run - timezone.now()).total_seconds()
                 time.sleep(max(sleep_duration, 0))  
         except BaseException as e:
