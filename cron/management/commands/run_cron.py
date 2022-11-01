@@ -3,12 +3,15 @@ import requests
 import time
 import threading
 import queue
+import re
+import json
 from datetime import timedelta
 
 from django.utils import timezone
 from django.core.management.base import BaseCommand
+from deepdiff import DeepDiff
 
-from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, APIMonitorResult
+from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, APIMonitorResult, AssertionExcludeKey
 
 # Mock this function to interrupt the cron function
 def mock_cron_interrupt():
@@ -30,6 +33,232 @@ class Command(BaseCommand):
                     return None
             time.sleep(0.2)
     
+    # Access dictionary with key a.b.c or a.b.c[0] or a.b[0].c
+    def access_dict_with_key(self, key, source):
+        key_part = key.split('.', 1)
+        current_key = key_part[0]
+        res = None
+        
+        if not isinstance(source, dict):
+            return False
+        
+        array_idx = re.findall("\[\d\]$", current_key)
+        if len(array_idx) == 1:
+            current_key = current_key.replace(array_idx[0], '')
+            if current_key not in source:
+                return False
+            
+            if not isinstance(source[current_key], list):
+                return False
+            
+            array_idx_num = int(array_idx[0].strip('[]'))
+            if len(source[current_key]) < array_idx_num + 1:
+                return False
+            
+            res = source[current_key][array_idx_num]
+        else:
+            if current_key not in source:
+                return False
+            
+            res = source[current_key]
+            
+        if len(key_part) > 1:
+            return self.access_dict_with_key(key_part[1], res)
+        return str(res)
+
+    def replace_string_with_json_result(self, text, dict):
+        if dict is None:
+            return text
+
+        result = re.findall("{{.+?}}", text)
+        for match in result:
+            key = match.strip("{}")
+            value = self.access_dict_with_key(key, dict)
+            if value == False:
+                raise KeyError(f"Value not found while accessing with key \"{key}\"")
+            text = text.replace(match, value)
+        return text
+
+    def run_api_monitor_assertions(self, monitor_id, response):
+        monitor = APIMonitor.objects.get(id=monitor_id)
+        if monitor.assertion_type == 'TEXT' and response != monitor.assertion_value:
+            raise AssertionError(f'Assertion text failed.\nExpected: "{monitor.assertion_value}"\nGot: "{response}"')
+        elif monitor.assertion_type == 'JSON':
+            try:
+                api_response = json.loads(response) 
+            except json.decoder.JSONDecodeError:
+                raise AssertionError('Failed to decode JSON api response')
+            
+            try:
+                assertion_value = json.loads(monitor.assertion_value)
+            except json.decoder.JSONDecodeError:
+                raise AssertionError('Failed to decode JSON monitor assertions value')
+            
+            # Assertion exclude keys
+            ddiff_exclude_path = []
+            exclude_keys = AssertionExcludeKey.objects.filter(monitor=monitor)
+            for key in exclude_keys:
+                key = key.exclude_key.split('.')
+                res_key = 'root'
+                for key_part in key:
+                    array_idx = re.findall("\[[\d]\]$", key_part)
+                    if len(array_idx) == 1:
+                        key_part = key_part.replace(array_idx[0], '')
+                        res_key += f"['{key_part}']{array_idx[0]}"
+                    else:
+                        res_key += f"['{key_part}']"
+                ddiff_exclude_path.append(res_key)
+            
+            ddiff = DeepDiff(assertion_value, api_response, exclude_paths=ddiff_exclude_path)
+            
+            diff_result = ""
+            if not monitor.is_assert_json_schema_only:
+                if 'type_changes' in ddiff:
+                    for k,v in ddiff['type_changes'].items():
+                        diff_result += f"Different type detected on {k}, expected \"{v['old_value']}\" ({v['old_type']}) but found \"{v['new_value']}\" ({v['new_type']})\n"
+                if 'values_changed' in ddiff:
+                    for k,v in ddiff['values_changed'].items():
+                        diff_result += f"Different value detected on {k}, expected \"{v['old_value']}\" but found \"{v['new_value']}\"\n"
+            if 'dictionary_item_added' in ddiff:
+                diff_result += f"New key detected with keys {ddiff['dictionary_item_added']}\n"
+            if 'dictionary_item_removed' in ddiff:
+                diff_result += f"Missing key detected with keys {ddiff['dictionary_item_removed']}\n"
+            if 'iterable_item_added' in ddiff:
+                diff_result += f"Found iterable item added with keys {ddiff['iterable_item_added'].keys()}\n"
+            if 'iterable_item_removed' in ddiff:
+                diff_result += f"Found iterable item removed with keys {ddiff['iterable_item_removed'].keys()}\n"
+
+            if diff_result != "":
+                raise AssertionError(diff_result.strip('\n'))
+            
+    def run_api_monitor_request(self, monitor_id, monitor_history):
+        monitor_history.append(monitor_id)
+        
+        monitor = APIMonitor.objects.get(id=monitor_id)
+        previous_json = None
+        result = APIMonitorResult(
+            monitor=monitor,
+            success=False,
+            status_code=-1,
+            log_response="",
+            log_error="",
+        )
+        
+        # Run previous step of api monitor
+        if monitor.previous_step != None:
+            # Limit 10 monitor
+            if len(monitor_history) >= 10:
+                return APIMonitorResult(
+                    monitor=monitor,
+                    success=False,
+                    status_code=-1,
+                    log_response="",
+                    log_error=f"Depth limit of previous step API monitor reached (maximum: 10)"
+                )
+                
+            # Check if infinite recursion on api monitor detected
+            if monitor.previous_step.id in monitor_history:
+                return APIMonitorResult(
+                    monitor=monitor,
+                    success=False,
+                    status_code=-1,
+                    log_response="",
+                    log_error=f"Request aborted due to recursion of API monitor steps"
+                )
+                
+            prev_result = self.run_api_monitor_request(monitor.previous_step.id, monitor_history)
+            if not prev_result.success:
+                return APIMonitorResult(
+                    monitor=monitor,
+                    success=False,
+                    status_code=result.status_code,
+                    log_response=result.log_response,
+                    log_error=f"Error on previous step: {prev_result.monitor.name}\n" + prev_result.log_error,
+                )
+                
+            # Extract json from log response if possible
+            try:
+                previous_json = json.loads(prev_result.log_response)
+            except json.decoder.JSONDecodeError:
+                pass
+        
+        try:
+            # Prepare headers
+            request_headers = {}
+            headers = APIMonitorHeader.objects.filter(monitor=monitor)
+            for header in headers:
+                header_key = self.replace_string_with_json_result(header.key, previous_json)
+                header_value = self.replace_string_with_json_result(header.value, previous_json)
+                request_headers[header_key] = header_value
+                
+            # Prepare request body
+            request_body = {}
+            if monitor.body_type == 'FORM':
+                forms = APIMonitorBodyForm.objects.filter(monitor=monitor)
+                for form in forms:
+                    form_key = self.replace_string_with_json_result(form.key, previous_json)
+                    form_value = self.replace_string_with_json_result(form.value, previous_json)
+                    request_body[form_key] = form_value
+            elif monitor.body_type == 'RAW':
+                try:
+                    raw_body = APIMonitorRawBody.objects.get(monitor=monitor)
+                    request_body = self.replace_string_with_json_result(raw_body.body, previous_json)
+                except APIMonitorRawBody.DoesNotExist:
+                    pass
+            elif monitor.body_type == 'EMPTY':
+                request_body = None
+                
+            # Prepare query params
+            request_params = {}
+            query_params = APIMonitorQueryParam.objects.filter(monitor=monitor)
+            for param in query_params:
+                params_key = self.replace_string_with_json_result(param.key, previous_json)
+                params_value =  self.replace_string_with_json_result(param.value, previous_json)
+                request_params[params_key] = params_value
+        except KeyError as e:
+            return APIMonitorResult(
+                monitor=monitor,
+                success=False,
+                status_code=result.status_code,
+                log_response=result.log_response,
+                log_error=f"Error while preparing API monitor params: {str(e)}\n" + result.log_error,
+            )
+                
+        resp = None
+        
+        try:
+            if monitor.method == 'GET':
+                resp = requests.get(monitor.url, params=request_params, headers=request_headers, timeout=30)
+            elif monitor.method == 'POST':
+                resp = requests.post(monitor.url, params=request_params, data=request_body, headers=request_headers, timeout=30)
+            elif monitor.method == 'PATCH':
+                resp = requests.patch(monitor.url, params=request_params, data=request_body, headers=request_headers, timeout=30)
+            elif monitor.method == 'PUT':
+                resp = requests.put(monitor.url, params=request_params, data=request_body, headers=request_params, timeout=30)
+            elif monitor.method == 'DELETE':
+                resp = requests.delete(monitor.url, params=request_params, data=request_body, headers=request_headers, timeout=30)
+        except Exception as e:
+            result.log_error = str(e)
+        
+        if resp is not None:
+            if resp.status_code >= 200 and resp.status_code <= 299:
+                result.success = True
+            else:
+                result.log_error += 'Error code not in acceptable range 2xx'
+            result.log_response = resp.content.decode('utf-8', errors='ignore')
+            result.status_code = resp.status_code
+            
+        # Run assertions only when successful and only on root monitor
+        if result.success and len(monitor_history) == 1:
+            try:
+                self.run_api_monitor_assertions(monitor.id, result.log_response)
+            except AssertionError as e:
+                result.success = False
+                result.log_error = str(e)
+                
+        return result
+    
+    
     def worker(self):
         while True:
             # Prevent halt worker
@@ -38,74 +267,18 @@ class Command(BaseCommand):
                 if monitor_id == None:
                     return
                 
-                execution_time = timezone.localtime()
                 print(f"[{timezone.now()}] Running cron for monitor id:{monitor_id}")
-                monitor = APIMonitor.objects.get(id=monitor_id)
                 
-                # Prepare headers
-                request_headers = {}
-                headers = APIMonitorHeader.objects.filter(monitor=monitor)
-                for header in headers:
-                    request_headers[header.key] = header.value
-                    
-                # Prepare request body
-                request_body = {}
-                if monitor.body_type == 'FORM':
-                    forms = APIMonitorBodyForm.objects.filter(monitor=monitor)
-                    for form in forms:
-                        request_body[form.key] = form.value
-                elif monitor.body_type == 'RAW':
-                    try:
-                        raw_body = APIMonitorRawBody.objects.get(monitor=monitor)
-                        request_body = raw_body.body
-                    except APIMonitorRawBody.DoesNotExist:
-                        pass
-                elif monitor.body_type == 'EMPTY':
-                    request_body = None
-                    
-                # Prepare query params
-                request_params = {}
-                query_params = APIMonitorQueryParam.objects.filter(monitor=monitor)
-                for param in query_params:
-                    request_params[param.key] = param.value
-                        
-                resp = None
-                exception = ''
-                
+                execution_time = timezone.localtime()
                 start = time.perf_counter()
-                try:
-                    if monitor.method == 'GET':
-                        resp = requests.get(monitor.url, params=request_params, headers=request_headers, timeout=30)
-                    elif monitor.method == 'POST':
-                        resp = requests.post(monitor.url, params=request_params, data=request_body, headers=request_headers, timeout=30)
-                    elif monitor.method == 'PATCH':
-                        resp = requests.patch(monitor.url, params=request_params, data=request_body, headers=request_headers, timeout=30)
-                    elif monitor.method == 'PUT':
-                        resp = requests.put(monitor.url, params=request_params, data=request_body, headers=request_params, timeout=30)
-                    elif monitor.method == 'DELETE':
-                        resp = requests.delete(monitor.url, params=request_params, data=request_body, headers=request_headers, timeout=30)
-                except Exception as e:
-                    exception = str(e)
-                request_time = (time.perf_counter() - start) * 1000 # Convert from s to ms
                 
-                success = False
-                status_code = -1
-                resp_content = ''
-                if resp is not None:
-                    if resp.status_code >= 200 and resp.status_code <= 299:
-                        success = True
-                    resp_content = resp.content.decode('utf-8', errors='ignore')
-                    status_code = resp.status_code
-                    
-                APIMonitorResult.objects.create(
-                    monitor=monitor,
-                    execution_time=execution_time,
-                    response_time=request_time,
-                    success=success,
-                    status_code=status_code,
-                    log_response=resp_content,
-                    log_error=exception,
-                )
+                api_monitor_result = self.run_api_monitor_request(monitor_id, [])
+                
+                process_time = (time.perf_counter() - start) * 1000 # Convert from s to ms
+                api_monitor_result.execution_time = execution_time
+                api_monitor_result.response_time = process_time
+                api_monitor_result.save()
+                
                 print(f"[{timezone.now()}] Done run cron for monitor id:{monitor_id}")
                 self.q.task_done()
             except Exception as e:

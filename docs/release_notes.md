@@ -19,3 +19,11 @@ Date: 17th October 2022
 1. Implement create new api monitor
 2. Implement api monitor details
 3. Run cron for api monitor
+
+### Release 3
+Version: v0.3.0<br>
+Date: 31th October 2022
+1. Edit API Monitor
+2. API Monitor Assertions
+3. Multi step API monitor
+4. Alerts configuration

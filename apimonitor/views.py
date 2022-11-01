@@ -7,17 +7,19 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
-
+from utils import try_parse_int
 from apimonitor.models import (APIMonitor, APIMonitorResult, APIMonitorQueryParam,
-                               APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody)
+                               APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody, AssertionExcludeKey)
 from apimonitor.serializers import (APIMonitorSerializer, APIMonitorListSerializer,
                                     APIMonitorQueryParamSerializer, APIMonitorHeaderSerializer,
                                     APIMonitorBodyFormSerializer, APIMonitorRawBodySerializer,
-                                    APIMonitorRetrieveSerializer, APIMonitorDashboardSerializer)
+                                    APIMonitorRetrieveSerializer, APIMonitorDashboardSerializer,
+                                    AssertionExcludeKeySerializer)
 
 
 class APIMonitorViewSet(mixins.ListModelMixin,
                         mixins.CreateModelMixin,
+                        mixins.UpdateModelMixin,
                         mixins.DestroyModelMixin,
                         viewsets.GenericViewSet):
 
@@ -29,21 +31,121 @@ class APIMonitorViewSet(mixins.ListModelMixin,
     def get_queryset(self):
         queryset = APIMonitor.objects.filter(user=self.request.user)
         return queryset
-
-    def create(self, request, *args, **kwargs):
+    
+    def get_monitor_data_from_request(self, request):
         monitor_data = {
             'user': request.user,
             'name': request.data.get('name'),
             'method': request.data.get('method'),
             'url': request.data.get('url'),
             'schedule': request.data.get('schedule'),
-            'body_type': request.data.get('body_type')
+            'body_type': request.data.get('body_type'),
+            'previous_step_id': None if request.data.get('previous_step_id') == '' else request.data.get('previous_step_id', None),
+            'assertion_type': request.data.get('assertion_type', "DISABLED"),
+            'assertion_value': request.data.get('assertion_value', ""),
+            'is_assert_json_schema_only': request.data.get('is_assert_json_schema_only', False)
         }
+        return monitor_data
+
+    # PBI-15-edit-api-monitor-backend
+    def update(self, request, *args, **kwargs):
+        monitor_data = self.get_monitor_data_from_request(request)
+
+        if monitor_data['previous_step_id'] is not None:
+            if try_parse_int(monitor_data['previous_step_id']):
+                monitor_data['previous_step_obj'] = APIMonitor.objects.get(pk=int(monitor_data['previous_step_id']))
+            else:
+                return Response(data={"error": ["Please make sure your [previous step id] is valid and exist!"]},
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            monitor_data['previous_step_obj'] = None
+
+        api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
+        monitor_obj = APIMonitor.objects.get(pk=kwargs['pk'])
+        if (api_monitor_serializer.is_valid()):
+            # Saved
+            monitor_obj.name = monitor_data['name']
+            monitor_obj.method = monitor_data['method']
+            monitor_obj.url = monitor_data['url']
+            monitor_obj.schedule = monitor_data['schedule']
+            monitor_obj.body_type = monitor_data['body_type']
+            monitor_obj.previous_step = monitor_data['previous_step_obj']
+            monitor_obj.assertion_type = monitor_data['assertion_type']
+            monitor_obj.assertion_value = monitor_data['assertion_value']
+            monitor_obj.is_assert_json_schema_only = monitor_data['is_assert_json_schema_only']
+            monitor_obj.save()
+
+            # Delete old objects
+            APIMonitorQueryParam.objects.filter(monitor=kwargs['pk']).delete()
+            APIMonitorHeader.objects.filter(monitor=kwargs['pk']).delete()
+            APIMonitorBodyForm.objects.filter(monitor=kwargs['pk']).delete()
+            APIMonitorRawBody.objects.filter(monitor=kwargs['pk']).delete()
+            AssertionExcludeKey.objects.filter(monitor=kwargs['pk']).delete()
+
+            # Create new query param
+            for i in range(len(request.data.get('query_params', []))):
+                # Empty key or value will never reach backend, thanks Hugo
+                key = request.data.get('query_params')[i]['key']
+                value = request.data.get('query_params')[i]['value']
+                record = {
+                    "monitor": monitor_obj,
+                    "key": key,
+                    "value": value
+                }
+                APIMonitorQueryParam.objects.create(**record)
+
+            for i in range(len(request.data.get('headers', []))):
+                key = request.data.get('headers')[i]['key']
+                value = request.data.get('headers')[i]['value']
+                record = {
+                    "monitor": monitor_obj,
+                    "key": key,
+                    "value": value
+                }
+                APIMonitorHeader.objects.create(**record)
+
+            if (monitor_data['body_type'] == "FORM"):
+                for i in range(len(request.data.get('body_form', []))):
+                    key = request.data.get('body_form')[i]['key']
+                    value = request.data.get('body_form')[i]['value']
+                    record = {
+                        "monitor": monitor_obj,
+                        "key": key,
+                        "value": value
+                    }
+                    APIMonitorBodyForm.objects.create(**record)
+            elif (monitor_data['body_type'] == "RAW"):
+                record = {
+                    'monitor': monitor_obj,
+                    'body': request.data['raw_body']
+                }
+                APIMonitorRawBody.objects.create(**record)
+
+            for i in range(len(request.data.get('exclude_keys', []))):
+                key = request.data.get('exclude_keys')[i]['key']
+                record = {
+                    "monitor": monitor_obj,
+                    "exclude_key": key
+                }
+                AssertionExcludeKey.objects.create(**record)
+
+            serializer = APIMonitorSerializer(monitor_obj)
+            return Response(serializer.data)
+        else:
+            return Response(data={"error": "['Please make sure your [name, method, url, schedule, body_type] is valid']"},status=status.HTTP_400_BAD_REQUEST)
+
+    def create(self, request, *args, **kwargs):
+        monitor_data = self.get_monitor_data_from_request(request)
         api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
         if api_monitor_serializer.is_valid():
-            monitor_obj = APIMonitor.objects.create(**monitor_data)
             error_log = []
-            try:
+            try:    
+                if monitor_data['previous_step_id'] == None or ( try_parse_int(monitor_data['previous_step_id']) and APIMonitor.objects.filter(id=monitor_data['previous_step_id'], user=request.user).exists()):
+                    monitor_obj = APIMonitor.objects.create(**monitor_data)
+                else:
+                    error_log += ["Please make sure your [previous step id] is valid and exist!"]
+                    return Response(data={"error": f"{error_log[0]}"}, status=status.HTTP_400_BAD_REQUEST)
+
                 if request.data.get('query_params'):
                     for key_value_pair in request.data.get('query_params'):
                         if 'key' in key_value_pair and 'value' in key_value_pair:
@@ -110,7 +212,23 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                         APIMonitorRawBody.objects.create(**record)
                     else:
                         error_log += ["Please make sure your [raw body] is a valid string or JSON!"]
-
+                if request.data.get('exclude_keys'):
+                    for key_json in request.data.get('exclude_keys'):
+                        if 'key' in key_json:
+                            key = key_json['key']
+                        else:
+                            error_log += ["Please make sure you submit correct [exclude key]"]
+                            break
+                        record = {
+                            'monitor': monitor_obj.id,
+                            'exclude_key': key,
+                        }
+                        if AssertionExcludeKeySerializer(data=record).is_valid():
+                            record['monitor'] = monitor_obj
+                            AssertionExcludeKey.objects.create(**record)
+                        else:
+                            error_log += ["Please make sure your [exclude key] valid strings!"]
+                            break
                 assert len(error_log) == 0, error_log
                 serialized_obj = APIMonitorSerializer(monitor_obj)
                 return Response(data=serialized_obj.data, status=status.HTTP_201_CREATED)
