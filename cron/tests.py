@@ -95,6 +95,7 @@ class CronManagementCommand(TransactionTestCase):
         # Mock time function
         timezone.now = lambda: self.mock_current_time
         timezone.localtime = lambda: self.mock_current_time
+        os.environ['CRON_INTERVAL_IN_SECONDS'] = '2'
     
     def call_command(self, *args, **kwargs):
         out = StringIO()
