@@ -31,9 +31,8 @@ class APIMonitorViewSet(mixins.ListModelMixin,
     def get_queryset(self):
         queryset = APIMonitor.objects.filter(user=self.request.user)
         return queryset
-
-    # PBI-15-edit-api-monitor-backend
-    def update(self, request, *args, **kwargs):
+    
+    def get_monitor_data_from_request(self, request):
         monitor_data = {
             'user': request.user,
             'name': request.data.get('name'),
@@ -46,6 +45,11 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             'assertion_value': request.data.get('assertion_value', ""),
             'is_assert_json_schema_only': request.data.get('is_assert_json_schema_only', False)
         }
+        return monitor_data
+
+    # PBI-15-edit-api-monitor-backend
+    def update(self, request, *args, **kwargs):
+        monitor_data = self.get_monitor_data_from_request(request)
 
         if monitor_data['previous_step_id'] is not None:
             if try_parse_int(monitor_data['previous_step_id']):
@@ -131,18 +135,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             return Response(data={"error": "['Please make sure your [name, method, url, schedule, body_type] is valid']"},status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
-        monitor_data = {
-            'user': request.user,
-            'name': request.data.get('name'),
-            'method': request.data.get('method'),
-            'url': request.data.get('url'),
-            'schedule': request.data.get('schedule'),
-            'body_type': request.data.get('body_type'),
-            'previous_step_id': None if request.data.get('previous_step_id') == '' else request.data.get('previous_step_id', None) ,
-            'assertion_type': request.data.get('assertion_type', "DISABLED"),
-            'assertion_value': request.data.get('assertion_value', ""),
-            'is_assert_json_schema_only': request.data.get('is_assert_json_schema_only', False),
-        }
+        monitor_data = self.get_monitor_data_from_request(request)
         api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
         if api_monitor_serializer.is_valid():
             error_log = []
