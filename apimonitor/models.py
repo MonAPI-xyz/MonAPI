@@ -1,7 +1,7 @@
 from io import open_code
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class APIMonitor(models.Model):
     method_choices = [
@@ -118,3 +118,18 @@ class AlertsConfiguration(models.Model):
     email_password = models.CharField(max_length=1024, blank=True, default="")
     email_use_tls = models.BooleanField(default=False)
     email_use_ssl = models.BooleanField(default=False)
+
+    # Threshold config
+    time_window_choices = [
+        ('1H', '1 Hour'),
+        ('2H', '2 Hour'),
+        ('3H', '3 Hour'),
+        ('6H', '6 Hour'),
+        ('12H', '12 Hour'),
+        ('24H', '24 Hour')
+    ]
+    threshold_pct = models.IntegerField(default=100, validators=[
+        MinValueValidator(1),
+        MaxValueValidator(100)
+    ])
+    time_window = models.CharField(max_length=16, choices=time_window_choices, default='1H')

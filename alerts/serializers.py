@@ -23,4 +23,6 @@ class AlertsConfigurationSerializer(serializers.ModelSerializer):
             'email_password',
             'email_use_tls',
             'email_use_ssl',
+            'threshold_pct',
+            'time_window',
         ]
