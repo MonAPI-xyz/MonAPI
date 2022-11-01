@@ -3260,7 +3260,7 @@ class ListAPIMonitor(APITestCase):
             }
         )
 
-    def test_user_can_create_api_monitor_with_dash_previous_step(self):
+    def test_user_can_create_api_monitor_with_empty_previous_step(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         token = Token.objects.create(user=user)
@@ -3272,7 +3272,7 @@ class ListAPIMonitor(APITestCase):
             'method': 'GET',
             'url': 'Test Path',
             'schedule': '10MIN',
-            'previous_step_id': '-',
+            'previous_step_id': '',
             'body_type': 'EMPTY',
         }
 
