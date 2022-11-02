@@ -538,7 +538,7 @@ class CronAlertsManagementCommand(TransactionTestCase):
             pass
         time.sleep(0.1)
         
-        self.assertFalse(mock_request.called)
+        self.assertTrue(mock_request.called)
         
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.post")
