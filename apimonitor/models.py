@@ -45,6 +45,7 @@ class APIMonitor(models.Model):
     assertion_type = models.CharField(max_length=16, choices=assertion_type_choices, default='DISABLED')
     assertion_value = models.TextField(blank=True)
     is_assert_json_schema_only = models.BooleanField(default=False)
+    last_notified = models.DateTimeField(null=True, blank=True)
     
     
 class APIMonitorQueryParam(models.Model):
@@ -109,6 +110,7 @@ class AlertsConfiguration(models.Model):
     is_pagerduty_active = models.BooleanField(default=False)
     pagerduty_api_key = models.CharField(max_length=256, blank=True, default="")
     pagerduty_default_from_email = models.CharField(max_length=256, blank=True, default="")
+    pagerduty_service_id = models.CharField(max_length=64, blank=True, default="")
     
     # Email config
     is_email_active = models.BooleanField(default=False)
