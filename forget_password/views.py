@@ -54,7 +54,7 @@ class RequestForgetPasswordTokenView(views.APIView):
             send_mail(
                 'MonAPI Reset Password Request',
                 email_content,
-                'MonAPI <noreply@monapi.xyz>',
+                None,
                 [user.email],
                 html_message=email_content_html,
                 fail_silently=False,
