@@ -5,11 +5,13 @@ import threading
 import queue
 from datetime import timedelta
 
+from django.core.mail import get_connection
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.db.models import Count, Q
 from django.core.management.base import BaseCommand
 
-from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, APIMonitorResult, AlertsConfiguration, AssertionExcludeKey
+from apimonitor.models import APIMonitor, APIMonitorResult, AlertsConfiguration
 
 # Mock this function to interrupt the cron function
 def mock_cron_interrupt():
@@ -72,9 +74,40 @@ class Command(BaseCommand):
         })
     
     def send_alert_email(self, monitor_id):
-        # TODO: implement send alerts to email for given monitor id
-        pass
-    
+        monitor = APIMonitor.objects.get(id=monitor_id)
+        alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
+
+        error_logs_link = f"{os.environ.get('FRONTEND_URL', '')}/error-logs/"
+        email_content = f'''
+            Success rate monitor {monitor.name} is dropping below {alerts_config.threshold_pct}%\n
+            You can check the error logs in\n
+            {error_logs_link}
+            '''
+
+        email_content_html = render_to_string('email/alerts.html', {
+                'api_monitor_name': monitor.name,
+                'threshold_pct': alerts_config.threshold_pct,
+                'error_logs_link': error_logs_link,
+            })
+
+        from_email = f"{alerts_config.email_name} <{alerts_config.email_address}>"
+
+        with get_connection(
+            host = alerts_config.email_host, 
+            port = alerts_config.email_port, 
+            username = alerts_config.email_username, 
+            password = alerts_config.email_password, 
+            use_tls = alerts_config.email_use_tls,
+            use_ssl = alerts_config.email_use_ssl
+        ) as connection:
+            monitor.user.email_user(
+                "Alerts! from MonAPI",
+                email_content,
+                from_email,
+                fail_silently=False,
+                connection=connection,
+                html_message=email_content_html,
+            )
     
     def worker(self, type):
         monitor_id = None
