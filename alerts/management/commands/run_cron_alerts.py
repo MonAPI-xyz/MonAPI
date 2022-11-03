@@ -76,21 +76,20 @@ class Command(BaseCommand):
     def send_alert_email(self, monitor_id):
         monitor = APIMonitor.objects.get(id=monitor_id)
         alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
-
         error_logs_link = f"{os.environ.get('FRONTEND_URL', '')}/error-logs/"
+
+        email_subject = f"Alerts on monitor {monitor.name}! - MonAPI"
         email_content = f'''
             Success rate monitor {monitor.name} is dropping below {alerts_config.threshold_pct}%\n
             You can check the error logs in\n
             {error_logs_link}
             '''
-
+        from_email = f"{alerts_config.email_name} <{alerts_config.email_address}>"
         email_content_html = render_to_string('email/alerts.html', {
                 'api_monitor_name': monitor.name,
                 'threshold_pct': alerts_config.threshold_pct,
                 'error_logs_link': error_logs_link,
             })
-
-        from_email = f"{alerts_config.email_name} <{alerts_config.email_address}>"
 
         with get_connection(
             host = alerts_config.email_host, 
@@ -101,7 +100,7 @@ class Command(BaseCommand):
             use_ssl = alerts_config.email_use_ssl
         ) as connection:
             monitor.user.email_user(
-                "Alerts! from MonAPI",
+                email_subject,
                 email_content,
                 from_email,
                 fail_silently=False,
