@@ -40,8 +40,16 @@ class Command(BaseCommand):
             q.put(monitor_id)
             
     def send_alert_slack(self, monitor_id):
-        # TODO: implement send alerts to slack for given monitor id
-        pass
+        monitor = APIMonitor.objects.get(id=monitor_id)
+        alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
+        requests.post('https://slack.com/api/chat.postMessage', json=
+        {
+            "channel": alerts_config.slack_channel_id,
+            "text": f"Success rate monitor {monitor.name} is dropping below {alerts_config.threshold_pct}%"
+        }, headers={
+            "Authorization": f"Bearer {alerts_config.slack_token}",
+            "Content-Type": "application/json",
+        })
     
     def send_alert_discord(self, monitor_id):
         # TODO: implement send alerts to discord for given monitor id
