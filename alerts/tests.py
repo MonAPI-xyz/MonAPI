@@ -591,7 +591,78 @@ class CronAlertsManagementCommand(TransactionTestCase):
         time.sleep(0.1)
         
         self.assertFalse(mock_request.called)
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect = [None, InterruptedError])
+    @patch("requests.post")
+    def test_when_api_monitor_failed_and_last_notified_within_5min_then_not_send_alert_slack(self, mock_request, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+            is_slack_active=True,
+        )
         
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=False,
+            status_code=500,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        
+        self.assertEqual(mock_request.call_count, 1)
+
+
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.post")
+    def test_when_api_monitor_success_and_slack_enabled_then_not_send_alert(self, mock_request, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+            is_slack_active=True,
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=True,
+            status_code=200,
+            log_response='resp',
+            log_error='',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        self.assertFalse(mock_request.called)
+
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.post")
     def test_when_api_monitor_failed_and_slack_enabled_then_send_alert(self, mock_request, mock_interrupt):
@@ -625,7 +696,7 @@ class CronAlertsManagementCommand(TransactionTestCase):
         except InterruptedError:
             pass
         time.sleep(0.1)
-        
-        self.assertFalse(mock_request.called)
+        args = mock_request.call_args.args
+        self.assertEqual(args[0], 'https://slack.com/api/chat.postMessage')
         
     
