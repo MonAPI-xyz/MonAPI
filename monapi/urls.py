@@ -22,9 +22,10 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 
 urlpatterns = [
+    path('', include(router.urls)),
     path('admin/', admin.site.urls),
     path('register/', include('register.urls')),
-    path('', include(router.urls)),
+    path('forget-password/', include('forget_password.urls')),
     path('logout/', include('logout.urls')),
     path('monitor/', include('apimonitor.urls')),
     path('login/', include('login.urls')),
