@@ -114,6 +114,8 @@ class AlertsConfiguration(models.Model):
     
     # Email config
     is_email_active = models.BooleanField(default=False)
+    email_name = models.CharField(max_length=1024, blank=True, default="")
+    email_address = models.EmailField(max_length = 1024, blank=True)
     email_host = models.CharField(max_length=1024, blank=True, default="")
     email_port = models.IntegerField(null=True, blank=True)
     email_username = models.CharField(max_length=1024, blank=True, default="")
