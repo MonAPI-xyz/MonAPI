@@ -234,7 +234,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 if os.getenv('PRODUCTION', '') == 'True':
-    CORS_ALLOWED_ORIGINS = os.getenv('FRONTEND_URL', '').split(',')
+    CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
 
 # Server mail configuration
 EMAIL_HOST = os.getenv('EMAIL_HOST', '')
