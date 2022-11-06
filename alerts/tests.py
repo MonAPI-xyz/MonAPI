@@ -486,6 +486,7 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect = [None, InterruptedError])
     @patch("requests.post")
     def test_when_api_monitor_failed_and_last_notified_within_5min_then_not_send_alert(self, mock_request, mock_interrupt):
+        os.environ['FRONTEND_URL'] = "http://localhost:8080"
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
         AlertsConfiguration.objects.create(
             user=user,
