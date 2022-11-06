@@ -13,6 +13,7 @@ from django.core.management.base import BaseCommand
 
 from apimonitor.models import APIMonitor, APIMonitorResult, AlertsConfiguration
 
+from discord_webhook import DiscordWebhook, DiscordEmbed
 # Mock this function to interrupt the cron function
 def mock_cron_interrupt():
     pass
@@ -24,6 +25,33 @@ class Command(BaseCommand):
     channels = ['slack', 'discord', 'pagerduty', 'email']
     
     stop_signal = threading.Event()
+
+    def get_success_rate(self, monitor):
+        time_window_in_seconds = {
+            '1H': 3600,
+            '2H': 7200,
+            '3H': 10800,
+            '6H': 21600,
+            '12H': 43200,
+            '24H': 86400,
+        }
+
+        alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
+        time_theshold = timezone.now() - timedelta(seconds=time_window_in_seconds[alerts_config.time_window])
+
+        # Average success rate
+        success_count = APIMonitorResult.objects \
+            .filter(monitor=monitor, execution_time__gte=time_theshold) \
+            .aggregate(
+            s=Count('success', filter=Q(success=True)),
+            f=Count('success', filter=Q(success=False)),
+            total=Count('pk'),
+        )
+
+        success_rate = 100
+        if success_count['total'] != 0:
+            success_rate = success_count['s'] / (success_count['total']) * 100
+        return success_rate
     
     def get_monitor_id_from_queue(self, type):
         while True:
@@ -46,8 +74,24 @@ class Command(BaseCommand):
         pass
     
     def send_alert_discord(self, monitor_id):
-        # TODO: implement send alerts to discord for given monitor id
-        pass
+        monitor = APIMonitor.objects.get(id=monitor_id)
+        success_rate = self.get_success_rate(monitor)
+        alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
+        discord_webhook_url = alerts_config.discord_webhook_url
+        webhook = DiscordWebhook(url=discord_webhook_url, rate_limit_retry=True)
+        embed = DiscordEmbed(title=f"Your API Monitor ({monitor.name}) Recently failed!",
+                             description=f"Your API Monitor failed to reach {alerts_config.threshold_pct}% success rate",
+                             url=os.getenv('FRONTEND_URL') + f"/{monitor_id}/detail/"
+                             )
+
+        embed.add_embed_field(name='Threshold', value=f"{alerts_config.threshold_pct}%")
+        embed.add_embed_field(name='Current Success Rate', value=f"{round(float(success_rate), 2)}%")
+        embed.add_embed_field(name='Method', value=f"{monitor.method}")
+        embed.add_embed_field(name="Url", value=f"{monitor.url}")
+        embed.set_timestamp()
+
+        webhook.add_embed(embed)
+        webhook.execute()
     
     def send_alert_pagerduty(self, monitor_id):
         monitor = APIMonitor.objects.get(id=monitor_id)
@@ -157,15 +201,6 @@ class Command(BaseCommand):
                 consumer = threading.Thread(target=self.worker, args=[channel])
                 consumer.start()
                 thread_pool.append(consumer)
-
-        time_window_in_seconds = {
-            '1H': 3600,
-            '2H': 7200,
-            '3H': 10800,
-            '6H': 21600,
-            '12H': 43200,
-            '24H': 86400,
-        }
         
         try:
             # Cron loop function
@@ -176,23 +211,10 @@ class Command(BaseCommand):
                 for monitor in api_monitors:
                     if monitor.last_notified != None and monitor.last_notified > timezone.now() - timedelta(minutes=5):
                         continue
-                    
+
                     alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
-                    time_theshold = timezone.now() - timedelta(seconds=time_window_in_seconds[alerts_config.time_window])
-                    
-                    # Average success rate
-                    success_count = APIMonitorResult.objects \
-                        .filter(monitor=monitor, execution_time__gte=time_theshold) \
-                        .aggregate(
-                            s=Count('success', filter=Q(success=True)), 
-                            f=Count('success', filter=Q(success=False)),
-                            total=Count('pk'),
-                        )
-                    
-                    success_rate = 100
-                    if success_count['total'] != 0:
-                        success_rate = success_count['s'] / (success_count['total']) * 100
-                    
+                    success_rate = self.get_success_rate(monitor)
+
                     if success_rate < alerts_config.threshold_pct:
                         self.put_monitor_id_into_queue(monitor.id)
                         monitor.last_notified = timezone.now()
