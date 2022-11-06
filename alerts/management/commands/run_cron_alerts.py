@@ -91,7 +91,7 @@ class Command(BaseCommand):
         embed.set_timestamp()
 
         webhook.add_embed(embed)
-        response = webhook.execute()
+        webhook.execute()
     
     def send_alert_pagerduty(self, monitor_id):
         monitor = APIMonitor.objects.get(id=monitor_id)
@@ -201,15 +201,6 @@ class Command(BaseCommand):
                 consumer = threading.Thread(target=self.worker, args=[channel])
                 consumer.start()
                 thread_pool.append(consumer)
-
-        time_window_in_seconds = {
-            '1H': 3600,
-            '2H': 7200,
-            '3H': 10800,
-            '6H': 21600,
-            '12H': 43200,
-            '24H': 86400,
-        }
         
         try:
             # Cron loop function
