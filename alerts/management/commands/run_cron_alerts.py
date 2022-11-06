@@ -79,11 +79,14 @@ class Command(BaseCommand):
         webhook = DiscordWebhook(url=discord_webhook_url, rate_limit_retry=True)
         embed = DiscordEmbed(title=f"Your API Monitor ({monitor.name}) Recently failed!",
                              description=f"Your API Monitor failed to reach {alerts_config.threshold_pct}% success rate",
-                             url=f"https://staging.monapi.xyz/{monitor_id}/detail/"
+                             url=os.getenv('FRONTEND_URL') + f"/{monitor_id}/detail/"
                              )
 
         embed.add_embed_field(name='Threshold', value=f"{alerts_config.threshold_pct}%")
-        embed.add_embed_field(name='Current Success Rate', value=f"{success_rate}%")
+        embed.add_embed_field(name='Current Success Rate', value=f"{round(float(success_rate), 2)}%")
+        embed.add_embed_field(name='Method', value=f"{monitor.method}")
+        embed.add_embed_field(name="Url", value=f"{monitor.url}")
+        embed.set_timestamp()
 
         webhook.add_embed(embed)
         response = webhook.execute()
