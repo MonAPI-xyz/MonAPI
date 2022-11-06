@@ -14,7 +14,6 @@ from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from datetime import datetime
 import time
-import requests
 import os
 
 from apimonitor.models import APIMonitor, APIMonitorResult, AlertsConfiguration
@@ -54,6 +53,8 @@ class AlertsConfigurationTestCase(APITestCase):
             "pagerduty_default_from_email": "",
             "pagerduty_service_id": "",
             "is_email_active": False,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -93,6 +94,8 @@ class AlertsConfigurationTestCase(APITestCase):
             "pagerduty_default_from_email": "",
             "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -119,6 +122,8 @@ class AlertsConfigurationTestCase(APITestCase):
             "pagerduty_default_from_email": "",
             "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -140,6 +145,8 @@ class AlertsConfigurationTestCase(APITestCase):
             "pagerduty_default_from_email": "",
             "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -187,6 +194,8 @@ class ThresholdConfigTest(APITestCase):
             "pagerduty_default_from_email": "",
             "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -210,6 +219,8 @@ class ThresholdConfigTest(APITestCase):
             "pagerduty_default_from_email": "",
             "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -242,6 +253,8 @@ class ThresholdConfigTest(APITestCase):
             "pagerduty_default_from_email": "",
             "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -273,6 +286,8 @@ class ThresholdConfigTest(APITestCase):
             "pagerduty_default_from_email": "",
             "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -541,8 +556,8 @@ class CronAlertsManagementCommand(TransactionTestCase):
         self.assertTrue(mock_request.called)
         
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
-    @patch("requests.post")
-    def test_when_api_monitor_failed_and_email_enabled_then_send_alert(self, mock_request, mock_interrupt):
+    @patch("django.contrib.auth.models.User.email_user")
+    def test_when_api_monitor_failed_and_email_enabled_then_send_alert(self, mock_send_mail, mock_interrupt):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
         AlertsConfiguration.objects.create(
             user=user,
@@ -574,7 +589,43 @@ class CronAlertsManagementCommand(TransactionTestCase):
             pass
         time.sleep(0.1)
         
-        self.assertFalse(mock_request.called)
+        self.assertEqual(mock_send_mail.call_count, 1)
+        
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("django.contrib.auth.models.User.email_user")
+    def test_when_api_monitor_success_and_email_enabled_then_no_send_alert(self, mock_send_mail, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+            is_email_active=True,
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=True,
+            status_code=200,
+            log_response='resp',
+            log_error='',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        
+        self.assertFalse(mock_send_mail.called)
         
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.post")

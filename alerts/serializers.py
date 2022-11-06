@@ -16,6 +16,8 @@ class AlertsConfigurationSerializer(serializers.ModelSerializer):
             'pagerduty_default_from_email',
             'pagerduty_service_id',
             'is_email_active',
+            'email_name',
+            'email_address',
             'email_host',
             'email_port',
             'email_username',
