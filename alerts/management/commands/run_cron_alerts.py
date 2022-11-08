@@ -12,6 +12,7 @@ from django.db.models import Count, Q
 from django.core.management.base import BaseCommand
 
 from apimonitor.models import APIMonitor, APIMonitorResult, AlertsConfiguration
+from login.models import TeamMember
 
 from discord_webhook import DiscordWebhook, DiscordEmbed
 # Mock this function to interrupt the cron function
@@ -36,7 +37,7 @@ class Command(BaseCommand):
             '24H': 86400,
         }
 
-        alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
+        alerts_config, _ = AlertsConfiguration.objects.get_or_create(team=monitor.team)
         time_theshold = timezone.now() - timedelta(seconds=time_window_in_seconds[alerts_config.time_window])
 
         # Average success rate
@@ -76,7 +77,7 @@ class Command(BaseCommand):
     def send_alert_discord(self, monitor_id):
         monitor = APIMonitor.objects.get(id=monitor_id)
         success_rate = self.get_success_rate(monitor)
-        alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
+        alerts_config, _ = AlertsConfiguration.objects.get_or_create(team=monitor.team)
         discord_webhook_url = alerts_config.discord_webhook_url
         webhook = DiscordWebhook(url=discord_webhook_url, rate_limit_retry=True)
         embed = DiscordEmbed(title=f"Your API Monitor ({monitor.name}) Recently failed!",
@@ -95,7 +96,7 @@ class Command(BaseCommand):
     
     def send_alert_pagerduty(self, monitor_id):
         monitor = APIMonitor.objects.get(id=monitor_id)
-        alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
+        alerts_config, _ = AlertsConfiguration.objects.get_or_create(team=monitor.team)
         
         requests.post('https://api.pagerduty.com/incidents', json={
             "incident": {
@@ -119,7 +120,7 @@ class Command(BaseCommand):
     
     def send_alert_email(self, monitor_id):
         monitor = APIMonitor.objects.get(id=monitor_id)
-        alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
+        alerts_config, _ = AlertsConfiguration.objects.get_or_create(team=monitor.team)
         error_logs_link = f"{os.environ.get('FRONTEND_URL', '')}/error-logs/"
 
         email_subject = f"Alerts on monitor {monitor.name}! - MonAPI"
@@ -143,14 +144,16 @@ class Command(BaseCommand):
             use_tls = alerts_config.email_use_tls,
             use_ssl = alerts_config.email_use_ssl
         ) as connection:
-            monitor.user.email_user(
-                email_subject,
-                email_content,
-                from_email,
-                fail_silently=False,
-                connection=connection,
-                html_message=email_content_html,
-            )
+            team_members = TeamMember.objects.filter(team=monitor.team)
+            for member in team_members:
+                member.user.email_user(
+                    email_subject,
+                    email_content,
+                    from_email,
+                    fail_silently=False,
+                    connection=connection,
+                    html_message=email_content_html,
+                )
     
     def worker(self, type):
         monitor_id = None
@@ -164,7 +167,7 @@ class Command(BaseCommand):
                 print(f"[{timezone.now()}] Send {type} alert for monitor id:{monitor_id}")
                 
                 monitor = APIMonitor.objects.get(id=monitor_id)
-                alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
+                alerts_config, _ = AlertsConfiguration.objects.get_or_create(team=monitor.team)
                 
                 if type == 'slack' and alerts_config.is_slack_active:
                     self.send_alert_slack(monitor_id)
@@ -212,7 +215,7 @@ class Command(BaseCommand):
                     if monitor.last_notified != None and monitor.last_notified > timezone.now() - timedelta(minutes=5):
                         continue
 
-                    alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
+                    alerts_config, _ = AlertsConfiguration.objects.get_or_create(team=monitor.team)
                     success_rate = self.get_success_rate(monitor)
 
                     if success_rate < alerts_config.threshold_pct:

@@ -15,6 +15,7 @@ from apimonitor.serializers import (APIMonitorSerializer, APIMonitorListSerializ
                                     APIMonitorBodyFormSerializer, APIMonitorRawBodySerializer,
                                     APIMonitorRetrieveSerializer, APIMonitorDashboardSerializer,
                                     AssertionExcludeKeySerializer)
+from login.permissions import UserTeamExists
 
 
 class APIMonitorViewSet(mixins.ListModelMixin,
@@ -25,16 +26,16 @@ class APIMonitorViewSet(mixins.ListModelMixin,
 
     queryset = APIMonitor.objects.all()
     serializer_class = APIMonitorSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, UserTeamExists]
     lookup_field = "pk"
     
     def get_queryset(self):
-        queryset = APIMonitor.objects.filter(user=self.request.user)
+        queryset = APIMonitor.objects.filter(team=self.request.auth.team)
         return queryset
     
     def get_monitor_data_from_request(self, request):
         monitor_data = {
-            'user': request.user,
+            'team': request.auth.team,
             'name': request.data.get('name'),
             'method': request.data.get('method'),
             'url': request.data.get('url'),
@@ -140,7 +141,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
         if api_monitor_serializer.is_valid():
             error_log = []
             try:    
-                if monitor_data['previous_step_id'] == None or ( try_parse_int(monitor_data['previous_step_id']) and APIMonitor.objects.filter(id=monitor_data['previous_step_id'], user=request.user).exists()):
+                if monitor_data['previous_step_id'] == None or ( try_parse_int(monitor_data['previous_step_id']) and APIMonitor.objects.filter(id=monitor_data['previous_step_id'], team=request.auth.team).exists()):
                     monitor_obj = APIMonitor.objects.create(**monitor_data)
                 else:
                     error_log += ["Please make sure your [previous step id] is valid and exist!"]
@@ -376,7 +377,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             start_time = last_chosen_period
             end_time = last_chosen_period+timedelta(hours=1)
             avg_response_time = APIMonitorResult.objects \
-                .filter(monitor__user=request.user, execution_time__gte=start_time, execution_time__lte=end_time) \
+                .filter(monitor__team=request.auth.team, execution_time__gte=start_time, execution_time__lte=end_time) \
                 .aggregate(avg=Avg('response_time'))
 
             avg = 0
@@ -392,7 +393,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
 
             # Average success rate
             success_count = APIMonitorResult.objects \
-                .filter(monitor__user=request.user, execution_time__gte=start_time, execution_time__lte=end_time) \
+                .filter(monitor__team=request.auth.team, execution_time__gte=start_time, execution_time__lte=end_time) \
                 .aggregate(
                     s=Count('success', filter=Q(success=True)), 
                     f=Count('success', filter=Q(success=False)),

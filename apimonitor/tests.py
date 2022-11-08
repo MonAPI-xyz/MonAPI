@@ -11,6 +11,7 @@ from rest_framework.authtoken.models import Token
 
 from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, \
     APIMonitorResult, AssertionExcludeKey
+from login.models import Team, TeamMember, MonAPIToken
 
 
 class DetailListAPIMonitor(APITestCase):
@@ -24,10 +25,13 @@ class DetailListAPIMonitor(APITestCase):
 
     def init_for_test_retrieve_without_result(self, range_schedule):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='Test Monitor',
             method='GET',
             url='Test Path',
@@ -40,10 +44,13 @@ class DetailListAPIMonitor(APITestCase):
 
     def init_for_test_retrieve_with_result(self, range_schedule):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='Test Monitor',
             method='GET',
             url='Test Path',
@@ -1978,10 +1985,13 @@ class StatsAPIMonitor(APITestCase):
 
     def test_stats_with_result(self):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='Test Monitor',
             method='GET',
             url='Test Path',
@@ -2073,10 +2083,13 @@ class StatsAPIMonitor(APITestCase):
 
     def test_stats_without_result(self):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='Test Monitor',
             method='GET',
             url='Test Path',
@@ -2178,7 +2191,10 @@ class ListAPIMonitor(APITestCase):
     def test_when_authenticated_and_empty_monitor_then_return_success_empty_monitor(self):
         # Create dummy user and authenticate
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         response = self.client.get(self.test_url, format='json', **header)
@@ -2188,10 +2204,13 @@ class ListAPIMonitor(APITestCase):
     def test_when_authenticated_and_non_empty_monitor_then_return_success_with_monitor(self):
         # Create dummy user and authenticate
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='Test Monitor',
             method='GET',
             url='Test Path',
@@ -2457,10 +2476,13 @@ class ListAPIMonitor(APITestCase):
     def test_when_authenticated_and_empty_monitor_result_then_return_one_hunderd_success_rate(self):
         # Create dummy user and authenticate
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='Test Monitor',
             method='GET',
             url='Test Path',
@@ -2681,12 +2703,15 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_delete_an_api_monitor(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         # Create an API Monitor object under their account
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='Test Monitor',
             method='GET',
             url='Test Path',
@@ -2758,7 +2783,7 @@ class ListAPIMonitor(APITestCase):
 
         # Other user CANNOT delete monitor that is now owned by themself
         # Get the monitor's ID, in this case: delete first created
-        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        target_monitor_id = APIMonitor.objects.filter(team=team)[:1].get().id
         delete_test_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
 
         # Object is deleted
@@ -2769,12 +2794,15 @@ class ListAPIMonitor(APITestCase):
     def test_non_owner_cannot_delete_another_owned_api_monitor(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         # Create an API Monitor object under their account
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='Test Monitor',
             method='GET',
             url='Test Path',
@@ -2844,11 +2872,14 @@ class ListAPIMonitor(APITestCase):
         # Create malicious user
         malicious_user = User.objects.create_user(username="test2@test.com", email="test2@test.com",
                                                   password="Test1234")
-        token2 = Token.objects.create(user=malicious_user)
+        team2 = Team.objects.create(name='test team')
+        team_member2 = TeamMember.objects.create(team=team2, user=malicious_user)
+        
+        token2 = MonAPIToken.objects.create(team_member=team_member2)
         header2 = {'HTTP_AUTHORIZATION': f"Token {token2.key}"}
 
         # Get path
-        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        target_monitor_id = APIMonitor.objects.filter(team=team)[:1].get().id
         delete_test_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
 
         # Request failed, api monitor is not deleted
@@ -2859,7 +2890,10 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_create_new_api_monitor(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -2919,7 +2953,10 @@ class ListAPIMonitor(APITestCase):
     def test_failed_attempt_because_query_params_doesnt_create_object(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -2980,7 +3017,10 @@ class ListAPIMonitor(APITestCase):
     def test_failed_attempt_because_headers_doesnt_create_object(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3042,7 +3082,10 @@ class ListAPIMonitor(APITestCase):
     def test_failed_attempt_because_body_form_doesnt_create_object(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3105,7 +3148,10 @@ class ListAPIMonitor(APITestCase):
     def test_failed_attempt_because_raw_body_doesnt_create_object(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3159,7 +3205,10 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_create_api_monitor_with_raw_body(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3214,7 +3263,10 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_create_api_monitor_without_previous_step(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3263,7 +3315,10 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_create_api_monitor_with_empty_previous_step(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3314,7 +3369,10 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_create_api_monitor_with_valid_previous_step(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3370,12 +3428,19 @@ class ListAPIMonitor(APITestCase):
                 "exclude_keys": []
             }
         )
-    def test_user_can_create_api_monitor_with_other_user_previous_step_id(self):
+    def test_user_cannot_create_api_monitor_with_other_user_previous_step_id(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
+        
         user_two = User.objects.create_user(username="test2@test.com", email="test2@test.com", password="Test1234")
-        token_two = Token.objects.create(user=user_two)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user_two)
+        
+        token_two = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         header_two = {'HTTP_AUTHORIZATION': f"Token {token_two.key}"}
 
@@ -3419,7 +3484,10 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_create_api_monitor_with_invalid_previous_step_1(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3452,7 +3520,10 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_create_api_monitor_with_invalid_previous_step_2(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3485,7 +3556,10 @@ class ListAPIMonitor(APITestCase):
     def test_bad_monitor_data_shouldnt_be_created(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3537,7 +3611,10 @@ class ListAPIMonitor(APITestCase):
     def test_query_params_is_not_valid(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3589,7 +3666,10 @@ class ListAPIMonitor(APITestCase):
     def test_header_is_not_valid(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3640,7 +3720,10 @@ class ListAPIMonitor(APITestCase):
     def test_body_form_is_not_valid(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3700,7 +3783,10 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_create_new_api_monitor_with_text_assertion(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3764,7 +3850,10 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_create_new_api_monitor_with_json_assertion(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3800,7 +3889,10 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_create_new_api_monitor_with_json_assertion_with_exclude_keys(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3847,7 +3939,10 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_create_new_api_monitor_with_json_assertion_schema_only(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3891,7 +3986,10 @@ class ListAPIMonitor(APITestCase):
     def test_user_can_create_new_api_monitor_with_disabled_assertion(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3924,7 +4022,10 @@ class ListAPIMonitor(APITestCase):
     def test_exclude_keys_assertion_is_not_valid(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -3967,7 +4068,10 @@ class ListAPIMonitor(APITestCase):
     def test_failed_attempt_because_exclude_keys_doesnt_create_object(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -4011,7 +4115,10 @@ class EditAPIMonitor(APITestCase):
     # PBI-15-edit-api-monitor-backend
     def test_user_can_edit_api_monitor_simple(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor_value = {
             'user': 'test@test.com',
@@ -4095,7 +4202,7 @@ class EditAPIMonitor(APITestCase):
             'raw_body': monitorrawbody_value
         }
 
-        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        target_monitor_id = APIMonitor.objects.filter(team=team)[:1].get().id
         edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
         response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -4111,7 +4218,10 @@ class EditAPIMonitor(APITestCase):
 
     def test_user_can_edit_api_monitor_simple_body_form(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor_value = {
             'user': 'test@test.com',
@@ -4200,7 +4310,7 @@ class EditAPIMonitor(APITestCase):
             'raw_body': monitorrawbody_value
         }
 
-        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        target_monitor_id = APIMonitor.objects.filter(team=team)[:1].get().id
         edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
         response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -4216,7 +4326,10 @@ class EditAPIMonitor(APITestCase):
 
     def test_user_can_edit_api_monitor_without_optional_params(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor_value = {
             'user': 'test@test.com',
@@ -4285,7 +4398,7 @@ class EditAPIMonitor(APITestCase):
             'body_form': monitorbodyform_value
         }
 
-        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        target_monitor_id = APIMonitor.objects.filter(team=team)[:1].get().id
         edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
         response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -4301,7 +4414,10 @@ class EditAPIMonitor(APITestCase):
 
     def test_user_can_not_edit_api_monitor_without_required_fields(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor_value = {
             'user': 'test@test.com',
@@ -4368,7 +4484,7 @@ class EditAPIMonitor(APITestCase):
             'body_form': monitorbodyform_value
         }
 
-        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        target_monitor_id = APIMonitor.objects.filter(team=team)[:1].get().id
         edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
         response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
         self.assertEqual(response.data['error'],
@@ -4377,7 +4493,10 @@ class EditAPIMonitor(APITestCase):
 
     def test_user_can_edit_assertion_fields(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor_value = {
             'user': 'test@test.com',
@@ -4449,7 +4568,7 @@ class EditAPIMonitor(APITestCase):
             'body_form': monitorbodyform_value,
             'raw_body': monitorrawbody_value
         }
-        target_monitor_id = APIMonitor.objects.filter(user=user)[:1].get().id
+        target_monitor_id = APIMonitor.objects.filter(team=team)[:1].get().id
         edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
         response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
         self.assertEqual(len(response.data['exclude_keys']), 0)
@@ -4467,7 +4586,10 @@ class EditAPIMonitor(APITestCase):
 
     def test_user_can_edit_previous_step(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor_value = {
             'user': 'test@test.com',
@@ -4518,7 +4640,7 @@ class EditAPIMonitor(APITestCase):
 
         # 3. Edit object id = 2's prev step to 1
         received_json['previous_step_id'] = 1
-        target_monitor_id = APIMonitor.objects.filter(user=user)[1].id
+        target_monitor_id = APIMonitor.objects.filter(team=team)[1].id
         edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
         response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
         self.assertEqual(response.data['id'], 2)
@@ -4526,7 +4648,10 @@ class EditAPIMonitor(APITestCase):
 
     def test_user_must_put_valid_previous_step(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         monitor_value = {
             'user': 'test@test.com',
@@ -4577,7 +4702,7 @@ class EditAPIMonitor(APITestCase):
 
         # 3. Edit object id = 2's prev step to "abc" --> invalid prev_step_id
         received_json['previous_step_id'] = "abc"
-        target_monitor_id = APIMonitor.objects.filter(user=user)[1].id
+        target_monitor_id = APIMonitor.objects.filter(team=team)[1].id
         edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
         response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
         self.assertEqual(response.data['error'], ['Please make sure your [previous step id] is valid and exist!'])

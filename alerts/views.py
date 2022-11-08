@@ -4,17 +4,18 @@ from rest_framework.response import Response
 
 from alerts.serializers import AlertsConfigurationSerializer
 from apimonitor.models import AlertsConfiguration
+from login.permissions import UserTeamExists
 
 class AlertConfiguration(views.APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, UserTeamExists]
     
-    def get(self, request, format=None):
-        config, _ = AlertsConfiguration.objects.get_or_create(user=request.user)
+    def get(self, request, format=None):        
+        config, _ = AlertsConfiguration.objects.get_or_create(team=request.auth.team)
         serializer = AlertsConfigurationSerializer(config)
         return Response(serializer.data)
     
-    def post(self, request, format=None):
-        config, _ = AlertsConfiguration.objects.get_or_create(user=request.user)
+    def post(self, request, format=None):        
+        config, _ = AlertsConfiguration.objects.get_or_create(team=request.auth.team)
         serializer = AlertsConfigurationSerializer(config, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()

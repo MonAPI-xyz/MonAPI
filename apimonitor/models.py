@@ -2,6 +2,7 @@ from io import open_code
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from login.models import Team
 
 class APIMonitor(models.Model):
     method_choices = [
@@ -35,7 +36,7 @@ class APIMonitor(models.Model):
         ('JSON', 'JSON'),
     ]
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=256)
     method = models.CharField(max_length=16, choices=method_choices)
     url = models.CharField(max_length=512)
@@ -93,7 +94,7 @@ class AssertionExcludeKey(models.Model):
     
 
 class AlertsConfiguration(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    team = models.OneToOneField(Team, on_delete=models.CASCADE, null=True, blank=True)
     
     # Slack config
     is_slack_active = models.BooleanField(default=False)

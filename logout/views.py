@@ -7,7 +7,7 @@ from rest_framework.response import Response
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def user_logout(request):
-    request.user.auth_token.delete()
+    request.auth.delete()
     logout(request)
 
     return Response('User Logged out successfully')
