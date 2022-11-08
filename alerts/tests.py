@@ -47,9 +47,7 @@ class AlertsConfigurationTestCase(APITestCase):
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": False,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": False,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
@@ -90,9 +88,7 @@ class AlertsConfigurationTestCase(APITestCase):
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
@@ -120,9 +116,7 @@ class AlertsConfigurationTestCase(APITestCase):
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
@@ -145,9 +139,7 @@ class AlertsConfigurationTestCase(APITestCase):
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
@@ -196,9 +188,7 @@ class ThresholdConfigTest(APITestCase):
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
@@ -223,9 +213,7 @@ class ThresholdConfigTest(APITestCase):
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
@@ -259,9 +247,7 @@ class ThresholdConfigTest(APITestCase):
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
@@ -294,9 +280,7 @@ class ThresholdConfigTest(APITestCase):
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
@@ -538,6 +522,7 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.post")
     def test_when_api_monitor_failed_and_discord_enabled_then_send_alert(self, mock_request, mock_interrupt):
+        os.environ['FRONTEND_URL'] = "http://localhost:8080"
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
         AlertsConfiguration.objects.create(
             user=user,
@@ -568,8 +553,8 @@ class CronAlertsManagementCommand(TransactionTestCase):
         except InterruptedError:
             pass
         time.sleep(0.1)
-        
-        self.assertFalse(mock_request.called)
+        print(f"Mock Request = {mock_request}")
+        self.assertTrue(mock_request.called)
         
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("django.contrib.auth.models.User.email_user")

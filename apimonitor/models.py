@@ -102,9 +102,7 @@ class AlertsConfiguration(models.Model):
     
     # Discord config
     is_discord_active = models.BooleanField(default=False)
-    discord_bot_token = models.CharField(max_length=256, blank=True, default="")
-    discord_guild_id = models.CharField(max_length=256, blank=True, default="")
-    discord_channel_id = models.CharField(max_length=256, blank=True, default="")
+    discord_webhook_url = models.CharField(max_length=256, blank=True, default="")
     
     # Pagerduty config
     is_pagerduty_active = models.BooleanField(default=False)

@@ -15,3 +15,5 @@ requests==2.28.1
 sqlparse==0.4.2
 tzdata==2022.2
 urllib3==1.26.12
+discord.py==2.0.1
+discord-webhook==0.17.0
