@@ -1,5 +1,4 @@
 import os
-from tracemalloc import start
 import requests
 import time
 import threading
@@ -8,7 +7,7 @@ from datetime import timedelta
 
 from django.core.mail import get_connection
 from django.template.loader import render_to_string
-from django.utils import timezone, dateformat
+from django.utils import timezone
 from django.db.models import Count, Q
 from django.core.management.base import BaseCommand
 
@@ -40,7 +39,7 @@ class Command(BaseCommand):
 
         alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
         end_time = timezone.now()
-        start_time = timezone.now() - timedelta(seconds=time_window_in_seconds[alerts_config.time_window])
+        start_time = end_time - timedelta(seconds=time_window_in_seconds[alerts_config.time_window])
 
         # Average success rate
         success_count = APIMonitorResult.objects \
@@ -54,7 +53,12 @@ class Command(BaseCommand):
         success_rate = 100
         if success_count['total'] != 0:
             success_rate = success_count['s'] / (success_count['total']) * 100
-        return success_rate, start_time.strftime("%d %b %Y, %H:%M:%S"), end_time.strftime("%d %b %Y, %H:%M:%S")
+
+        formatted_success_rate = round(float(success_rate), 2)
+        formatted_start_time = start_time.strftime("%d %b %Y, %H:%M:%S")
+        formatted_end_time = end_time.strftime("%d %b %Y, %H:%M:%S")
+
+        return formatted_success_rate , formatted_start_time, formatted_end_time
     
     def get_monitor_id_from_queue(self, type):
         while True:
@@ -181,7 +185,6 @@ class Command(BaseCommand):
                 
                 monitor = APIMonitor.objects.get(id=monitor_id)
                 success_rate, start_time, end_time = self.get_success_rate(monitor)
-                success_rate = round(float(success_rate), 2)
                 alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
                 
                 if type == 'slack' and alerts_config.is_slack_active:
