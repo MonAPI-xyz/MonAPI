@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 
+from corsheaders.defaults import default_headers
+
+
 import os
 import sys
 
@@ -231,6 +234,11 @@ if os.getenv('MEDIA_ROOT', '') != '':
 # DRF CORS configuration
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',
+]
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'baggage',
+    'sentry-trace',
 ]
 
 if os.getenv('PRODUCTION', '') == 'True':
