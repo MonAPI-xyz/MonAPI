@@ -31,4 +31,5 @@ urlpatterns = [
     path('login/', include('login.urls')),
     path('error-logs/', include('error_logs.urls')),
     path('alerts/', include('alerts.urls')),
+    path('api-test/', include('apitest.urls')),
 ]
