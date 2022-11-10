@@ -67,9 +67,6 @@ class APITestView(views.APIView):
                         error_log += ["Please make sure your [body form] key and value are valid strings!"]
                         break
             elif request.data.get('body_type') == 'RAW':
-                record = {
-                    'body': request.data['raw_body']
-                }
                 monitor_data['body']=request.data["raw_body"]
 
             assert len(error_log) == 0, error_log
