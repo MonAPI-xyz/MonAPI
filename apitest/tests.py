@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.urls import reverse
-from apimonitor.models import APIMonitor
 
 # Create your tests here.
 class APITest(APITestCase):
