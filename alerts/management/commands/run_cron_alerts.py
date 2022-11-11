@@ -18,6 +18,7 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 def mock_cron_interrupt():
     pass
 
+
 class Command(BaseCommand):
     help = 'Run Cron Alerts'
     
@@ -37,11 +38,12 @@ class Command(BaseCommand):
         }
 
         alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
-        time_theshold = timezone.now() - timedelta(seconds=time_window_in_seconds[alerts_config.time_window])
+        end_time = timezone.now()
+        start_time = end_time - timedelta(seconds=time_window_in_seconds[alerts_config.time_window])
 
         # Average success rate
         success_count = APIMonitorResult.objects \
-            .filter(monitor=monitor, execution_time__gte=time_theshold) \
+            .filter(monitor=monitor, execution_time__gte=start_time) \
             .aggregate(
             s=Count('success', filter=Q(success=True)),
             f=Count('success', filter=Q(success=False)),
@@ -51,7 +53,12 @@ class Command(BaseCommand):
         success_rate = 100
         if success_count['total'] != 0:
             success_rate = success_count['s'] / (success_count['total']) * 100
-        return success_rate
+
+        formatted_success_rate = round(float(success_rate), 2)
+        formatted_start_time = start_time.strftime("%d %b %Y, %H:%M:%S")
+        formatted_end_time = end_time.strftime("%d %b %Y, %H:%M:%S")
+
+        return formatted_success_rate , formatted_start_time, formatted_end_time
     
     def get_monitor_id_from_queue(self, type):
         while True:
@@ -69,23 +76,21 @@ class Command(BaseCommand):
             q = self.queue[channel]
             q.put(monitor_id)
             
-    def send_alert_slack(self, monitor_id):
+    def send_alert_slack(self, monitor_id, success_rate, start_time, end_time):
         monitor = APIMonitor.objects.get(id=monitor_id)
-        success_rate = self.get_success_rate(monitor)
         monitor_link = os.getenv('FRONTEND_URL') + f"/{monitor_id}/detail/"
         alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
         requests.post('https://slack.com/api/chat.postMessage', json=
         {
             "channel": alerts_config.slack_channel_id,
-            "text": f"Success rate monitor <{monitor_link}|{monitor.name}> is dropping below {alerts_config.threshold_pct}%\nCurrent Success Rate: {round(float(success_rate), 2)}\nYour monitor URL: {monitor.url}\nMethod: {monitor.method}"
+            "text": f"Success rate monitor <{monitor_link}|{monitor.name}> is dropping below {alerts_config.threshold_pct}%\nCurrent success rate from {start_time} - {end_time}: {success_rate}%\nYour monitor URL: {monitor.url}\nMethod: {monitor.method}"
         }, headers={
             "Authorization": f"Bearer {alerts_config.slack_token}",
             "Content-Type": "application/json",
         })
     
-    def send_alert_discord(self, monitor_id):
+    def send_alert_discord(self, monitor_id, success_rate, start_time, end_time):
         monitor = APIMonitor.objects.get(id=monitor_id)
-        success_rate = self.get_success_rate(monitor)
         alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
         discord_webhook_url = alerts_config.discord_webhook_url
         webhook = DiscordWebhook(url=discord_webhook_url, rate_limit_retry=True)
@@ -95,7 +100,8 @@ class Command(BaseCommand):
                              )
 
         embed.add_embed_field(name='Threshold', value=f"{alerts_config.threshold_pct}%")
-        embed.add_embed_field(name='Current Success Rate', value=f"{round(float(success_rate), 2)}%")
+        embed.add_embed_field(name=f'Current Success rate', value=f"{success_rate}%")
+        embed.add_embed_field(name='Success rate range', value=f"{start_time} - {end_time}")
         embed.add_embed_field(name='Method', value=f"{monitor.method}")
         embed.add_embed_field(name="Url", value=f"{monitor.url}")
         embed.set_timestamp()
@@ -103,7 +109,7 @@ class Command(BaseCommand):
         webhook.add_embed(embed)
         webhook.execute()
     
-    def send_alert_pagerduty(self, monitor_id):
+    def send_alert_pagerduty(self, monitor_id, success_rate, start_time, end_time):
         monitor = APIMonitor.objects.get(id=monitor_id)
         alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
         
@@ -117,7 +123,7 @@ class Command(BaseCommand):
                 },
                 "body": {
                     "type": "incident_body",
-                    "details": f"Success rate is dropping below {alerts_config.threshold_pct}%"
+                    "details": f"Success rate is dropping below {alerts_config.threshold_pct}%\nCurrent success rate from {start_time} - {end_time}: {success_rate}"
                 }
             }
         }, headers={
@@ -127,7 +133,7 @@ class Command(BaseCommand):
             "Accept": "application/vnd.pagerduty+json;version=2",
         })
     
-    def send_alert_email(self, monitor_id):
+    def send_alert_email(self, monitor_id, success_rate, start_time, end_time):
         monitor = APIMonitor.objects.get(id=monitor_id)
         alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
         error_logs_link = f"{os.environ.get('FRONTEND_URL', '')}/error-logs/"
@@ -135,6 +141,7 @@ class Command(BaseCommand):
         email_subject = f"Alerts on monitor {monitor.name}! - MonAPI"
         email_content = f'''
             Success rate monitor {monitor.name} is dropping below {alerts_config.threshold_pct}%\n
+            Current success rate from {start_time} - {end_time} is {success_rate}%
             You can check the error logs in\n
             {error_logs_link}
             '''
@@ -143,6 +150,9 @@ class Command(BaseCommand):
                 'api_monitor_name': monitor.name,
                 'threshold_pct': alerts_config.threshold_pct,
                 'error_logs_link': error_logs_link,
+                'success_rate': success_rate,
+                'start_time': start_time,
+                'end_time': end_time,
             })
 
         with get_connection(
@@ -174,16 +184,17 @@ class Command(BaseCommand):
                 print(f"[{timezone.now()}] Send {type} alert for monitor id:{monitor_id}")
                 
                 monitor = APIMonitor.objects.get(id=monitor_id)
+                success_rate, start_time, end_time = self.get_success_rate(monitor)
                 alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
                 
                 if type == 'slack' and alerts_config.is_slack_active:
-                    self.send_alert_slack(monitor_id)
+                    self.send_alert_slack(monitor_id, success_rate, start_time, end_time)
                 elif type == 'discord' and alerts_config.is_discord_active:
-                    self.send_alert_discord(monitor_id)
+                    self.send_alert_discord(monitor_id, success_rate,start_time, end_time)
                 elif type == 'pagerduty' and alerts_config.is_pagerduty_active:
-                    self.send_alert_pagerduty(monitor_id)
+                    self.send_alert_pagerduty(monitor_id, success_rate,start_time, end_time)
                 elif type == 'email' and alerts_config.is_email_active:
-                    self.send_alert_email(monitor_id)    
+                    self.send_alert_email(monitor_id, success_rate,start_time, end_time)    
                 
                 print(f"[{timezone.now()}] Done send {type} alert for monitor id:{monitor_id}")
                    
@@ -223,7 +234,7 @@ class Command(BaseCommand):
                         continue
 
                     alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
-                    success_rate = self.get_success_rate(monitor)
+                    success_rate,_,_ = self.get_success_rate(monitor)
 
                     if success_rate < alerts_config.threshold_pct:
                         self.put_monitor_id_into_queue(monitor.id)
