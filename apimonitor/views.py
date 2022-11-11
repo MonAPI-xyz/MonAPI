@@ -8,16 +8,23 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from utils import try_parse_int
+import json
+
 from apimonitor.models import (APIMonitor, APIMonitorResult, APIMonitorQueryParam,
                                APIMonitorHeader, APIMonitorBodyForm, APIMonitorRawBody, AssertionExcludeKey)
 from apimonitor.serializers import (APIMonitorSerializer, APIMonitorListSerializer,
                                     APIMonitorQueryParamSerializer, APIMonitorHeaderSerializer,
                                     APIMonitorBodyFormSerializer, APIMonitorRawBodySerializer,
                                     APIMonitorRetrieveSerializer, APIMonitorDashboardSerializer,
-                                    AssertionExcludeKeySerializer)
+                                    AssertionExcludeKeySerializer, APIMonitorDetailSuccessRateSerializer, 
+                                    APIMonitorDetailResponseTimeSerializer)
+
+from monapi.cache import (CACHE_KEY_API_MONITOR_LIST, CACHE_KEY_API_MONITOR_DETAIL_STATS, 
+                          CACHE_KEY_API_MONITOR_STATS, get_cache_value, set_cache_value)
 
 
 class APIMonitorViewSet(mixins.ListModelMixin,
+                        mixins.RetrieveModelMixin,
                         mixins.CreateModelMixin,
                         mixins.UpdateModelMixin,
                         mixins.DestroyModelMixin,
@@ -29,8 +36,11 @@ class APIMonitorViewSet(mixins.ListModelMixin,
     lookup_field = "pk"
     
     def get_queryset(self):
-        queryset = APIMonitor.objects.filter(user=self.request.user)
-        return queryset
+        if self.action == 'list':
+            return APIMonitor.objects.filter(user=self.request.user)    
+        
+        return APIMonitor.objects.filter(user=self.request.user) \
+            .prefetch_related('query_params', 'headers', 'body_form', 'raw_body', 'exclude_keys')
     
     def get_monitor_data_from_request(self, request):
         monitor_data = {
@@ -47,7 +57,6 @@ class APIMonitorViewSet(mixins.ListModelMixin,
         }
         return monitor_data
 
-    # PBI-15-edit-api-monitor-backend
     def update(self, request, *args, **kwargs):
         monitor_data = self.get_monitor_data_from_request(request)
 
@@ -238,8 +247,12 @@ class APIMonitorViewSet(mixins.ListModelMixin,
         else:
             return Response(data={"error": "['Please make sure your [name, method, url, schedule, body_type] is valid']"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def retrieve_with_param(last_chosen_period_in_hours, n_bar, increment_in_minutes, monitor, success_rate, response_time):
+    def retrieve_stats_with_param(self, last_chosen_period_in_hours, increment_in_minutes, monitor):
         last_chosen_period = timezone.now() - timedelta(hours=last_chosen_period_in_hours)
+        n_bar = int(last_chosen_period_in_hours * 60 / increment_in_minutes)
+        
+        success_rate = []
+        response_time = []
         for _ in range(n_bar):
             start_time = last_chosen_period
             end_time = last_chosen_period+timedelta(minutes=increment_in_minutes)
@@ -274,32 +287,46 @@ class APIMonitorViewSet(mixins.ListModelMixin,
                 "failed" : success_count['f']
             })
             last_chosen_period = last_chosen_period+timedelta(minutes=increment_in_minutes)
+        
+        return success_rate, response_time
 
     def retrieve(self, request, pk=None):          
         queryset = self.filter_queryset(self.get_queryset())
         monitor = get_object_or_404(queryset,pk=pk)
-
+        stats_range = self.request.query_params.get("range")
+        
         response_time = []
         success_rate = []
         
-        if(self.request.query_params.get("range")=="30MIN"):
-            APIMonitorViewSet.retrieve_with_param(0.5, 30, 1, monitor, success_rate, response_time)
-        elif(self.request.query_params.get("range")=="60MIN"):
-            APIMonitorViewSet.retrieve_with_param(1, 30, 2, monitor, success_rate, response_time)
-        elif(self.request.query_params.get("range")=="180MIN"):
-            APIMonitorViewSet.retrieve_with_param(3, 36, 5, monitor, success_rate, response_time)
-        elif(self.request.query_params.get("range")=="360MIN"):
-            APIMonitorViewSet.retrieve_with_param(6, 36, 10, monitor, success_rate, response_time)
-        elif(self.request.query_params.get("range")=="720MIN"):
-            APIMonitorViewSet.retrieve_with_param(12, 36, 20, monitor, success_rate, response_time)
-        elif(self.request.query_params.get("range")=="1440MIN"):
-            APIMonitorViewSet.retrieve_with_param(24, 48, 30, monitor, success_rate, response_time)
+        cache_key = CACHE_KEY_API_MONITOR_DETAIL_STATS.format(monitor.id, stats_range)
+        cache_stats = get_cache_value(cache_key)
+        if cache_stats:
+            cache_stats = json.loads(cache_stats)
+            success_rate = cache_stats['success_rate']
+            response_time = cache_stats['response_time']
+        else:
+            if(stats_range=="30MIN"):
+                success_rate, response_time = self.retrieve_stats_with_param(0.5, 1, monitor)
+            elif(stats_range=="60MIN"):
+                success_rate, response_time = self.retrieve_stats_with_param(1, 2, monitor)
+            elif(stats_range=="180MIN"):
+                success_rate, response_time = self.retrieve_stats_with_param(3, 5, monitor)
+            elif(stats_range=="360MIN"):
+                success_rate, response_time = self.retrieve_stats_with_param(6, 10, monitor)
+            elif(stats_range=="720MIN"):
+                success_rate, response_time = self.retrieve_stats_with_param(12, 20, monitor)
+            elif(stats_range=="1440MIN"):
+                success_rate, response_time = self.retrieve_stats_with_param(24, 30, monitor)
+                
+            set_cache_value(cache_key, json.dumps({
+                'success_rate': APIMonitorDetailSuccessRateSerializer(success_rate, many=True).data,
+                'response_time': APIMonitorDetailResponseTimeSerializer(response_time, many=True).data,
+            }), timeout=60)
 
-        monitor.success_rate=success_rate
-        monitor.response_time=response_time
+        monitor.success_rate = success_rate
+        monitor.response_time = response_time
 
         serializer = APIMonitorRetrieveSerializer(monitor)
-
         return Response(serializer.data)
     
     def list(self, request):
@@ -308,6 +335,18 @@ class APIMonitorViewSet(mixins.ListModelMixin,
         
         # Append summary to each monitor
         for monitor in queryset:
+            cache_key = CACHE_KEY_API_MONITOR_LIST.format(monitor.id)
+            
+            cache_monitor = get_cache_value(cache_key)
+            if cache_monitor:
+                cache_monitor = json.loads(cache_monitor)
+                
+                monitor.avg_response_time = cache_monitor['avg_response_time']
+                monitor.success_rate = cache_monitor['success_rate']
+                monitor.success_rate_history = cache_monitor['success_rate_history']
+                monitor.last_result = cache_monitor['last_result']
+                continue
+                
             # Average response time
             avg_response_time = APIMonitorResult.objects \
                 .filter(monitor=monitor, execution_time__gte=last_24_hour) \
@@ -359,53 +398,67 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             # Last result 
             last_result = APIMonitorResult.objects.filter(monitor=monitor).last()
             monitor.last_result = last_result
+            
+            serializer_obj = APIMonitorListSerializer(monitor)
+            set_cache_value(cache_key, json.dumps(serializer_obj.data), timeout=60)
        
         serializer = APIMonitorListSerializer(queryset, many=True)
         return Response(serializer.data)
     
     @action(detail=False,methods=["GET"])
     def stats(self, request):
-
         queryset = self.filter_queryset(self.get_queryset())
     
         response_time= []
         success_rate = []
+        
+        cache_key = CACHE_KEY_API_MONITOR_STATS.format(request.user.id)
+        cache_stats = get_cache_value(cache_key)
+        if cache_stats:
+            cache_stats = json.loads(cache_stats)
+            success_rate = cache_stats['success_rate']
+            response_time = cache_stats['response_time']
+        else:
+            last_chosen_period = timezone.now() - timedelta(hours=24)
+            for _ in range(24):
+                start_time = last_chosen_period
+                end_time = last_chosen_period+timedelta(hours=1)
+                avg_response_time = APIMonitorResult.objects \
+                    .filter(monitor__user=request.user, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(avg=Avg('response_time'))
 
-        last_chosen_period = timezone.now() - timedelta(hours=24)
-        for _ in range(24):
-            start_time = last_chosen_period
-            end_time = last_chosen_period+timedelta(hours=1)
-            avg_response_time = APIMonitorResult.objects \
-                .filter(monitor__user=request.user, execution_time__gte=start_time, execution_time__lte=end_time) \
-                .aggregate(avg=Avg('response_time'))
+                avg = 0
 
-            avg = 0
+                if  avg_response_time["avg"]!=None:
+                    avg = avg_response_time['avg']
 
-            if  avg_response_time["avg"]!=None:
-                avg = avg_response_time['avg']
+                response_time.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "avg": avg
+                })
 
-            response_time.append({
-                "start_time": start_time,
-                "end_time" : end_time,
-                "avg": avg
-            })
+                # Average success rate
+                success_count = APIMonitorResult.objects \
+                    .filter(monitor__user=request.user, execution_time__gte=start_time, execution_time__lte=end_time) \
+                    .aggregate(
+                        s=Count('success', filter=Q(success=True)), 
+                        f=Count('success', filter=Q(success=False)),
+                        total=Count('pk'),
+                    )
 
-            # Average success rate
-            success_count = APIMonitorResult.objects \
-                .filter(monitor__user=request.user, execution_time__gte=start_time, execution_time__lte=end_time) \
-                .aggregate(
-                    s=Count('success', filter=Q(success=True)), 
-                    f=Count('success', filter=Q(success=False)),
-                    total=Count('pk'),
-                )
-
-            success_rate.append({
-                "start_time": start_time,
-                "end_time" : end_time,
-                "success": success_count['s'],
-                "failed" : success_count['f']
-            })
-            last_chosen_period = last_chosen_period+timedelta(hours=1)
+                success_rate.append({
+                    "start_time": start_time,
+                    "end_time" : end_time,
+                    "success": success_count['s'],
+                    "failed" : success_count['f']
+                })
+                last_chosen_period = last_chosen_period+timedelta(hours=1)
+            
+            set_cache_value(cache_key, json.dumps({
+                'success_rate': APIMonitorDetailSuccessRateSerializer(success_rate, many=True).data,
+                'response_time': APIMonitorDetailResponseTimeSerializer(response_time, many=True).data,
+            }), timeout=60)
 
         queryset.success_rate = success_rate
         queryset.response_time = response_time

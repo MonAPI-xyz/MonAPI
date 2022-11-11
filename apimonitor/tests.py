@@ -194,7 +194,7 @@ class DetailListAPIMonitor(APITestCase):
 
     def test_retrieve_30_min_without_result(self):
         response = DetailListAPIMonitor.init_for_test_retrieve_without_result(self,
-                                                                              "30MIN")  # print(json.dumps(response.data))
+                                                                              "30MIN")
 
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "30MIN",
@@ -2259,49 +2259,19 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(response.data, [
             {
                 "avg_response_time": 81,
-                "body_form": [
-                    {
-                        "id": 1,
-                        "key": "Test Key Body",
-                        "monitor": 1,
-                        "value": "Test Value Body"
-                    }
-                ],
                 "body_type": "FORM",
-                "headers": [
-                    {
-                        "id": 1,
-                        "key": "Test Key Header",
-                        "monitor": 1,
-                        "value": "Test Value Header"
-                    }
-                ],
                 "id": 1,
                 "last_result": {
                     "execution_time": "2022-09-20T10:00:00+07:00",
                     "id": 4,
                     "log_error": "",
                     "log_response": "{}",
-                    "monitor": 1,
                     "response_time": 50,
                     "status_code": 200,
                     "success": False
                 },
                 "method": "GET",
                 "name": "Test Monitor",
-                "query_params": [
-                    {
-                        "id": 1,
-                        "key": "Test Key Query",
-                        "monitor": 1,
-                        "value": "Test Value Query"
-                    }
-                ],
-                "raw_body": {
-                    "body": "Test Body",
-                    "id": 1,
-                    "monitor": 1
-                },
                 "schedule": "10MIN",
                 "success_rate": "75.0",
                 "success_rate_history": [
@@ -2491,40 +2461,11 @@ class ListAPIMonitor(APITestCase):
         self.assertEqual(response.data, [
             {
                 "avg_response_time": 0,
-                "body_form": [
-                    {
-                        "id": 1,
-                        "key": "Test Key Body",
-                        "monitor": 1,
-                        "value": "Test Value Body"
-                    }
-                ],
                 "body_type": "FORM",
-                "headers": [
-                    {
-                        "id": 1,
-                        "key": "Test Key Header",
-                        "monitor": 1,
-                        "value": "Test Value Header"
-                    }
-                ],
                 "id": 1,
                 "last_result": None,
                 "method": "GET",
                 "name": "Test Monitor",
-                "query_params": [
-                    {
-                        "id": 1,
-                        "key": "Test Key Query",
-                        "monitor": 1,
-                        "value": "Test Value Query"
-                    }
-                ],
-                "raw_body": {
-                    "body": "Test Body",
-                    "id": 1,
-                    "monitor": 1
-                },
                 "schedule": "10MIN",
                 "success_rate": "100.0",
                 "success_rate_history": [

@@ -104,7 +104,6 @@ class APIMonitorResultSerializer(serializers.ModelSerializer):
         model = APIMonitorResult
         fields = [
             'id',
-            'monitor',
             'execution_time',
             'response_time',
             'success',
@@ -129,10 +128,6 @@ class APIMonitorListSerializer(APIMonitorSerializer):
             'url',
             'schedule',
             'body_type',
-            'query_params',
-            'headers',
-            'body_form',
-            'raw_body',
             'success_rate',
             'avg_response_time',
             'success_rate_history',

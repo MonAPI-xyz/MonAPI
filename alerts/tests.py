@@ -553,7 +553,6 @@ class CronAlertsManagementCommand(TransactionTestCase):
         except InterruptedError:
             pass
         time.sleep(0.1)
-        print(f"Mock Request = {mock_request}")
         self.assertTrue(mock_request.called)
         
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
