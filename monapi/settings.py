@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'login',
     'error_logs',
     'forget_password',
+    'apitest',
 ]
 
 MIDDLEWARE = [
