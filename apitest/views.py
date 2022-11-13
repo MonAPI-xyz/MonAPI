@@ -70,8 +70,6 @@ class APITestView(views.APIView):
                 monitor_data['body']=request.data["raw_body"]
 
             assert len(error_log) == 0, error_log
-
-            resp = None
         
             try:
                 print(f"""
@@ -80,16 +78,8 @@ class APITestView(views.APIView):
                     headers = {monitor_data['headers']}
                     data = {monitor_data['body']}
                 """)
-                if monitor_data['method'] == 'GET':
-                    resp = requests.get(monitor_data['url'], params=monitor_data['query_params'], headers=monitor_data['headers'], timeout=30)
-                elif monitor_data['method'] == 'POST':
-                    resp = requests.post(monitor_data['url'], params=monitor_data['query_params'], data=monitor_data['body'], headers=monitor_data['headers'], timeout=30)
-                elif monitor_data['method'] == 'PATCH':
-                    resp = requests.patch(monitor_data['url'], params=monitor_data['query_params'], data=monitor_data['body'], headers=monitor_data['headers'], timeout=30)
-                elif monitor_data['method'] == 'PUT':
-                    resp = requests.put(monitor_data['url'], params=monitor_data['query_params'], data=monitor_data['body'], headers=monitor_data['headers'], timeout=30)
-                elif monitor_data['method'] == 'DELETE':
-                    resp = requests.delete(monitor_data['url'], params=monitor_data['query_params'], data=monitor_data['body'], headers=monitor_data['headers'], timeout=30)
+                resp = requests.request(monitor_data['method'], monitor_data['url'], params=monitor_data['query_params'], data=monitor_data['body'], headers=monitor_data['headers'], timeout=30)
+                
             except Exception as e:
                 error_log += [str(e)]
 
