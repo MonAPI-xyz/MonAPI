@@ -94,6 +94,11 @@ class AssertionExcludeKey(models.Model):
 
 class AlertsConfiguration(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    utc = models.IntegerField(default=0, validators=[
+        MinValueValidator(-1200),
+        MaxValueValidator(1400)
+    ])
     
     # Slack config
     is_slack_active = models.BooleanField(default=False)
