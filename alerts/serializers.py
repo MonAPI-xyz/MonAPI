@@ -6,6 +6,7 @@ class AlertsConfigurationSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlertsConfiguration
         fields = [
+            'utc',
             'is_slack_active',
             'slack_token',
             'slack_channel_id',

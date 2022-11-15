@@ -3,7 +3,7 @@ import requests
 import time
 import threading
 import queue
-from datetime import timedelta
+from datetime import timedelta, timezone as tzdt
 
 from django.core.mail import get_connection
 from django.template.loader import render_to_string
@@ -36,7 +36,7 @@ class Command(BaseCommand):
             '12H': 43200,
             '24H': 86400,
         }
-
+        
         alerts_config, _ = AlertsConfiguration.objects.get_or_create(user=monitor.user)
         end_time = timezone.now()
         start_time = end_time - timedelta(seconds=time_window_in_seconds[alerts_config.time_window])
@@ -55,8 +55,8 @@ class Command(BaseCommand):
             success_rate = success_count['s'] / (success_count['total']) * 100
 
         formatted_success_rate = round(float(success_rate), 2)
-        formatted_start_time = start_time.strftime("%d %b %Y, %H:%M:%S")
-        formatted_end_time = end_time.strftime("%d %b %Y, %H:%M:%S")
+        formatted_start_time = start_time.astimezone(tzdt(timedelta(hours=+alerts_config.utc))).strftime("%d %b %Y, %H:%M:%S %Z")
+        formatted_end_time = end_time.astimezone(tzdt(timedelta(hours=+alerts_config.utc))).strftime("%d %b %Y, %H:%M:%S %Z")
 
         return formatted_success_rate , formatted_start_time, formatted_end_time
     
