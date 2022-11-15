@@ -96,8 +96,8 @@ class AlertsConfiguration(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     utc = models.IntegerField(default=0, validators=[
-        MinValueValidator(-1200),
-        MaxValueValidator(1400)
+        MinValueValidator(-12),
+        MaxValueValidator(14)
     ])
     
     # Slack config
