@@ -43,6 +43,7 @@ class AlertsConfigurationTestCase(APITestCase):
         response = self.client.get(self.test_url, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {
+            "utc": 0,
             "is_slack_active": False,
             "slack_token": "",
             "slack_channel_id": "",
@@ -75,6 +76,7 @@ class AlertsConfigurationTestCase(APITestCase):
         
         AlertsConfiguration.objects.create(
             user=user,
+            utc=0,
             is_slack_active=True,
             is_discord_active=True,
             is_pagerduty_active=True,
@@ -84,6 +86,7 @@ class AlertsConfigurationTestCase(APITestCase):
         response = self.client.get(self.test_url, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {
+            "utc": 0,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
@@ -112,6 +115,7 @@ class AlertsConfigurationTestCase(APITestCase):
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         
         req_body = {
+            "utc": 0,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
@@ -135,6 +139,7 @@ class AlertsConfigurationTestCase(APITestCase):
         response = self.client.post(self.test_url, data=req_body, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {
+            "utc": 0,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
@@ -158,6 +163,7 @@ class AlertsConfigurationTestCase(APITestCase):
         })
         
         config = AlertsConfiguration.objects.get(user=user)
+        self.assertEqual(config.utc, 0)
         self.assertEqual(config.is_slack_active, True)
         self.assertEqual(config.is_discord_active, True)
         self.assertEqual(config.is_pagerduty_active, True)
@@ -184,6 +190,7 @@ class ThresholdConfigTest(APITestCase):
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         req_body = {
+            "utc": 0,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
@@ -209,6 +216,7 @@ class ThresholdConfigTest(APITestCase):
         response = self.client.post(self.test_url, data=req_body, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {
+            "utc": 0,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
@@ -232,6 +240,7 @@ class ThresholdConfigTest(APITestCase):
         })
 
         config = AlertsConfiguration.objects.get(user=user)
+        self.assertEqual(config.utc, 0)
         self.assertEqual(config.is_slack_active, True)
         self.assertEqual(config.is_discord_active, True)
         self.assertEqual(config.is_pagerduty_active, True)
@@ -243,6 +252,7 @@ class ThresholdConfigTest(APITestCase):
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         req_body = {
+            "utc": 0,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
@@ -276,6 +286,7 @@ class ThresholdConfigTest(APITestCase):
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         req_body = {
+            "utc": 0,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
@@ -413,6 +424,7 @@ class CronAlertsManagementCommand(TransactionTestCase):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
         AlertsConfiguration.objects.create(
             user=user,
+            utc= 0,
             is_pagerduty_active=True,
         )
         
