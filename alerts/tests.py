@@ -11,12 +11,12 @@ from io import StringIO
 
 from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework.authtoken.models import Token
 from datetime import datetime
 import time
 import os
 
 from apimonitor.models import APIMonitor, APIMonitorResult, AlertsConfiguration
+from login.models import Team, TeamMember, MonAPIToken
 
 
 class AlertsConfigurationTestCase(APITestCase):
@@ -37,7 +37,10 @@ class AlertsConfigurationTestCase(APITestCase):
 
     def test_when_authenticated_and_dont_have_configuration_then_create_new_configuration(self):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         response = self.client.get(self.test_url, format='json', **header)
@@ -71,11 +74,14 @@ class AlertsConfigurationTestCase(APITestCase):
 
     def test_when_authenticated_already_have_configuration_then_return_configuration(self):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         
         AlertsConfiguration.objects.create(
-            user=user,
+            team=team,
             utc=7,
             is_slack_active=True,
             is_discord_active=True,
@@ -111,7 +117,10 @@ class AlertsConfigurationTestCase(APITestCase):
     
     def test_when_authenticated_update_config_then_save_configuration(self):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         
         req_body = {
@@ -162,7 +171,7 @@ class AlertsConfigurationTestCase(APITestCase):
             'time_window': '1H'
         })
         
-        config = AlertsConfiguration.objects.get(user=user)
+        config = AlertsConfiguration.objects.get(team=team)
         self.assertEqual(config.utc, 7)
         self.assertEqual(config.is_slack_active, True)
         self.assertEqual(config.is_discord_active, True)
@@ -171,7 +180,10 @@ class AlertsConfigurationTestCase(APITestCase):
     
     def test_when_authenticated_update_config_invalid_data_then_return_bad_request(self):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         
         req_body = {
@@ -186,7 +198,10 @@ class ThresholdConfigTest(APITestCase):
     test_url = reverse('alert-configuration')
     def test_threshold_config_can_be_created(self):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         req_body = {
@@ -239,7 +254,7 @@ class ThresholdConfigTest(APITestCase):
             "time_window": "6H"
         })
 
-        config = AlertsConfiguration.objects.get(user=user)
+        config = AlertsConfiguration.objects.get(team=team)
         self.assertEqual(config.utc, 7)
         self.assertEqual(config.is_slack_active, True)
         self.assertEqual(config.is_discord_active, True)
@@ -248,7 +263,10 @@ class ThresholdConfigTest(APITestCase):
 
     def test_threshold_pct_cannot_be_negative_and_time_window_must_be_valid(self):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         req_body = {
@@ -282,7 +300,10 @@ class ThresholdConfigTest(APITestCase):
 
     def test_threshold_pct_cannot_be_larger_than_100(self):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         req_body = {
@@ -332,10 +353,10 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.post")
     def test_when_api_monitor_result_empty_then_not_send_alert(self, mock_request, mock_interrupt):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         
-        monitor = APIMonitor.objects.create(
-            user=user,
+        APIMonitor.objects.create(
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -364,11 +385,11 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.post")
     def test_when_env_config_invalid_then_use_default(self, mock_request, mock_interrupt):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         os.environ['CRON_ALERTS_THREAD_COUNT'] = 'invalid int'
         
-        monitor = APIMonitor.objects.create(
-            user=user,
+        APIMonitor.objects.create(
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -387,13 +408,13 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.post")
     def test_when_api_monitor_failed_but_notification_disabled_then_not_send_alert(self, mock_request, mock_interrupt):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         AlertsConfiguration.objects.create(
-            user=user,
+            team=team,
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -421,14 +442,14 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.post")
     def test_when_api_monitor_failed_and_pagerduty_enabled_then_send_alert(self, mock_request, mock_interrupt):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         AlertsConfiguration.objects.create(
-            user=user,
+            team=team,
             is_pagerduty_active=True,
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -458,14 +479,14 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.post")
     def test_when_api_monitor_failed_and_pagerduty_error_then_do_nothing(self, mock_request, mock_interrupt):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         AlertsConfiguration.objects.create(
-            user=user,
+            team=team,
             is_pagerduty_active=True,
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -497,14 +518,14 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect = [None, InterruptedError])
     @patch("requests.post")
     def test_when_api_monitor_failed_and_last_notified_within_5min_then_not_send_alert(self, mock_request, mock_interrupt):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         AlertsConfiguration.objects.create(
-            user=user,
+            team=team,
             is_pagerduty_active=True,
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -534,14 +555,14 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("requests.post")
     def test_when_api_monitor_failed_and_discord_enabled_then_send_alert(self, mock_request, mock_interrupt):
         os.environ['FRONTEND_URL'] = "http://localhost:8080"
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         AlertsConfiguration.objects.create(
-            user=user,
+            team=team,
             is_discord_active=True,
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -571,13 +592,16 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("django.contrib.auth.models.User.email_user")
     def test_when_api_monitor_failed_and_email_enabled_then_send_alert(self, mock_send_mail, mock_interrupt):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
+        TeamMember.objects.create(team=team, user=user)
+        
         AlertsConfiguration.objects.create(
-            user=user,
+            team=team,
             is_email_active=True,
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -606,14 +630,14 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("django.contrib.auth.models.User.email_user")
     def test_when_api_monitor_success_and_email_enabled_then_no_send_alert(self, mock_send_mail, mock_interrupt):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         AlertsConfiguration.objects.create(
-            user=user,
+            team=team,
             is_email_active=True,
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -642,13 +666,13 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect = [None, InterruptedError])
     @patch("requests.post")
     def test_when_api_monitor_failed_and_last_notified_within_5min_then_not_send_alert_slack(self, mock_request, mock_interrupt):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         AlertsConfiguration.objects.create(
-            user=user,
+            team=team,
             is_slack_active=True,     
         )   
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -678,14 +702,14 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.post")
     def test_when_api_monitor_success_and_slack_enabled_then_not_send_alert(self, mock_request, mock_interrupt):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         AlertsConfiguration.objects.create(
-            user=user,
+            team=team,
             is_slack_active=True,
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -713,14 +737,14 @@ class CronAlertsManagementCommand(TransactionTestCase):
     @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.post")
     def test_when_api_monitor_failed_and_slack_enabled_then_send_alert(self, mock_request, mock_interrupt):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         AlertsConfiguration.objects.create(
-            user=user,
+            team=team,
             is_slack_active=True,
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',

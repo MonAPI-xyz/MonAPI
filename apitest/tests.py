@@ -4,15 +4,18 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.urls import reverse
 
+from login.models import MonAPIToken, Team, TeamMember
+
 # Create your tests here.
 class APITest(APITestCase):
-
-
     #GET
     def test_api_test_get(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -52,7 +55,10 @@ class APITest(APITestCase):
     def test_api_test_get_wrong_url(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -92,7 +98,10 @@ class APITest(APITestCase):
     def test_api_test_get_query_param_failed(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -132,7 +141,10 @@ class APITest(APITestCase):
     def test_api_test_get_query_param_failed_none(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -172,7 +184,10 @@ class APITest(APITestCase):
     def test_api_test_get_headers_failed(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -212,7 +227,10 @@ class APITest(APITestCase):
     def test_api_test_get_headers_failed_none(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -254,7 +272,10 @@ class APITest(APITestCase):
     def test_api_test_post_no_body(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -294,7 +315,10 @@ class APITest(APITestCase):
     def test_api_test_post_form(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -348,7 +372,10 @@ class APITest(APITestCase):
     def test_api_test_post_form_failed(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -398,7 +425,10 @@ class APITest(APITestCase):
     def test_api_test_post_form_failed_none(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -448,7 +478,10 @@ class APITest(APITestCase):
     def test_api_test_post_raw_body(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -495,7 +528,10 @@ class APITest(APITestCase):
     def test_api_test_patch_no_body(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -535,7 +571,10 @@ class APITest(APITestCase):
     def test_api_test_patch_form(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -589,7 +628,10 @@ class APITest(APITestCase):
     def test_api_test_patch_raw_body(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -636,7 +678,10 @@ class APITest(APITestCase):
     def test_api_test_put_no_body(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -676,7 +721,10 @@ class APITest(APITestCase):
     def test_api_test_put_form(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -730,7 +778,10 @@ class APITest(APITestCase):
     def test_api_test_put_raw_body(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -777,7 +828,10 @@ class APITest(APITestCase):
     def test_api_test_delete_no_body(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -817,7 +871,10 @@ class APITest(APITestCase):
     def test_api_test_delete_form(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {
@@ -871,7 +928,10 @@ class APITest(APITestCase):
     def test_api_test_delete_raw_body(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-        token = Token.objects.create(user=user)
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         monitor_value = {

@@ -12,6 +12,7 @@ import requests
 import time
 
 from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, APIMonitorResult, AssertionExcludeKey
+from login.models import Team
 from cron.management.commands.run_cron import Command
 
 
@@ -141,8 +142,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     def test_when_result_exists_in_given_interval_then_continue(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -173,8 +175,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_result_not_exists_in_given_interval_and_empty_body_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -212,8 +215,9 @@ class CronManagementCommand(TransactionTestCase):
         mock_cron.side_effect = [None, InterruptedError]
         
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -251,8 +255,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_result_not_exists_in_given_interval_and_form_body_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -295,8 +300,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_result_not_exists_in_given_interval_and_raw_body_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -338,8 +344,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_result_not_exists_in_given_interval_and_raw_body_not_exists_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -376,8 +383,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get_exception)
     def test_when_result_not_exists_in_given_interval_and_error_exception_then_log_exception(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -414,8 +422,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.post", mocked_request_get)
     def test_when_method_post_and_result_not_exists_in_given_interval_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='POST',
             url='https://monapi.xyz',
@@ -452,8 +461,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.patch", mocked_request_get)
     def test_when_method_patch_and_result_not_exists_in_given_interval_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='PATCH',
             url='https://monapi.xyz',
@@ -490,8 +500,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.put", mocked_request_get)
     def test_when_method_put_and_result_not_exists_in_given_interval_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='PUT',
             url='https://monapi.xyz',
@@ -528,8 +539,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.delete", mocked_request_get)
     def test_when_method_delete_and_result_not_exists_in_given_interval_then_run_test(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='DELETE',
             url='https://monapi.xyz',
@@ -565,8 +577,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.delete", mocked_request_get)
     def test_when_status_code_not_2xx_then_test_success_false(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='DELETE',
             url='https://mockerrorstatuscode.xyz',
@@ -602,8 +615,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_with_previous_step_then_run_previous_step_first(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor_prev = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapitestprev.xyz',
@@ -622,7 +636,7 @@ class CronManagementCommand(TransactionTestCase):
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -659,10 +673,11 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_with_previous_step_over_10_monitor_then_return_error(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor_prev = None
         for i in range(11):
             monitor_prev = APIMonitor.objects.create(
-                user=user,
+                team=team,
                 name='apimonitor',
                 method='GET',
                 url='https://monapitestprev.xyz',
@@ -682,7 +697,7 @@ class CronManagementCommand(TransactionTestCase):
             )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -719,8 +734,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_with_recursion_then_return_error(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor_prev = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapitestprev.xyz',
@@ -739,7 +755,7 @@ class CronManagementCommand(TransactionTestCase):
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -779,8 +795,9 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_key_not_exists_then_return_error(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         monitor_prev = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapitestprev.xyz',
@@ -799,7 +816,7 @@ class CronManagementCommand(TransactionTestCase):
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -836,9 +853,10 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_return_non_json_then_return_success(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         
         monitor_prev = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapinonjson.xyz',
@@ -857,7 +875,7 @@ class CronManagementCommand(TransactionTestCase):
         )
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapinonjson.xyz',
@@ -894,9 +912,10 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_assert_text_failure_then_error(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapinonjson.xyz',
@@ -922,9 +941,10 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_assert_json_invalid_response_then_error(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapinonjson.xyz',
@@ -950,9 +970,10 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_assert_json_invalid_assert_value_then_error(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -978,9 +999,10 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_assert_json_different_value_then_error(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -1006,9 +1028,10 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_assert_json_key_only_then_success(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -1035,9 +1058,10 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_assert_json_exclude_keys_then_success(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -1068,9 +1092,10 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_assert_json_different_type_then_error(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -1096,9 +1121,10 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_assert_json_dict_add_remove_then_error(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://monapi.xyz',
@@ -1124,9 +1150,10 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_assert_json_iterable_add_remove_then_error(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://mockiterable.xyz',
@@ -1153,9 +1180,10 @@ class CronManagementCommand(TransactionTestCase):
     @patch("requests.get", mocked_request_get)
     def test_when_api_monitor_assert_json_iterable_exclude_then_success(self, *args):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        team = Team.objects.create(name='test team')
         
         monitor = APIMonitor.objects.create(
-            user=user,
+            team=team,
             name='apimonitor',
             method='GET',
             url='https://mockiterable.xyz',
