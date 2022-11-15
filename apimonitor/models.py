@@ -95,7 +95,7 @@ class AssertionExcludeKey(models.Model):
 class AlertsConfiguration(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    utc = models.IntegerField(default=0, validators=[
+    utc = models.IntegerField(default=7, validators=[
         MinValueValidator(-12),
         MaxValueValidator(14)
     ])
