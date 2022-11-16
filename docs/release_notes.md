@@ -27,3 +27,10 @@ Date: 31th October 2022
 2. API Monitor Assertions
 3. Multi step API monitor
 4. Alerts configuration
+
+### Release 4
+Version: v0.4.0<br>
+Date: 13th November 2022
+1. Alerts integration
+2. Forget Password
+3. Test API
