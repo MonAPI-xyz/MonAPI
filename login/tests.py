@@ -9,8 +9,7 @@ from login.models import MonAPIToken, TeamMember, Team, get_file_path
 class LoginTest(APITestCase):
     login_url = reverse('login')
 
-    def test_when_non_authenticated_and_login_then_return_success(self):
-        # Create dummy user and authenticate
+    def test_when_non_authenticated_and_login_without_team_then_return_success(self):
         User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')
 
         request_params = {'email': 'test@gmail.com', 'password': 'Test1234'}
@@ -22,28 +21,9 @@ class LoginTest(APITestCase):
         assert(response.data['token'])
         
     def test_when_non_authenticated_and_team_exists_then_return_success(self):
-        # Create dummy user and authenticate
         user = User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')
         team = Team.objects.create(name='test team')
         team_member = TeamMember.objects.create(team=team, user=user)
-
-        request_params = {'email': 'test@gmail.com', 'password': 'Test1234'}
-        response = self.client.post(self.login_url, request_params)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['response'], 'Sign-in successful.')
-        self.assertEqual(response.data['email'], 'test@gmail.com')
-        assert(response.data['token'])
-        
-        tokens = MonAPIToken.objects.all()
-        self.assertEqual(len(tokens), 1)
-        self.assertEqual(tokens[0].team_member, team_member)
-        
-    def test_when_non_authenticated_and_team_exists_None_return_success(self):
-        # Create dummy user and authenticate
-        user = User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')
-        team = Team.objects.create(name='test team')
-        team_member = TeamMember.objects.create(user=user, team=team)
 
         request_params = {'email': 'test@gmail.com', 'password': 'Test1234'}
         response = self.client.post(self.login_url, request_params)
@@ -98,7 +78,6 @@ class LogoutTest(APITestCase):
     logout_url = reverse('auth-logout')
 
     def test_when_invalid_token_and_logout_then_return_error(self):
-        # Create dummy user and authenticate
         header = {'HTTP_AUTHORIZATION': f"Token abcdefg"}
 
         response = self.client.post(self.logout_url, **header)
@@ -107,7 +86,6 @@ class LogoutTest(APITestCase):
         self.assertEqual(response.data['detail'], 'Invalid token.')
         
     def test_when_valid_token_and_logout_then_return_success(self):
-        # Create dummy user and authenticate
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         team = Team.objects.create(name='test team')
         team_member = TeamMember.objects.create(team=team, user=user)
@@ -125,7 +103,6 @@ class CurentTeamTest(APITestCase):
     current_team_url = reverse('auth-current-team')
 
     def test_when_invalid_token_and_current_team_then_return_error(self):
-        # Create dummy user and authenticate
         header = {'HTTP_AUTHORIZATION': f"Token abcdefg"}
 
         response = self.client.get(self.current_team_url, **header)
@@ -134,7 +111,6 @@ class CurentTeamTest(APITestCase):
         self.assertEqual(response.data['detail'], 'Invalid token.')
         
     def test_when_valid_token_and_current_team_then_return_current_team_information(self):
-        # Create dummy user and authenticate
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         team = Team.objects.create(name='test team')
         team_member = TeamMember.objects.create(team=team, user=user)
@@ -147,11 +123,11 @@ class CurentTeamTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], team.id)
         
+
 class AvailableTeamTest(APITestCase):
     available_team_url = reverse('auth-available-team')
 
     def test_when_invalid_token_and_available_team_then_return_error(self):
-        # Create dummy user and authenticate
         header = {'HTTP_AUTHORIZATION': f"Token abcdefg"}
 
         response = self.client.get(self.available_team_url, **header)
@@ -160,7 +136,6 @@ class AvailableTeamTest(APITestCase):
         self.assertEqual(response.data['detail'], 'Invalid token.')
         
     def test_when_valid_token_and_available_team_then_return_available_team_information(self):
-        # Create dummy user and authenticate
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         team = Team.objects.create(name='test team')
         team_member = TeamMember.objects.create(team=team, user=user)
@@ -173,12 +148,12 @@ class AvailableTeamTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], team.id)
-   
+
+
 class ChangeTeamTest(APITestCase):
     change_team_url = reverse('auth-change-team')
 
     def test_when_invalid_token_and_change_team_then_return_error(self):
-        # Create dummy user and authenticate
         header = {'HTTP_AUTHORIZATION': f"Token abcdefg"}
 
         response = self.client.post(self.change_team_url, **header)
@@ -187,7 +162,6 @@ class ChangeTeamTest(APITestCase):
         self.assertEqual(response.data['detail'], 'Invalid token.')
         
     def test_when_valid_token_and_no_team_id_then_error(self):
-        # Create dummy user and authenticate
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         team = Team.objects.create(name='test team')
         team_member = TeamMember.objects.create(team=team, user=user)
@@ -201,7 +175,6 @@ class ChangeTeamTest(APITestCase):
         self.assertEqual(response.data['error'], 'Team id required')
         
     def test_when_valid_token_and_invalid_team_id_then_error(self):
-        # Create dummy user and authenticate
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         team = Team.objects.create(name='test team')
         team_2 = Team.objects.create(name='test team 2')
@@ -217,7 +190,6 @@ class ChangeTeamTest(APITestCase):
         self.assertEqual(response.data['error'], 'Invalid team id')
         
     def test_when_valid_token_and_valid_team_id_then_success(self):
-        # Create dummy user and authenticate
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         team = Team.objects.create(name='test team')
         team_2 = Team.objects.create(name='test team 2')

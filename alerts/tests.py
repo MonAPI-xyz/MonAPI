@@ -593,7 +593,7 @@ class CronAlertsManagementCommand(TransactionTestCase):
     def test_when_api_monitor_failed_and_email_enabled_then_send_alert(self, mock_send_mail, mock_interrupt):
         user = User.objects.create_user(username='test', email='test@test.com', password='test123')
         team = Team.objects.create(name='test team')
-        TeamMember.objects.create(team=team, user=user)
+        TeamMember.objects.create(team=team, user=user) # Required for email test
         
         AlertsConfiguration.objects.create(
             team=team,
