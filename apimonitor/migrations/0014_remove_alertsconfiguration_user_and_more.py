@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('login', '0001_initial'),
+        ('login', '0002_alter_team_description_alter_team_logo'),
         ('apimonitor', '0013_merge_20221106_1259'),
     ]
 
