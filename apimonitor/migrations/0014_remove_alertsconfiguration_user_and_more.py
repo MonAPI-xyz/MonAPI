@@ -3,7 +3,6 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-from django.contrib.auth.models import User
 
 
 def forwards_func(apps, schema_editor):
@@ -12,11 +11,15 @@ def forwards_func(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     
     Team = apps.get_model("login", "Team")
+    TeamMember = apps.get_model("login", "TeamMember")
+    User = apps.get_model("auth", "User")
+    
     users = User.objects.using(db_alias).all()
     team_mapping = {}
     for user in users:
         username = user.username.split('@')[0]
-        team = Team.objects.create(name=username.title())
+        team = Team.objects.using(db_alias).create(name=username.title())
+        TeamMember.objects.using(db_alias).create(team=team, user=user)
         team_mapping[user.id] = team
     
     APIMonitor = apps.get_model("apimonitor", "APIMonitor")
