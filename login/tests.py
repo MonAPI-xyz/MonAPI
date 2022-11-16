@@ -123,6 +123,7 @@ class CurentTeamTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], team.id)
         
+
 class AvailableTeamTest(APITestCase):
     available_team_url = reverse('auth-available-team')
 
