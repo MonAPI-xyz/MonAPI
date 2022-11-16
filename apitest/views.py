@@ -72,12 +72,6 @@ class APITestView(views.APIView):
             assert len(error_log) == 0, error_log
         
             try:
-                print(f"""
-                    url = {monitor_data['url']}
-                    params = {monitor_data['query_params']}
-                    headers = {monitor_data['headers']}
-                    data = {monitor_data['body']}
-                """)
                 resp = requests.request(monitor_data['method'], monitor_data['url'], params=monitor_data['query_params'], data=monitor_data['body'], headers=monitor_data['headers'], timeout=30)
                 
             except Exception as e:
