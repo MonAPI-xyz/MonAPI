@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 
+from corsheaders.defaults import default_headers
+
+
 import os
 import sys
 
@@ -71,6 +74,8 @@ INSTALLED_APPS = [
     'password_validators',
     'login',
     'error_logs',
+    'forget_password',
+    'apitest',
 ]
 
 MIDDLEWARE = [
@@ -232,8 +237,13 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',
 ]
 
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'baggage',
+    'sentry-trace',
+]
+
 if os.getenv('PRODUCTION', '') == 'True':
-    CORS_ALLOWED_ORIGINS = os.getenv('FRONTEND_URL', '').split(',')
+    CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
 
 # Server mail configuration
 EMAIL_HOST = os.getenv('EMAIL_HOST', '')
@@ -242,6 +252,7 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'False') == 'True'
 EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', '')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

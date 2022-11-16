@@ -45,6 +45,7 @@ class APIMonitor(models.Model):
     assertion_type = models.CharField(max_length=16, choices=assertion_type_choices, default='DISABLED')
     assertion_value = models.TextField(blank=True)
     is_assert_json_schema_only = models.BooleanField(default=False)
+    last_notified = models.DateTimeField(null=True, blank=True)
     
     
 class APIMonitorQueryParam(models.Model):
@@ -93,6 +94,11 @@ class AssertionExcludeKey(models.Model):
 
 class AlertsConfiguration(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    utc = models.IntegerField(default=7, validators=[
+        MinValueValidator(-12),
+        MaxValueValidator(14)
+    ])
     
     # Slack config
     is_slack_active = models.BooleanField(default=False)
@@ -101,17 +107,18 @@ class AlertsConfiguration(models.Model):
     
     # Discord config
     is_discord_active = models.BooleanField(default=False)
-    discord_bot_token = models.CharField(max_length=256, blank=True, default="")
-    discord_guild_id = models.CharField(max_length=256, blank=True, default="")
-    discord_channel_id = models.CharField(max_length=256, blank=True, default="")
+    discord_webhook_url = models.CharField(max_length=256, blank=True, default="")
     
     # Pagerduty config
     is_pagerduty_active = models.BooleanField(default=False)
     pagerduty_api_key = models.CharField(max_length=256, blank=True, default="")
     pagerduty_default_from_email = models.CharField(max_length=256, blank=True, default="")
+    pagerduty_service_id = models.CharField(max_length=64, blank=True, default="")
     
     # Email config
     is_email_active = models.BooleanField(default=False)
+    email_name = models.CharField(max_length=1024, blank=True, default="")
+    email_address = models.EmailField(max_length = 1024, blank=True)
     email_host = models.CharField(max_length=1024, blank=True, default="")
     email_port = models.IntegerField(null=True, blank=True)
     email_username = models.CharField(max_length=1024, blank=True, default="")

@@ -3,13 +3,20 @@ import pytz
 from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.management import call_command
 from django.utils import timezone
+from unittest.mock import patch
+from django.test import TransactionTestCase
+from io import StringIO
+
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from datetime import datetime
+import time
+import os
 
-from apimonitor.models import AlertsConfiguration
+from apimonitor.models import APIMonitor, APIMonitorResult, AlertsConfiguration
 
 
 class AlertsConfigurationTestCase(APITestCase):
@@ -36,17 +43,19 @@ class AlertsConfigurationTestCase(APITestCase):
         response = self.client.get(self.test_url, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {
+            "utc": 7,
             "is_slack_active": False,
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": False,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": False,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
+            "pagerduty_service_id": "",
             "is_email_active": False,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -67,6 +76,7 @@ class AlertsConfigurationTestCase(APITestCase):
         
         AlertsConfiguration.objects.create(
             user=user,
+            utc=7,
             is_slack_active=True,
             is_discord_active=True,
             is_pagerduty_active=True,
@@ -76,17 +86,19 @@ class AlertsConfigurationTestCase(APITestCase):
         response = self.client.get(self.test_url, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {
+            "utc": 7,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
+            "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -103,17 +115,19 @@ class AlertsConfigurationTestCase(APITestCase):
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         
         req_body = {
+            "utc": 7,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
+            "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -125,17 +139,19 @@ class AlertsConfigurationTestCase(APITestCase):
         response = self.client.post(self.test_url, data=req_body, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {
+            "utc": 7,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
+            "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -147,6 +163,7 @@ class AlertsConfigurationTestCase(APITestCase):
         })
         
         config = AlertsConfiguration.objects.get(user=user)
+        self.assertEqual(config.utc, 7)
         self.assertEqual(config.is_slack_active, True)
         self.assertEqual(config.is_discord_active, True)
         self.assertEqual(config.is_pagerduty_active, True)
@@ -173,17 +190,19 @@ class ThresholdConfigTest(APITestCase):
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         req_body = {
+            "utc": 7,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
+            "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -197,17 +216,19 @@ class ThresholdConfigTest(APITestCase):
         response = self.client.post(self.test_url, data=req_body, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {
+            "utc": 7,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
+            "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -219,6 +240,7 @@ class ThresholdConfigTest(APITestCase):
         })
 
         config = AlertsConfiguration.objects.get(user=user)
+        self.assertEqual(config.utc, 7)
         self.assertEqual(config.is_slack_active, True)
         self.assertEqual(config.is_discord_active, True)
         self.assertEqual(config.is_pagerduty_active, True)
@@ -230,17 +252,19 @@ class ThresholdConfigTest(APITestCase):
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         req_body = {
+            "utc": 7,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
+            "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -262,17 +286,19 @@ class ThresholdConfigTest(APITestCase):
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
         req_body = {
+            "utc": 7,
             "is_slack_active": True,
             "slack_token": "",
             "slack_channel_id": "",
             "is_discord_active": True,
-            "discord_bot_token": "",
-            "discord_guild_id": "",
-            "discord_channel_id": "",
+            "discord_webhook_url": "",
             "is_pagerduty_active": True,
             "pagerduty_api_key": "",
             "pagerduty_default_from_email": "",
+            "pagerduty_service_id": "",
             "is_email_active": True,
+            "email_name": "",
+            "email_address": "",
             "email_host": "",
             "email_port": None,
             "email_username": "",
@@ -286,3 +312,438 @@ class ThresholdConfigTest(APITestCase):
         response = self.client.post(self.test_url, data=req_body, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['threshold_pct'][0].title(), "Ensure This Value Is Less Than Or Equal To 100.")
+
+class CronAlertsManagementCommand(TransactionTestCase):
+    local_timezone = pytz.timezone(settings.TIME_ZONE)
+    mock_current_time = local_timezone.localize(datetime(2022,9,20,10))
+    
+    def setUp(self):
+        # Mock time function
+        timezone.now = lambda: self.mock_current_time
+        timezone.localtime = lambda: self.mock_current_time
+        os.environ['CRON_INTERVAL_IN_SECONDS'] = '2'
+    
+    def call_command(self, *args, **kwargs):
+        out = StringIO()
+        call_command("run_cron_alerts", *args, stdout=out, stderr=StringIO(), **kwargs)
+        return out.getvalue()
+    
+    # Mock interrupt
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.post")
+    def test_when_api_monitor_result_empty_then_not_send_alert(self, mock_request, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        
+        self.assertFalse(mock_request.called)
+        
+    @patch("time.sleep", side_effect=InterruptedError)
+    @patch("requests.post")
+    def test_when_mock_time_sleep_then_interrupt_on_sleep(self, mock_request, *args):
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        
+        self.assertFalse(mock_request.called)
+        
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.post")
+    def test_when_env_config_invalid_then_use_default(self, mock_request, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        os.environ['CRON_ALERTS_THREAD_COUNT'] = 'invalid int'
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        
+        self.assertFalse(mock_request.called)
+        
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.post")
+    def test_when_api_monitor_failed_but_notification_disabled_then_not_send_alert(self, mock_request, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=False,
+            status_code=500,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        self.assertFalse(mock_request.called)
+        
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.post")
+    def test_when_api_monitor_failed_and_pagerduty_enabled_then_send_alert(self, mock_request, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+            is_pagerduty_active=True,
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=False,
+            status_code=500,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        
+        args = mock_request.call_args.args
+        self.assertEqual(args[0], 'https://api.pagerduty.com/incidents')
+        
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.post")
+    def test_when_api_monitor_failed_and_pagerduty_error_then_do_nothing(self, mock_request, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+            is_pagerduty_active=True,
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=False,
+            status_code=500,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        mock_request.side_effect = Exception()
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        
+        args = mock_request.call_args.args
+        self.assertEqual(args[0], 'https://api.pagerduty.com/incidents')
+         
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect = [None, InterruptedError])
+    @patch("requests.post")
+    def test_when_api_monitor_failed_and_last_notified_within_5min_then_not_send_alert(self, mock_request, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+            is_pagerduty_active=True,
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=False,
+            status_code=500,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        
+        self.assertEqual(mock_request.call_count, 1)
+        
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.post")
+    def test_when_api_monitor_failed_and_discord_enabled_then_send_alert(self, mock_request, mock_interrupt):
+        os.environ['FRONTEND_URL'] = "http://localhost:8080"
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+            is_discord_active=True,
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=False,
+            status_code=500,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        print(f"Mock Request = {mock_request}")
+        self.assertTrue(mock_request.called)
+        
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("django.contrib.auth.models.User.email_user")
+    def test_when_api_monitor_failed_and_email_enabled_then_send_alert(self, mock_send_mail, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+            is_email_active=True,
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=False,
+            status_code=500,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        
+        self.assertEqual(mock_send_mail.call_count, 1)
+        
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("django.contrib.auth.models.User.email_user")
+    def test_when_api_monitor_success_and_email_enabled_then_no_send_alert(self, mock_send_mail, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+            is_email_active=True,
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=True,
+            status_code=200,
+            log_response='resp',
+            log_error='',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        
+        self.assertFalse(mock_send_mail.called)
+        
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect = [None, InterruptedError])
+    @patch("requests.post")
+    def test_when_api_monitor_failed_and_last_notified_within_5min_then_not_send_alert_slack(self, mock_request, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+            is_slack_active=True,     
+        )   
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=False,
+            status_code=500,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        
+        self.assertEqual(mock_request.call_count, 1)
+
+
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.post")
+    def test_when_api_monitor_success_and_slack_enabled_then_not_send_alert(self, mock_request, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+            is_slack_active=True,
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=True,
+            status_code=200,
+            log_response='resp',
+            log_error='',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        self.assertFalse(mock_request.called)
+
+    @patch("alerts.management.commands.run_cron_alerts.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.post")
+    def test_when_api_monitor_failed_and_slack_enabled_then_send_alert(self, mock_request, mock_interrupt):
+        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        AlertsConfiguration.objects.create(
+            user=user,
+            is_slack_active=True,
+        )
+        
+        monitor = APIMonitor.objects.create(
+            user=user,
+            name='apimonitor',
+            method='GET',
+            url='https://monapi.xyz',
+            schedule='60MIN',
+            body_type='EMPTY',
+        )
+        
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=10,
+            success=False,
+            status_code=500,
+            log_response='resp',
+            log_error='error',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+        args = mock_request.call_args.args
+        self.assertEqual(args[0], 'https://slack.com/api/chat.postMessage')
+        
+    

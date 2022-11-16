@@ -6,17 +6,19 @@ class AlertsConfigurationSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlertsConfiguration
         fields = [
+            'utc',
             'is_slack_active',
             'slack_token',
             'slack_channel_id',
             'is_discord_active',
-            'discord_bot_token',
-            'discord_guild_id',
-            'discord_channel_id',
+            'discord_webhook_url',
             'is_pagerduty_active',
             'pagerduty_api_key',
             'pagerduty_default_from_email',
+            'pagerduty_service_id',
             'is_email_active',
+            'email_name',
+            'email_address',
             'email_host',
             'email_port',
             'email_username',
