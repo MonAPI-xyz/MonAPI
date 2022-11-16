@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('login', '0001_initial'),
+        ('login', '0002_alter_team_description_alter_team_logo'),
         ('apimonitor', '0014_remove_alertsconfiguration_user_and_more'),
     ]
 
