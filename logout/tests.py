@@ -2,7 +2,8 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework.authtoken.models import Token
+
+from login.models import Team, TeamMember, MonAPIToken
 
 class ListAPIMonitor(APITestCase):
   logout_url = reverse('logout')
@@ -18,7 +19,10 @@ class ListAPIMonitor(APITestCase):
   def test_when_authenticated_and_logout_then_return_success(self):
     # Create dummy user and authenticate
     user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-    token = Token.objects.create(user=user)
+    team = Team.objects.create(name='test team')
+    team_member = TeamMember.objects.create(team=team, user=user)
+    
+    token = MonAPIToken.objects.create(team_member=team_member)
 
     header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
     response = self.client.post(self.logout_url, **header)
