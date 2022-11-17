@@ -28,5 +28,5 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 			new_team = Team.objects.create(**team_data)
 			serialized_obj = TeamSerializers(new_team)
 			return Response(data=serialized_obj.data, status=status.HTTP_201_CREATED)
-		else:
-			return Response(data={"error": "Please make sure your [team name] is exist!"}, status=status.HTTP_400_BAD_REQUEST)
+			
+		return Response(data={"error": "Please make sure your [team name] is exist!"}, status=status.HTTP_400_BAD_REQUEST)
