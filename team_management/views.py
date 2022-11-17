@@ -1,7 +1,7 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from login.models import Team
+from login.models import Team, TeamMember
 from login.serializers import TeamSerializers
 
 
@@ -26,6 +26,7 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 		team_serializer = TeamSerializers(data=team_data)
 		if team_serializer.is_valid():
 			new_team = Team.objects.create(**team_data)
+			TeamMember.objects.create(team=new_team, user=request.user)
 			serialized_obj = TeamSerializers(new_team)
 			return Response(data=serialized_obj.data, status=status.HTTP_201_CREATED)
 			
