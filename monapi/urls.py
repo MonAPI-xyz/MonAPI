@@ -36,4 +36,7 @@ urlpatterns = [
     path('alerts/', include('alerts.urls')),
     path('api-test/', include('apitest.urls')),
     path('team-management/', include('team_management.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
