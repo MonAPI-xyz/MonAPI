@@ -242,3 +242,14 @@ class TeamLogoTest(TestCase):
         path = get_file_path(None, 'test.png')
         self.assertTrue('teamlogo/' in path)
     
+class InviteMemberTest(TestCase):
+
+    def test_when_invited_a_user_is_not_verified(self):
+        user = User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')
+        user.is_active = False
+        user.save()
+
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(user=user, team=team)
+
+        self.assertEqual(team_member.verified, False)
