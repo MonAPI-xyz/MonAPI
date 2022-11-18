@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'forget_password',
     'apitest',
     'team_management',
+    'invite_team_members',
 ]
 
 MIDDLEWARE = [
