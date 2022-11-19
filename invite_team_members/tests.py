@@ -112,3 +112,62 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'User is already in the process of being invited to the team'})
         self.assertEqual(TeamMember.objects.filter(team=self.default_team).count(), 2)
+
+class AcceptInviteViewTest(APITestCase):
+    test_url = reverse('accept-invite')
+    local_timezone = pytz.timezone(settings.TIME_ZONE)
+    mock_current_time = local_timezone.localize(datetime(2022, 9, 20, 10))
+    mock_future_time = local_timezone.localize(datetime(2022,9, 20, 11))
+
+    def setUp(self):
+        timezone.now = lambda: self.mock_current_time
+        self.default_user = User.objects.create_user(username='default user', email='test@gmail.com',
+                                                     password='test1234')
+        self.default_team = Team.objects.create(name='default team')
+        self.default_team_member = TeamMember.objects.create(team=self.default_team, user=self.default_user, verified=True)
+        self.default_token = MonAPIToken.objects.create(team_member=self.default_team_member)
+        self.default_header = {'HTTP_AUTHORIZATION': f"Token {self.default_token.key}"}
+        self.default_invite_token = InviteTeamMemberToken.objects.create(user=self.default_user, team=self.default_team)
+
+    def test_frontend_sends_no_data(self):
+        response = self.client.post(self.test_url, {}, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {"key": ["This field is required."]})
+
+    def test_invite_already_verified_user(self):
+        response = self.client.post(self.test_url, {
+            'key': self.default_invite_token.key
+        }, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'You are already a member of the team'})
+
+    @patch("django.core.mail.send_mail", mocked_send_email)
+    def test_frontend_sends_unused_token_and_try_reusing_same_token(self):
+        invited_user = User.objects.create_user(username='new user', email='new_user@gmail.com', password='test1234')
+        response = self.client.post(reverse('invite-member-token'), {
+            'invited_email': invited_user.email,
+            'team_id': self.default_team.id
+        }, format='json', **self.default_header)
+        # User is invited and is added to the team as unverified user
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'success': True})
+        self.assertEqual(TeamMember.objects.filter(team=self.default_team).count(), 2)
+
+        invite_token = InviteTeamMemberToken.objects.get(user=invited_user, team=self.default_team)
+        invite_token_key = invite_token.key
+        response = self.client.post(self.test_url, {
+            'key': invite_token_key
+        }, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'success': True})
+        self.assertEqual(InviteTeamMemberToken.objects.all().count(), 1)
+
+        # Reusing same token
+        invite_token_key = invite_token.key
+        response = self.client.post(self.test_url, {
+            'key': invite_token_key
+        }, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'Invalid token'})
+        self.assertEqual(InviteTeamMemberToken.objects.all().count(), 1)
+
