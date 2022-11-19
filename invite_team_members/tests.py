@@ -84,11 +84,31 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
         self.assertEqual(response.data, {'error': 'Team not exists with given id'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch("django.core.mail.send_mail", mocked_send_email)
-    def test_request_invite_token_and_everything_valid(self):
+    def test_request_invite_token_and_everything_valid_but_user_is_already_in_team(self):
         response = self.client.post(self.test_url, {
             'invited_email': self.default_user.email,
             'team_id': self.default_team.id
         }, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'User is already in the process of being invited to the team'})
+
+    @patch("django.core.mail.send_mail", mocked_send_email)
+    def test_request_invite_token_and_everything_valid_but_user_is_invited_twice(self):
+        invited_user = User.objects.create_user(username='new user', email='new_user@gmail.com', password='test1234')
+        response = self.client.post(self.test_url, {
+            'invited_email': invited_user.email,
+            'team_id': self.default_team.id
+        }, format='json', **self.default_header)
+        # User is invited and is added to the team as unverified user
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'success': True})
+        self.assertEqual(TeamMember.objects.filter(team=self.default_team).count(), 2)
+
+        # User is invited again
+        response = self.client.post(self.test_url, {
+            'invited_email': invited_user.email,
+            'team_id': self.default_team.id
+        }, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'User is already in the process of being invited to the team'})
+        self.assertEqual(TeamMember.objects.filter(team=self.default_team).count(), 2)
