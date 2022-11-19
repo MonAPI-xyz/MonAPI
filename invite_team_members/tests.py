@@ -129,7 +129,6 @@ class AcceptInviteViewTest(APITestCase):
     test_url = reverse('accept-invite')
     local_timezone = pytz.timezone(settings.TIME_ZONE)
     mock_current_time = local_timezone.localize(datetime(2022, 9, 20, 10))
-    mock_future_time = local_timezone.localize(datetime(2022,9, 20, 11))
 
     def setUp(self):
         timezone.now = lambda: self.mock_current_time
@@ -181,5 +180,50 @@ class AcceptInviteViewTest(APITestCase):
         }, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Invalid token'})
+        self.assertEqual(InviteTeamMemberToken.objects.all().count(), 1)
+
+
+class CancelInviteViewTest(APITestCase):
+    test_url = reverse('cancel-invite')
+    local_timezone = pytz.timezone(settings.TIME_ZONE)
+    mock_current_time = local_timezone.localize(datetime(2022, 9, 20, 10))
+
+    def setUp(self):
+        timezone.now = lambda: self.mock_current_time
+        self.default_user = User.objects.create_user(username='default user', email='test@gmail.com',
+                                                     password='test1234')
+        self.default_team = Team.objects.create(name='default team')
+        self.default_team_member = TeamMember.objects.create(team=self.default_team, user=self.default_user)
+        self.default_token = MonAPIToken.objects.create(team_member=self.default_team_member)
+        self.default_header = {'HTTP_AUTHORIZATION': f"Token {self.default_token.key}"}
+        self.default_invite_token = InviteTeamMemberToken.objects.create(user=self.default_user, team=self.default_team)
+
+    def test_frontend_send_no_data(self):
+        response = self.client.post(self.test_url, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {"key": ["This field is required."]})
+
+    def test_frontend_sends_invalid_token(self):
+        response = self.client.post(self.test_url, {
+            'key': 'invalid'
+        }, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'Invalid token'})
+
+    @patch("django.core.mail.send_mail", mocked_send_email)
+    def test_request_invite_token_and_then_cancel(self):
+        invited_user = User.objects.create_user(username='new user', email='new_user@gmail.com', password='test1234')
+        self.client.post(reverse('invite-member-token'), {
+            'invited_email': invited_user.email,
+            'team_id': self.default_team.id
+        }, format='json', **self.default_header)
+
+        invite_token = InviteTeamMemberToken.objects.get(user=invited_user, team=self.default_team)
+        response = self.client.post(self.test_url, {
+            'key': invite_token.key
+        }, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'success': True})
+        self.assertEqual(TeamMember.objects.all().count(), 1)
         self.assertEqual(InviteTeamMemberToken.objects.all().count(), 1)
 
