@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from login.models import Team, TeamMember
 from login.serializers import TeamSerializers
+from team_management.serializers import TeamManagementSerializers
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 
@@ -35,7 +36,7 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 
 	@action(detail=False,methods=["GET"])
 	def current(self, request):
-		serializer = TeamSerializers(request.auth.team)
+		serializer = TeamManagementSerializers(request.auth.team)
 		return Response(serializer.data)
 		
 
