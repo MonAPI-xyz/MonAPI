@@ -14,8 +14,8 @@ class TeamUserSerializers(serializers.ModelSerializer):
         ]
 
 class TeamMemberSerializers(serializers.ModelSerializer):
-    class Meta:
-        user = TeamUserSerializers()
+    user = TeamUserSerializers()
+    class Meta:        
         model = TeamMember
         fields = [
             'team', 
@@ -23,8 +23,8 @@ class TeamMemberSerializers(serializers.ModelSerializer):
         ]
 
 class TeamManagementSerializers(serializers.ModelSerializer):
+    teammember = TeamMemberSerializers(many=True)
     class Meta:
-        teammember = TeamMemberSerializers(many=True)
         model = Team
         fields = [
             'id',
