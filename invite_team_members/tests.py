@@ -103,6 +103,7 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'success': True})
         self.assertEqual(TeamMember.objects.filter(team=self.default_team).count(), 2)
+        self.assertEqual(TeamMember.objects.get(user=invited_user, team=self.default_team).verified, False)
 
         # User is invited again
         response = self.client.post(self.test_url, {
@@ -112,6 +113,17 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'User is already in the process of being invited to the team'})
         self.assertEqual(TeamMember.objects.filter(team=self.default_team).count(), 2)
+
+    def test_request_invite_to_an_already_verified_team_member(self):
+        self.default_team_member.verified = True
+        self.default_team_member.save()
+        response = self.client.post(self.test_url, {
+            'invited_email': self.default_user.email,
+            'team_id': self.default_team.id
+        }, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'User is already in the team'})
+
 
 class AcceptInviteViewTest(APITestCase):
     test_url = reverse('accept-invite')
