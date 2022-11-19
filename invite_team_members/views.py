@@ -9,7 +9,8 @@ from rest_framework.response import Response
 from invite_team_members.models import InviteTeamMemberToken
 from invite_team_members.serializers import (InviteTeamMemberTokenCheckSerializer,
                                              RequestInviteTeamMemberTokenSerializer,
-                                             AcceptInviteSerializer)
+                                             AcceptInviteSerializer,
+                                             CancelInviteSerializer)
 from login.models import Team, TeamMember
 
 import os
@@ -101,3 +102,26 @@ class AcceptInviteView(views.APIView):
             invite_token.delete()
             return Response({'success': True})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CancelInviteView(views.APIView):
+
+    def post(self, request, format=None):
+        serializer = CancelInviteSerializer(data=request.data)
+        if serializer.is_valid():
+            invite_token = InviteTeamMemberToken.objects.filter(
+                key=serializer.validated_data['key'],
+                created_at__gte=timezone.now() - timedelta(weeks=1)
+            )
+            if len(invite_token) == 0:
+                return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+            invite_token = invite_token[0]
+            team_target = invite_token.team
+            user_target = invite_token.user
+
+            team_member = TeamMember.objects.get(user=user_target, team=team_target)
+
+            team_member.delete()
+            invite_token.delete()
+            return Response({'success': True})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

@@ -12,3 +12,7 @@ class RequestInviteTeamMemberTokenSerializer(serializers.Serializer):
 
 class AcceptInviteSerializer(serializers.Serializer):
     key = serializers.CharField(max_length=256)
+
+
+class CancelInviteSerializer(serializers.Serializer):
+    key = serializers.CharField(max_length=256)
