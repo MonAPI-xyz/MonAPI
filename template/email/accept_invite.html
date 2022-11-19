@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" style="font-family: Montserrat, sans-serif; font-size: 14px;">
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./style.css">
+    <title>MonAPI Invitation to Team {{team_name}}</title>
+</head>
+
+<body style="background-color: #F5F5F5;color: #424242;">
+    <div class="main-content-outer" style="padding: 60px; padding-top: 50px; padding-bottom: 50px;">
+        <div class="main-content" style="background-color: white;height: max-content;padding: 30px;">
+            <h1 style="color: red;">You are invited to the team!</h1>
+            <p class="text" style="margin-top: 25px; margin-bottom: 25px;">
+                You have been invited to join Team {{team.name}}<br>
+                Please follow below link to accept the invitation and join the team.
+                <br><br>
+                <a href="{{accept_url}}">{{accept_url}}</a>
+                <br>
+                This link is valid for 1 week.
+            </p>
+            <h5 style="color: #4B8F8C;">MonAPI Monitoring Platform</h3>
+        </div>
+    </div>
+</body>
+
+</html>
