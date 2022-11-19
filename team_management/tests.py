@@ -82,8 +82,7 @@ class TeamManagementTests(APITestCase):
     header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
     
     response = self.client.get(self.test_url, format='json', **header)
-
-    self.assertEqual(response.data,{'id': 1, 'name': 'myteam'})
+    self.assertEqual(response.data,{'id': 1, 'name': 'myteam', 'logo': None, 'description': '', 'teammember': [1]})
 
     
 
