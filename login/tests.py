@@ -283,3 +283,13 @@ class ListMemberTest(APITestCase):
         }, **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Invalid team id'})
+
+    def test_list_member_requires_id(self):
+        user1 = User.objects.create_user(username="user1@gmail.com", email="user1@gmail.com", password="test1234")
+        team1 = Team.objects.create(name="team 1")
+        team_member = TeamMember.objects.create(user=user1, team=team1, verified=True)
+        team_token = MonAPIToken.objects.create(team_member=team_member)
+        header = {'HTTP_AUTHORIZATION': f'Token {team_token.key}'}
+        response = self.client.post(self.test_url, {}, **header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'Team id required'})
