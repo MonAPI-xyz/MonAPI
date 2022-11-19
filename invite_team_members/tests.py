@@ -21,7 +21,8 @@ class InviteTeamMemberTokenTest(TestCase):
 
     def test_when_created_key_is_made(self):
         user = User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')
-        inviteToken =  InviteTeamMemberToken.objects.create(user=user)
+        team = Team.objects.create(name="default team")
+        inviteToken =  InviteTeamMemberToken.objects.create(user=user, team=team)
         self.assertEqual(InviteTeamMemberToken.objects.all().count(), 1)
 
 class RequestInviteTeamMemberTokenViewTest(APITestCase):
@@ -36,7 +37,7 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
         self.default_team_member = TeamMember.objects.create(team=self.default_team, user=self.default_user)
         self.default_token = MonAPIToken.objects.create(team_member=self.default_team_member)
         self.default_header = {'HTTP_AUTHORIZATION': f"Token {self.default_token.key}"}
-        self.default_invite_token = InviteTeamMemberToken.objects.create(user=self.default_user)
+        self.default_invite_token = InviteTeamMemberToken.objects.create(user=self.default_user, team=self.default_team)
 
     def test_check_user_must_be_authenthicated_to_get_invite_token(self):
         response = self.client.get(self.test_url, format='json', **self.default_header)
