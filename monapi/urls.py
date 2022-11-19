@@ -36,6 +36,7 @@ urlpatterns = [
     path('alerts/', include('alerts.urls')),
     path('api-test/', include('apitest.urls')),
     path('team-management/', include('team_management.urls')),
+    path('invite-member/', include('invite_team_members.urls')),
 ]
 
 if settings.DEBUG:

@@ -13,4 +13,15 @@ import os
 
 
 class RequestInviteTeamMemberTokenView(views.APIView):
-    pass
+
+    def get(self, request, format=None):
+        serializer = InviteTeamMemberTokenCheckSerializer(data=request.query_params)
+        if serializer.is_valid():
+            token = InviteTeamMemberToken.objects.filter(
+                key=serializer.validated_data['key'],
+                created_at__gte=timezone.now() - timedelta(weeks=1)
+            )
+            if len(token) == 0:
+                return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'success': True})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
