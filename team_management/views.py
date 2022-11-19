@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from login.models import Team, TeamMember
 from login.serializers import TeamSerializers
-
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import action
 
 class TeamManagementViewSet(mixins.CreateModelMixin,
 							viewsets.GenericViewSet):
@@ -31,3 +32,10 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 			return Response(data=serialized_obj.data, status=status.HTTP_201_CREATED)
 			
 		return Response(data={"error": "Please make sure your [team name] is exist!"}, status=status.HTTP_400_BAD_REQUEST)
+
+	@action(detail=False,methods=["GET"])
+	def current(self, request):
+		serializer = TeamSerializers(request.auth.team)
+		return Response(serializer.data)
+		
+
