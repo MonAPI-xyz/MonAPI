@@ -8,10 +8,15 @@ from django.utils import timezone
 from datetime import datetime
 from rest_framework import status
 from rest_framework.test import APITestCase
+from unittest.mock import patch
 
 from invite_team_members.models import InviteTeamMemberToken
 from login.models import Team, TeamMember, MonAPIToken
 # Create your tests here.
+
+def mocked_send_email(*args, **kwargs):
+    pass
+
 class InviteTeamMemberTokenTest(TestCase):
     local_timezone = pytz.timezone(settings.TIME_ZONE)
     mock_current_time = local_timezone.localize(datetime(2022, 9, 20, 10))
@@ -54,6 +59,36 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
     def test_check_token_exist_and_is_valid(self):
         response = self.client.get(self.test_url, {
             'key': self.default_invite_token.key
+        }, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'success': True})
+
+    def test_request_invite_token_but_no_param(self):
+        response = self.client.post(self.test_url, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(len(response.data), 2)
+
+    def test_request_invite_token_but_invited_user_does_not_exist(self):
+        response = self.client.post(self.test_url, {
+            'invited_email': 'invalid@gmail.com',
+            'team_id': -1
+        }, format='json', **self.default_header)
+        self.assertEqual(response.data, {'error': 'User not exists with given email'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_request_invite_token_but_team_does_not_exist(self):
+        response = self.client.post(self.test_url, {
+            'invited_email': self.default_user.email,
+            'team_id': 1798471298
+        }, format='json', **self.default_header)
+        self.assertEqual(response.data, {'error': 'Team not exists with given id'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch("django.core.mail.send_mail", mocked_send_email)
+    def test_request_invite_token_and_everything_valid(self):
+        response = self.client.post(self.test_url, {
+            'invited_email': self.default_user.email,
+            'team_id': self.default_team.id
         }, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'success': True})
