@@ -6,6 +6,7 @@ from login.models import Team, TeamMember, MonAPIToken
 
 class TeamManagementTests(APITestCase):
   url = reverse('team-management-list')
+  test_url = reverse('team-management-current')
 
   def test_when_non_authenticated_then_return_unauthorized(self):
     new_team_request = {
@@ -71,4 +72,23 @@ class TeamManagementTests(APITestCase):
     response = self.client.post(self.url, data=new_team_request, format='json', **header)
     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
     self.assertEqual(response.data['name'], "test team")
+  
+  def test_retrieve(self):
+    user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+    team = Team.objects.create(name='myteam')
+    team_member = TeamMember.objects.create(team=team, user=user)
+
+    token = MonAPIToken.objects.create(team_member=team_member)
+    header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+    
+    response = self.client.get(self.test_url, format='json', **header)
+
+    self.assertEqual(response.data,{'id': 1, 'name': 'myteam'})
+
+    
+
+
+
+
+
   
