@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from invite_team_members.models import InviteTeamMemberToken
 from invite_team_members.serializers import InviteTeamMemberTokenCheckSerializer, RequestInviteTeamMemberTokenSerializer
-from login.models import Team
+from login.models import Team, TeamMember
 
 import os
 
@@ -37,7 +37,15 @@ class RequestInviteTeamMemberTokenView(views.APIView):
             if not Team.objects.filter(pk=serializer.validated_data['team_id']).exists():
                 return Response({'error': 'Team not exists with given id'}, status=status.HTTP_400_BAD_REQUEST)
             team = Team.objects.get(pk=serializer.validated_data['team_id'])
+
+            if TeamMember.objects.filter(team=team, user=user).exists():
+                verified = TeamMember.objects.get(team=team, user=user).verified
+                if verified:
+                    return Response({'error': 'User is already in the team'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': 'User is already in the process of being invited to the team'}, status=status.HTTP_400_BAD_REQUEST)
             invite_token = InviteTeamMemberToken.objects.create(user=user, team=team)
+
+            team_member = TeamMember.objects.create(user=user, team=team, verified=False)
 
             accept_url = f"{os.environ.get('FRONTEND_URL', '')}/invite-member?key={invite_token.key}"
             email_content = f'''
