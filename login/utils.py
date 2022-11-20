@@ -6,7 +6,7 @@ def generate_token(user):
     if not team_member_query.exists():
         username = user.username.split('@')[0]
         team = Team.objects.create(name=username.title())
-        team_member = TeamMember.objects.create(user=user, team=team)
+        team_member = TeamMember.objects.create(user=user, team=team, verified=True)
     else:
         team_member = team_member_query.first()
         

@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate, logout
 from rest_framework import status
 
-from login.serializers import LoginSerializer, TeamSerializers
+from login.serializers import LoginSerializer, TeamSerializers, TeamMemberSerializers
 from login.models import TeamMember, Team
 from login.utils import generate_token
 
@@ -71,4 +71,18 @@ def change_team(request):
     
     return Response({'success': True})
 
-    
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def list_member(request):
+    if 'id' not in request.data:
+        return Response({'error': 'Team id required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    team_members = TeamMember.objects.filter(team__id=request.data['id'])
+    if len(team_members) < 1:
+        return Response({'error': 'Invalid team id'}, status=status.HTTP_400_BAD_REQUEST)
+
+    serializer = TeamMemberSerializers(team_members, many=True)
+    return Response(serializer.data)
+
+
