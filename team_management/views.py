@@ -3,9 +3,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from login.models import Team, TeamMember
 from login.serializers import TeamSerializers
-
+import os
 
 class TeamManagementViewSet(mixins.CreateModelMixin,
+							mixins.UpdateModelMixin,
 							viewsets.GenericViewSet):
 
 	queryset = Team.objects.all()
@@ -29,5 +30,25 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 			TeamMember.objects.create(team=new_team, user=request.user)
 			serialized_obj = TeamSerializers(new_team)
 			return Response(data=serialized_obj.data, status=status.HTTP_201_CREATED)
+			
+		return Response(data={"error": "Please make sure your [team name] is exist!"}, status=status.HTTP_400_BAD_REQUEST)
+
+	def update(self, request, *args, **kwargs):
+		team_data = self.get_team_data_from_request(request)
+		team_serializer = TeamSerializers(data=team_data)
+		if team_serializer.is_valid():
+			team = Team.objects.get(pk=kwargs['pk'])
+			
+			# Remove old image
+			if (team.logo and os.path.exists(team.logo.path)):
+				os.remove(team.logo.path)
+
+			team.name = team_data['name']
+			team.description = team_data['description']
+			team.logo = team_data['logo']
+			team.save()
+
+			serialized_obj = TeamSerializers(team)
+			return Response(data=serialized_obj.data, status=status.HTTP_200_OK)
 			
 		return Response(data={"error": "Please make sure your [team name] is exist!"}, status=status.HTTP_400_BAD_REQUEST)
