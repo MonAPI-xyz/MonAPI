@@ -131,6 +131,18 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'User is already in the team'})
 
+    def test_unverified_member_can_not_invite_user_to_team(self):
+        self.default_team_member.verified = False
+        self.default_team_member.save()
+        other_user = User.objects.create_user(username='other', email='other@gmail.com', password='other123')
+        response = self.client.post(self.test_url, {
+            'sender_id': self.default_user.id,
+            'invited_email': other_user.email,
+            'team_id': self.default_team.id
+        }, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'You do not have permission to invite users in this team!'})
+
 
 class AcceptInviteViewTest(APITestCase):
     test_url = reverse('accept-invite')
