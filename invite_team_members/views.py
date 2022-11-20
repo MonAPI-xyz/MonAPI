@@ -120,9 +120,16 @@ class CancelInviteView(views.APIView):
             invite_token = invite_token[0]
 
             team_member = invite_token.team_member
+            requesting_user = User.objects.get(pk=serializer.validated_data['user_id'])
+            team = Team.objects.get(pk=serializer.validated_data['team_id'])
 
-            team_member.delete()
-            invite_token.delete()
-            return Response({'success': True})
+            requesting_user_is_verified = TeamMember.objects.get(user=requesting_user, team=team).verified
+
+            if requesting_user_is_verified:
+                team_member.delete()
+                invite_token.delete()
+                return Response({'success': True})
+            return Response({'error': 'You do not have permission to cancel invite request!'},
+                            status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

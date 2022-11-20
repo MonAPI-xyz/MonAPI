@@ -222,11 +222,17 @@ class CancelInviteViewTest(APITestCase):
     def test_frontend_send_no_data(self):
         response = self.client.post(self.test_url, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {"key": ["This field is required."]})
+        self.assertEqual(response.data, {
+            "key": ["This field is required."],
+            "team_id": ["This field is required."],
+            "user_id": ["This field is required."]
+        })
 
     def test_frontend_sends_invalid_token(self):
         response = self.client.post(self.test_url, {
-            'key': 'invalid'
+            'key': 'invalid',
+            'team_id': self.default_team.id,
+            'user_id': self.default_user.id,
         }, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Invalid token'})
@@ -242,10 +248,27 @@ class CancelInviteViewTest(APITestCase):
         team_member = TeamMember.objects.get(user=invited_user, team=self.default_team)
         invite_token = InviteTeamMemberToken.objects.get(team_member=team_member)
         response = self.client.post(self.test_url, {
-            'key': invite_token.key
+            'key': invite_token.key,
+            'team_id': self.default_team.id,
+            'user_id': self.default_user.id
         }, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'success': True})
         self.assertEqual(TeamMember.objects.all().count(), 1)
         self.assertEqual(InviteTeamMemberToken.objects.all().count(), 1)
 
+    def test_unverified_member_cannot_cancel_invite(self):
+        self.default_team_member.verified = False
+        self.default_team_member.save()
+
+        # Create Invite for another user
+        other_user = User.objects.create_user(username="other", email="other@gmail.com", password="other123")
+        other_team_member = TeamMember.objects.create(user=other_user, team=self.default_team)
+        invite_token = InviteTeamMemberToken.objects.create(team_member=other_team_member)
+        response = self.client.post(self.test_url, {
+            'key': invite_token.key,
+            'team_id': self.default_team.id,
+            'user_id': self.default_user.id
+        }, format='json', **self.default_header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'You do not have permission to cancel invite request!'})

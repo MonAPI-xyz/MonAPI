@@ -16,4 +16,6 @@ class AcceptInviteSerializer(serializers.Serializer):
 
 
 class CancelInviteSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+    team_id = serializers.IntegerField()
     key = serializers.CharField(max_length=256)
