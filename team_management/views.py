@@ -26,7 +26,7 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 		team_serializer = TeamSerializers(data=team_data)
 		if team_serializer.is_valid():
 			new_team = Team.objects.create(**team_data)
-			TeamMember.objects.create(team=new_team, user=request.user)
+			TeamMember.objects.create(team=new_team, user=request.user, verified=True)
 			serialized_obj = TeamSerializers(new_team)
 			return Response(data=serialized_obj.data, status=status.HTTP_201_CREATED)
 			
