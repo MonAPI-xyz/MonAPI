@@ -47,10 +47,9 @@ class RequestInviteTeamMemberTokenView(views.APIView):
                     return Response({'error': 'User is already in the team'}, status=status.HTTP_400_BAD_REQUEST)
                 return Response({'error': 'User is already in the process of being invited to the team'},
                                 status=status.HTTP_400_BAD_REQUEST)
-            invite_token = InviteTeamMemberToken.objects.create(user=user, team=team)
 
             team_member = TeamMember.objects.create(user=user, team=team, verified=False)
-
+            invite_token = InviteTeamMemberToken.objects.create(team_member=team_member)
             accept_url = f"{os.environ.get('FRONTEND_URL', '')}/invite-member?key={invite_token.key}"
             email_content = f'''
                         You have been invited to join Team {team.name}.\n
@@ -89,10 +88,8 @@ class AcceptInviteView(views.APIView):
             if len(invite_token) == 0:
                 return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
             invite_token = invite_token[0]
-            team_target = invite_token.team
-            user_target = invite_token.user
 
-            team_member = TeamMember.objects.get(user=user_target, team=team_target)
+            team_member = invite_token.team_member
             if team_member.verified:
                 return Response({'error': 'You are already a member of the team'},
                                 status=status.HTTP_400_BAD_REQUEST)
@@ -115,10 +112,8 @@ class CancelInviteView(views.APIView):
             if len(invite_token) == 0:
                 return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
             invite_token = invite_token[0]
-            team_target = invite_token.team
-            user_target = invite_token.user
 
-            team_member = TeamMember.objects.get(user=user_target, team=team_target)
+            team_member = invite_token.team_member
 
             team_member.delete()
             invite_token.delete()

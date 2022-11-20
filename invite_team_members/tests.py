@@ -27,7 +27,8 @@ class InviteTeamMemberTokenTest(TestCase):
     def test_when_created_key_is_made(self):
         user = User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')
         team = Team.objects.create(name="default team")
-        inviteToken =  InviteTeamMemberToken.objects.create(user=user, team=team)
+        team_member = TeamMember.objects.create(user=user, team=team)
+        inviteToken = InviteTeamMemberToken.objects.create(team_member=team_member)
         self.assertEqual(InviteTeamMemberToken.objects.all().count(), 1)
 
 class RequestInviteTeamMemberTokenViewTest(APITestCase):
@@ -42,7 +43,7 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
         self.default_team_member = TeamMember.objects.create(team=self.default_team, user=self.default_user)
         self.default_token = MonAPIToken.objects.create(team_member=self.default_team_member)
         self.default_header = {'HTTP_AUTHORIZATION': f"Token {self.default_token.key}"}
-        self.default_invite_token = InviteTeamMemberToken.objects.create(user=self.default_user, team=self.default_team)
+        self.default_invite_token = InviteTeamMemberToken.objects.create(team_member=self.default_team_member)
 
     def test_check_user_must_be_authenthicated_to_get_invite_token(self):
         response = self.client.get(self.test_url, format='json', **self.default_header)
@@ -138,7 +139,7 @@ class AcceptInviteViewTest(APITestCase):
         self.default_team_member = TeamMember.objects.create(team=self.default_team, user=self.default_user, verified=True)
         self.default_token = MonAPIToken.objects.create(team_member=self.default_team_member)
         self.default_header = {'HTTP_AUTHORIZATION': f"Token {self.default_token.key}"}
-        self.default_invite_token = InviteTeamMemberToken.objects.create(user=self.default_user, team=self.default_team)
+        self.default_invite_token = InviteTeamMemberToken.objects.create(team_member=self.default_team_member)
 
     def test_frontend_sends_no_data(self):
         response = self.client.post(self.test_url, {}, format='json', **self.default_header)
@@ -164,7 +165,8 @@ class AcceptInviteViewTest(APITestCase):
         self.assertEqual(response.data, {'success': True})
         self.assertEqual(TeamMember.objects.filter(team=self.default_team).count(), 2)
 
-        invite_token = InviteTeamMemberToken.objects.get(user=invited_user, team=self.default_team)
+        team_member = TeamMember.objects.get(user=invited_user, team=self.default_team)
+        invite_token = InviteTeamMemberToken.objects.get(team_member=team_member)
         invite_token_key = invite_token.key
         response = self.client.post(self.test_url, {
             'key': invite_token_key
@@ -196,7 +198,7 @@ class CancelInviteViewTest(APITestCase):
         self.default_team_member = TeamMember.objects.create(team=self.default_team, user=self.default_user)
         self.default_token = MonAPIToken.objects.create(team_member=self.default_team_member)
         self.default_header = {'HTTP_AUTHORIZATION': f"Token {self.default_token.key}"}
-        self.default_invite_token = InviteTeamMemberToken.objects.create(user=self.default_user, team=self.default_team)
+        self.default_invite_token = InviteTeamMemberToken.objects.create(team_member=self.default_team_member)
 
     def test_frontend_send_no_data(self):
         response = self.client.post(self.test_url, format='json', **self.default_header)
@@ -217,8 +219,8 @@ class CancelInviteViewTest(APITestCase):
             'invited_email': invited_user.email,
             'team_id': self.default_team.id
         }, format='json', **self.default_header)
-
-        invite_token = InviteTeamMemberToken.objects.get(user=invited_user, team=self.default_team)
+        team_member = TeamMember.objects.get(user=invited_user, team=self.default_team)
+        invite_token = InviteTeamMemberToken.objects.get(team_member=team_member)
         response = self.client.post(self.test_url, {
             'key': invite_token.key
         }, format='json', **self.default_header)
