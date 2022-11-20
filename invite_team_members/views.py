@@ -41,6 +41,12 @@ class RequestInviteTeamMemberTokenView(views.APIView):
                 return Response({'error': 'Team not exists with given id'}, status=status.HTTP_400_BAD_REQUEST)
             team = Team.objects.get(pk=serializer.validated_data['team_id'])
 
+            sender = User.objects.get(pk=serializer.validated_data['sender_id'])
+            sender_is_verified = TeamMember.objects.get(user=sender, team=team).verified
+            if not sender_is_verified:
+                return Response({'error': 'You do not have permission to invite users in this team!'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
             if TeamMember.objects.filter(team=team, user=user).exists():
                 verified = TeamMember.objects.get(team=team, user=user).verified
                 if verified:

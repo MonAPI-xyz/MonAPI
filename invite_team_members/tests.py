@@ -40,7 +40,7 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
         timezone.now = lambda: self.mock_current_time
         self.default_user = User.objects.create_user(username='default user', email='test@gmail.com', password='test1234')
         self.default_team = Team.objects.create(name='default team')
-        self.default_team_member = TeamMember.objects.create(team=self.default_team, user=self.default_user)
+        self.default_team_member = TeamMember.objects.create(team=self.default_team, user=self.default_user, verified=True)
         self.default_token = MonAPIToken.objects.create(team_member=self.default_team_member)
         self.default_header = {'HTTP_AUTHORIZATION': f"Token {self.default_token.key}"}
         self.default_invite_token = InviteTeamMemberToken.objects.create(team_member=self.default_team_member)
@@ -67,10 +67,11 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
     def test_request_invite_token_but_no_param(self):
         response = self.client.post(self.test_url, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 3)
 
     def test_request_invite_token_but_invited_user_does_not_exist(self):
         response = self.client.post(self.test_url, {
+            'sender_id': self.default_user.id,
             'invited_email': 'invalid@gmail.com',
             'team_id': -1
         }, format='json', **self.default_header)
@@ -79,6 +80,7 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
 
     def test_request_invite_token_but_team_does_not_exist(self):
         response = self.client.post(self.test_url, {
+            'sender_id': self.default_user.id,
             'invited_email': self.default_user.email,
             'team_id': 1798471298
         }, format='json', **self.default_header)
@@ -86,8 +88,11 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_request_invite_token_and_everything_valid_but_user_is_already_in_team(self):
+        already_verified = User.objects.create_user(username='new', email='new@gmail.com', password='new12345')
+        TeamMember.objects.create(user=already_verified, team=self.default_team, verified=False)
         response = self.client.post(self.test_url, {
-            'invited_email': self.default_user.email,
+            'sender_id': self.default_user.id,
+            'invited_email': already_verified.email,
             'team_id': self.default_team.id
         }, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -97,6 +102,7 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
     def test_request_invite_token_and_everything_valid_but_user_is_invited_twice(self):
         invited_user = User.objects.create_user(username='new user', email='new_user@gmail.com', password='test1234')
         response = self.client.post(self.test_url, {
+            'sender_id': self.default_user.id,
             'invited_email': invited_user.email,
             'team_id': self.default_team.id
         }, format='json', **self.default_header)
@@ -108,6 +114,7 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
 
         # User is invited again
         response = self.client.post(self.test_url, {
+            'sender_id': self.default_user.id,
             'invited_email': invited_user.email,
             'team_id': self.default_team.id
         }, format='json', **self.default_header)
@@ -116,9 +123,8 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
         self.assertEqual(TeamMember.objects.filter(team=self.default_team).count(), 2)
 
     def test_request_invite_to_an_already_verified_team_member(self):
-        self.default_team_member.verified = True
-        self.default_team_member.save()
         response = self.client.post(self.test_url, {
+            'sender_id': self.default_user.id,
             'invited_email': self.default_user.email,
             'team_id': self.default_team.id
         }, format='json', **self.default_header)
@@ -157,6 +163,7 @@ class AcceptInviteViewTest(APITestCase):
     def test_frontend_sends_unused_token_and_try_reusing_same_token(self):
         invited_user = User.objects.create_user(username='new user', email='new_user@gmail.com', password='test1234')
         response = self.client.post(reverse('invite-member-token'), {
+            'sender_id': self.default_user.id,
             'invited_email': invited_user.email,
             'team_id': self.default_team.id
         }, format='json', **self.default_header)
@@ -195,7 +202,7 @@ class CancelInviteViewTest(APITestCase):
         self.default_user = User.objects.create_user(username='default user', email='test@gmail.com',
                                                      password='test1234')
         self.default_team = Team.objects.create(name='default team')
-        self.default_team_member = TeamMember.objects.create(team=self.default_team, user=self.default_user)
+        self.default_team_member = TeamMember.objects.create(team=self.default_team, user=self.default_user, verified=True)
         self.default_token = MonAPIToken.objects.create(team_member=self.default_team_member)
         self.default_header = {'HTTP_AUTHORIZATION': f"Token {self.default_token.key}"}
         self.default_invite_token = InviteTeamMemberToken.objects.create(team_member=self.default_team_member)
@@ -216,6 +223,7 @@ class CancelInviteViewTest(APITestCase):
     def test_request_invite_token_and_then_cancel(self):
         invited_user = User.objects.create_user(username='new user', email='new_user@gmail.com', password='test1234')
         self.client.post(reverse('invite-member-token'), {
+            'sender_id': self.default_user.id,
             'invited_email': invited_user.email,
             'team_id': self.default_team.id
         }, format='json', **self.default_header)

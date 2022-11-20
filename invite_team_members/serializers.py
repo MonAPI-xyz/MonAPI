@@ -6,6 +6,7 @@ class InviteTeamMemberTokenCheckSerializer(serializers.Serializer):
 
 
 class RequestInviteTeamMemberTokenSerializer(serializers.Serializer):
+    sender_id = serializers.IntegerField()
     team_id = serializers.IntegerField()
     invited_email = serializers.EmailField()
 
