@@ -7,10 +7,11 @@ class TeamUserSerializers(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            'id',
             'username', 
             'email', 
             'first_name', 
-            'last_name'
+            'last_name',
         ]
 
 class TeamMemberSerializers(serializers.ModelSerializer):
@@ -19,7 +20,8 @@ class TeamMemberSerializers(serializers.ModelSerializer):
         model = TeamMember
         fields = [
             'team', 
-            'user'
+            'user',
+            'verified',
         ]
 
 class TeamManagementSerializers(serializers.ModelSerializer):
@@ -31,7 +33,7 @@ class TeamManagementSerializers(serializers.ModelSerializer):
             'name',
             'logo',
             'description',
-            'teammember'
+            'teammember',
         ]
 
 

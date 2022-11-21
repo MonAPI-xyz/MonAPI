@@ -1,3 +1,4 @@
 from django.contrib import admin
+from invite_team_members.models import InviteTeamMemberToken
 
-# Register your models here.
+admin.site.register(InviteTeamMemberToken)
