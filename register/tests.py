@@ -3,6 +3,8 @@ from rest_framework import status
 from django.urls import reverse
 from django.contrib.auth.models import User
 
+from login.models import Team, TeamMember
+
 
 class APIViewTestCase(APITestCase):
     def test_user_can_register(self):
@@ -24,6 +26,11 @@ class APIViewTestCase(APITestCase):
         new_user = User.objects.get_by_natural_key("user1@gmail.com")
         self.assertEqual(new_user.get_username(), "user1@gmail.com")
         self.assertEqual(new_user.check_password('B0tch1ng'), True)
+        
+        self.assertEqual(Team.objects.count(), 1)
+        self.assertEqual(Team.objects.all()[0].name, "User1")
+        self.assertEqual(TeamMember.objects.count(), 1)
+        self.assertEqual(TeamMember.objects.all()[0].user, new_user)
 
     def test_user_password_must_match(self):
         response = self.client.post(
