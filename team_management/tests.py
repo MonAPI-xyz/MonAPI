@@ -5,8 +5,8 @@ from rest_framework.test import APITestCase
 from login.models import Team, TeamMember, MonAPIToken
 
 class TeamManagementTests(APITestCase):
-  url = reverse('team-management-list')
-  test_url = reverse('team-management-current')
+  list_url = reverse('team-management-list')
+  current_url = reverse('team-management-current')
 
   def test_when_non_authenticated_then_return_unauthorized(self):
     new_team_request = {
@@ -15,7 +15,7 @@ class TeamManagementTests(APITestCase):
       "logo": "testLogo.png",
     }
 
-    response = self.client.post(self.url, data=new_team_request, format='json')
+    response = self.client.post(self.list_url, data=new_team_request, format='json')
     self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
     self.assertEqual(response.data, {
         "detail": "Authentication credentials were not provided."
@@ -33,7 +33,7 @@ class TeamManagementTests(APITestCase):
       "name": "",
     }
 
-    response = self.client.post(self.url, data=new_team_request, format='json', **header)
+    response = self.client.post(self.list_url, data=new_team_request, format='json', **header)
     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     self.assertEqual(response.data, {
         "error": "Please make sure your [team name] is exist!"
@@ -51,7 +51,7 @@ class TeamManagementTests(APITestCase):
       "name": "test team",
     }
 
-    response = self.client.post(self.url, data=new_team_request, format='json', **header)
+    response = self.client.post(self.list_url, data=new_team_request, format='json', **header)
     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
     self.assertEqual(response.data['name'], "test team")
 
@@ -69,7 +69,7 @@ class TeamManagementTests(APITestCase):
       "logo": "testLogo.png",
     }
 
-    response = self.client.post(self.url, data=new_team_request, format='json', **header)
+    response = self.client.post(self.list_url, data=new_team_request, format='json', **header)
     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
     self.assertEqual(response.data['name'], "test team")
   
@@ -81,8 +81,8 @@ class TeamManagementTests(APITestCase):
     token = MonAPIToken.objects.create(team_member=team_member)
     header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
     
-    response = self.client.get(self.test_url, format='json', **header)
-    self.assertEqual(response.data,{'id': 1, 'name': 'myteam', 'logo': None, 'description': '', 'teammember': [{'team': 1, 'user': {'username': 'test@test.com', 'email': 'test@test.com', 'first_name': '', 'last_name': ''}}]})
+    response = self.client.get(self.current_url, format='json', **header)
+    self.assertEqual(response.data,{"id": 1, "name": "myteam", "logo": None, "description": "", "teammember": [{"team": 1, "user": {"id": 1, "username": "test@test.com", "email": "test@test.com", "first_name": "", "last_name": ""}, "verified": False}]})
 
     
 

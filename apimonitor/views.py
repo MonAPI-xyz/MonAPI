@@ -52,8 +52,10 @@ class APIMonitorViewSet(mixins.ListModelMixin,
         monitor_data = self.get_monitor_data_from_request(request)
 
         if monitor_data['previous_step_id'] is not None:
-            if try_parse_int(monitor_data['previous_step_id']):
-                monitor_data['previous_step_obj'] = APIMonitor.objects.get(pk=int(monitor_data['previous_step_id']))
+            previous_step_id = try_parse_int(monitor_data['previous_step_id'])
+            prev_api_monitor = APIMonitor.objects.filter(id=previous_step_id, team=request.auth.team)
+            if prev_api_monitor.exists():
+                monitor_data['previous_step_obj'] = prev_api_monitor[0]
             else:
                 return Response(data={"error": ["Please make sure your [previous step id] is valid and exist!"]},
                                 status=status.HTTP_400_BAD_REQUEST)

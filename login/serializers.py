@@ -28,14 +28,3 @@ class TeamSerializers(serializers.ModelSerializer):
             'id',
             'name',
         ]
-
-
-class TeamMemberSerializers(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username')
-    class Meta:
-        model = TeamMember
-        fields = [
-            'user',
-            'username',
-            'verified',
-        ]

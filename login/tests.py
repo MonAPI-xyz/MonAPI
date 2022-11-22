@@ -23,7 +23,7 @@ class LoginTest(APITestCase):
     def test_when_non_authenticated_and_team_exists_then_return_success(self):
         user = User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')
         team = Team.objects.create(name='test team')
-        team_member = TeamMember.objects.create(team=team, user=user)
+        team_member = TeamMember.objects.create(team=team, user=user, verified=True)
 
         request_params = {'email': 'test@gmail.com', 'password': 'Test1234'}
         response = self.client.post(self.login_url, request_params)
@@ -138,7 +138,7 @@ class AvailableTeamTest(APITestCase):
     def test_when_valid_token_and_available_team_then_return_available_team_information(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         team = Team.objects.create(name='test team')
-        team_member = TeamMember.objects.create(team=team, user=user)
+        team_member = TeamMember.objects.create(team=team, user=user, verified=True)
         
         token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
@@ -193,8 +193,8 @@ class ChangeTeamTest(APITestCase):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         team = Team.objects.create(name='test team')
         team_2 = Team.objects.create(name='test team 2')
-        team_member = TeamMember.objects.create(team=team, user=user)
-        team_member_2 = TeamMember.objects.create(team=team_2, user=user)
+        team_member = TeamMember.objects.create(team=team, user=user, verified=True)
+        team_member_2 = TeamMember.objects.create(team=team_2, user=user, verified=True)
         
         token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
@@ -253,43 +253,3 @@ class InviteMemberTest(TestCase):
         team_member = TeamMember.objects.create(user=user, team=team)
 
         self.assertEqual(team_member.verified, False)
-
-class ListMemberTest(APITestCase):
-    test_url = reverse('auth-list-member')
-    def test_member_list_returns_all_member_of_the_team(self):
-        user1 = User.objects.create_user(username="user1@gmail.com", email="user1@gmail.com", password="test1234")
-        user2 = User.objects.create_user(username="user2@gmail.com", email="user2@gmail.com", password="test1234")
-        team1 = Team.objects.create(name="team 1")
-        team2 = Team.objects.create(name="team 2")
-        TeamMember.objects.create(user=user1, team=team1, verified=True)
-        TeamMember.objects.create(user=user1, team=team2)
-        team_member = TeamMember.objects.create(user=user2, team=team2, verified=True)
-        team2_token = MonAPIToken.objects.create(team_member = team_member)
-        header = {'HTTP_AUTHORIZATION': f'Token {team2_token.key}'}
-        response = self.client.post(self.test_url, {
-            'id': team2.id
-        }, **header)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
-
-    def test_list_member_on_non_existent_team_should_return_error(self):
-        user1 = User.objects.create_user(username="user1@gmail.com", email="user1@gmail.com", password="test1234")
-        team1 = Team.objects.create(name="team 1")
-        team_member = TeamMember.objects.create(user=user1, team=team1, verified=True)
-        team_token = MonAPIToken.objects.create(team_member=team_member)
-        header = {'HTTP_AUTHORIZATION': f'Token {team_token.key}'}
-        response = self.client.post(self.test_url, {
-            'id': -1
-        }, **header)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'error': 'Invalid team id'})
-
-    def test_list_member_requires_id(self):
-        user1 = User.objects.create_user(username="user1@gmail.com", email="user1@gmail.com", password="test1234")
-        team1 = Team.objects.create(name="team 1")
-        team_member = TeamMember.objects.create(user=user1, team=team1, verified=True)
-        team_token = MonAPIToken.objects.create(team_member=team_member)
-        header = {'HTTP_AUTHORIZATION': f'Token {team_token.key}'}
-        response = self.client.post(self.test_url, {}, **header)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'error': 'Team id required'})

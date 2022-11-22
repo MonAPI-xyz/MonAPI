@@ -12,7 +12,6 @@ from unittest.mock import patch
 
 from invite_team_members.models import InviteTeamMemberToken
 from login.models import Team, TeamMember, MonAPIToken
-# Create your tests here.
 
 def mocked_send_email(*args, **kwargs):
     pass
@@ -67,33 +66,21 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
     def test_request_invite_token_but_no_param(self):
         response = self.client.post(self.test_url, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(len(response.data), 3)
+        self.assertEqual(len(response.data), 1)
 
     def test_request_invite_token_but_invited_user_does_not_exist(self):
         response = self.client.post(self.test_url, {
-            'sender_id': self.default_user.id,
             'invited_email': 'invalid@gmail.com',
-            'team_id': -1
         }, format='json', **self.default_header)
         self.assertEqual(response.data, {'error': 'User not exists with given email'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_request_invite_token_but_team_does_not_exist(self):
-        response = self.client.post(self.test_url, {
-            'sender_id': self.default_user.id,
-            'invited_email': self.default_user.email,
-            'team_id': 1798471298
-        }, format='json', **self.default_header)
-        self.assertEqual(response.data, {'error': 'Team not exists with given id'})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
     def test_request_invite_token_and_everything_valid_but_user_is_already_in_team(self):
         already_verified = User.objects.create_user(username='new', email='new@gmail.com', password='new12345')
-        TeamMember.objects.create(user=already_verified, team=self.default_team, verified=False)
+        team_member = TeamMember.objects.create(user=already_verified, team=self.default_team, verified=False)
+        InviteTeamMemberToken.objects.create(team_member=team_member)
         response = self.client.post(self.test_url, {
-            'sender_id': self.default_user.id,
             'invited_email': already_verified.email,
-            'team_id': self.default_team.id
         }, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'User is already in the process of being invited to the team'})
@@ -102,9 +89,7 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
     def test_request_invite_token_and_everything_valid_but_user_is_invited_twice(self):
         invited_user = User.objects.create_user(username='new user', email='new_user@gmail.com', password='test1234')
         response = self.client.post(self.test_url, {
-            'sender_id': self.default_user.id,
             'invited_email': invited_user.email,
-            'team_id': self.default_team.id
         }, format='json', **self.default_header)
         # User is invited and is added to the team as unverified user
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -114,9 +99,7 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
 
         # User is invited again
         response = self.client.post(self.test_url, {
-            'sender_id': self.default_user.id,
             'invited_email': invited_user.email,
-            'team_id': self.default_team.id
         }, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'User is already in the process of being invited to the team'})
@@ -124,24 +107,10 @@ class RequestInviteTeamMemberTokenViewTest(APITestCase):
 
     def test_request_invite_to_an_already_verified_team_member(self):
         response = self.client.post(self.test_url, {
-            'sender_id': self.default_user.id,
             'invited_email': self.default_user.email,
-            'team_id': self.default_team.id
         }, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'User is already in the team'})
-
-    def test_unverified_member_can_not_invite_user_to_team(self):
-        self.default_team_member.verified = False
-        self.default_team_member.save()
-        other_user = User.objects.create_user(username='other', email='other@gmail.com', password='other123')
-        response = self.client.post(self.test_url, {
-            'sender_id': self.default_user.id,
-            'invited_email': other_user.email,
-            'team_id': self.default_team.id
-        }, format='json', **self.default_header)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'error': 'You do not have permission to invite users in this team!'})
 
 
 class AcceptInviteViewTest(APITestCase):
@@ -175,9 +144,7 @@ class AcceptInviteViewTest(APITestCase):
     def test_frontend_sends_unused_token_and_try_reusing_same_token(self):
         invited_user = User.objects.create_user(username='new user', email='new_user@gmail.com', password='test1234')
         response = self.client.post(reverse('invite-member-token'), {
-            'sender_id': self.default_user.id,
             'invited_email': invited_user.email,
-            'team_id': self.default_team.id
         }, format='json', **self.default_header)
         # User is invited and is added to the team as unverified user
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -223,52 +190,40 @@ class CancelInviteViewTest(APITestCase):
         response = self.client.post(self.test_url, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {
-            "key": ["This field is required."],
-            "team_id": ["This field is required."],
             "user_id": ["This field is required."]
         })
 
-    def test_frontend_sends_invalid_token(self):
+    def test_frontend_sends_invalid_user_id(self):
         response = self.client.post(self.test_url, {
-            'key': 'invalid',
-            'team_id': self.default_team.id,
             'user_id': self.default_user.id,
         }, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'error': 'Invalid token'})
+        self.assertEqual(response.data, {'error': 'Invalid user id'})
 
     @patch("django.core.mail.send_mail", mocked_send_email)
     def test_request_invite_token_and_then_cancel(self):
         invited_user = User.objects.create_user(username='new user', email='new_user@gmail.com', password='test1234')
         self.client.post(reverse('invite-member-token'), {
-            'sender_id': self.default_user.id,
             'invited_email': invited_user.email,
-            'team_id': self.default_team.id
         }, format='json', **self.default_header)
-        team_member = TeamMember.objects.get(user=invited_user, team=self.default_team)
-        invite_token = InviteTeamMemberToken.objects.get(team_member=team_member)
+        
         response = self.client.post(self.test_url, {
-            'key': invite_token.key,
-            'team_id': self.default_team.id,
-            'user_id': self.default_user.id
+            'user_id': invited_user.id,
         }, format='json', **self.default_header)
+        
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'success': True})
-        self.assertEqual(TeamMember.objects.all().count(), 1)
-        self.assertEqual(InviteTeamMemberToken.objects.all().count(), 1)
+        self.assertEqual(TeamMember.objects.count(), 1)
+        self.assertEqual(InviteTeamMemberToken.objects.count(), 1)
 
     def test_unverified_member_cannot_cancel_invite(self):
-        self.default_team_member.verified = False
-        self.default_team_member.save()
-
-        # Create Invite for another user
+        other_team = Team.objects.create(name='another team')
         other_user = User.objects.create_user(username="other", email="other@gmail.com", password="other123")
-        other_team_member = TeamMember.objects.create(user=other_user, team=self.default_team)
+        other_team_member = TeamMember.objects.create(user=other_user, team=other_team)
         invite_token = InviteTeamMemberToken.objects.create(team_member=other_team_member)
+        
         response = self.client.post(self.test_url, {
-            'key': invite_token.key,
-            'team_id': self.default_team.id,
-            'user_id': self.default_user.id
+            'user_id': other_user.id
         }, format='json', **self.default_header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'error': 'You do not have permission to cancel invite request!'})
+        self.assertEqual(response.data, {'error': 'Invalid user id'})
