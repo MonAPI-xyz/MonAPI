@@ -35,21 +35,23 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 
 	def update(self, request, *args, **kwargs):
 		team = Team.objects.get(pk=kwargs['pk'])
-		
-		if (request.data.get('name') is not None):
-			return Response(data={"error": "Team name cannot be changed!"}, status=status.HTTP_400_BAD_REQUEST)
-		
-		# remove old image
-		if (request.data.get('logo') is not None and team.logo and os.path.exists(team.logo.path)):
-			os.remove(team.logo.path)
-			team.logo = request.data.get('logo')
+		if (request.auth.team == team):
+			if (request.data.get('name') is not None):
+				return Response(data={"error": "Team name cannot be changed!"}, status=status.HTTP_400_BAD_REQUEST)
+			
+			# remove old image
+			if (request.data.get('logo') is not None and team.logo and os.path.exists(team.logo.path)):
+				os.remove(team.logo.path)
+				team.logo = request.data.get('logo')
 
-		if (request.data.get('description') is not None):
-			team.description = request.data.get('description')
-		
-		team.save()
+			if (request.data.get('description') is not None):
+				team.description = request.data.get('description')
+			
+			team.save()
 
-		serialized_obj = TeamSerializers(team)
-		return Response(data=serialized_obj.data, status=status.HTTP_200_OK)
+			serialized_obj = TeamSerializers(team)
+			return Response(data=serialized_obj.data, status=status.HTTP_200_OK)
+		else:
+			return Response(data={"error": "Require to change team first!"}, status=status.HTTP_400_BAD_REQUEST)
 			
 		
