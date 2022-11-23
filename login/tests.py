@@ -23,7 +23,7 @@ class LoginTest(APITestCase):
     def test_when_non_authenticated_and_team_exists_then_return_success(self):
         user = User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')
         team = Team.objects.create(name='test team')
-        team_member = TeamMember.objects.create(team=team, user=user)
+        team_member = TeamMember.objects.create(team=team, user=user, verified=True)
 
         request_params = {'email': 'test@gmail.com', 'password': 'Test1234'}
         response = self.client.post(self.login_url, request_params)
@@ -138,7 +138,7 @@ class AvailableTeamTest(APITestCase):
     def test_when_valid_token_and_available_team_then_return_available_team_information(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         team = Team.objects.create(name='test team')
-        team_member = TeamMember.objects.create(team=team, user=user)
+        team_member = TeamMember.objects.create(team=team, user=user, verified=True)
         
         token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
@@ -193,8 +193,8 @@ class ChangeTeamTest(APITestCase):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         team = Team.objects.create(name='test team')
         team_2 = Team.objects.create(name='test team 2')
-        team_member = TeamMember.objects.create(team=team, user=user)
-        team_member_2 = TeamMember.objects.create(team=team_2, user=user)
+        team_member = TeamMember.objects.create(team=team, user=user, verified=True)
+        team_member_2 = TeamMember.objects.create(team=team_2, user=user, verified=True)
         
         token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
@@ -242,3 +242,14 @@ class TeamLogoTest(TestCase):
         path = get_file_path(None, 'test.png')
         self.assertTrue('teamlogo/' in path)
     
+class InviteMemberTest(TestCase):
+
+    def test_when_invited_a_user_is_not_verified(self):
+        user = User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')
+        user.is_active = False
+        user.save()
+
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(user=user, team=team)
+
+        self.assertEqual(team_member.verified, False)

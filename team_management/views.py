@@ -4,6 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from login.models import Team, TeamMember
 from login.serializers import TeamSerializers
 import os
+from team_management.serializers import TeamManagementSerializers
+from rest_framework.decorators import action
 
 class TeamManagementViewSet(mixins.CreateModelMixin,
 							mixins.UpdateModelMixin,
@@ -27,7 +29,7 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 		team_serializer = TeamSerializers(data=team_data)
 		if team_serializer.is_valid():
 			new_team = Team.objects.create(**team_data)
-			TeamMember.objects.create(team=new_team, user=request.user)
+			TeamMember.objects.create(team=new_team, user=request.user, verified=True)
 			serialized_obj = TeamSerializers(new_team)
 			return Response(data=serialized_obj.data, status=status.HTTP_201_CREATED)
 			
@@ -55,3 +57,9 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 			return Response(data={"error": "Require to change team first!"}, status=status.HTTP_400_BAD_REQUEST)
 			
 		
+	@action(detail=False,methods=["GET"])
+	def current(self, request):
+		serializer = TeamManagementSerializers(request.auth.team)
+		return Response(serializer.data)
+		
+

@@ -19,6 +19,7 @@ class Team(models.Model):
 class TeamMember(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='teammember')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    verified = models.BooleanField(default=False)
     
     class Meta:
         unique_together = ('team', 'user',)

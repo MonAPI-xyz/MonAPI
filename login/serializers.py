@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from login.models import Team
+from login.models import Team, TeamMember
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
