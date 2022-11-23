@@ -164,3 +164,25 @@ class TeamManagementTests(APITestCase):
     self.assertEqual(response.status_code, status.HTTP_200_OK)
     self.assertEqual(response.data['name'], "myteam")
     self.assertEqual(os.path.exists(team_logo_path), True )
+
+  def test_when_authenticated_and_not_in_current_edit_team_then_return_bad_request(self):
+    
+    user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+    team = Team.objects.create(name='myteam')
+    team_two = Team.objects.create(name='myteam2')
+    team_member = TeamMember.objects.create(team=team, user=user)
+    TeamMember.objects.create(team=team_two, user=user)
+    
+    token = MonAPIToken.objects.create(team_member=team_member)
+    header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+    new_team_request = {
+      "description": "test description",
+      "logo": "testLogo.png",
+    }    
+
+    target_team_id = TeamMember.objects.filter(team=team_two)[:1].get().id
+    edit_team_url = reverse('team-management-detail', kwargs={'pk': target_team_id})    
+    response = self.client.put(edit_team_url, data=new_team_request, format='json', **header)
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    self.assertEqual(response.data['error'], 'Require to change team first!')
