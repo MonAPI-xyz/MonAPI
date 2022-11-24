@@ -186,7 +186,7 @@ class TeamManagementTests(APITestCase):
     edit_team_url = reverse('team-management-detail', kwargs={'pk': target_team_id})    
     response = self.client.put(edit_team_url, data=new_team_request, format='json', **header)
     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    self.assertEqual(response.data['error'], 'Require to change team first!')
+    self.assertEqual(response.data['error'], 'Team not found')
   
   def test_retrieve(self):
     user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")

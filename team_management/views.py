@@ -54,7 +54,7 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 			serialized_obj = TeamSerializers(team)
 			return Response(data=serialized_obj.data, status=status.HTTP_200_OK)
 		else:
-			return Response(data={"error": "Require to change team first!"}, status=status.HTTP_400_BAD_REQUEST)
+			return Response(data={"error": "Team not found"}, status=status.HTTP_400_BAD_REQUEST)
 			
 		
 	@action(detail=False,methods=["GET"])
