@@ -3,11 +3,12 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from login.models import Team, TeamMember
 from login.serializers import TeamSerializers
+import os
 from team_management.serializers import TeamManagementSerializers
-from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 
 class TeamManagementViewSet(mixins.CreateModelMixin,
+							mixins.UpdateModelMixin,
 							viewsets.GenericViewSet):
 
 	queryset = Team.objects.all()
@@ -22,7 +23,7 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 			'logo': request.data.get('logo'),
 		}
 		return team_data
-		
+
 	def create(self, request, *args, **kwargs):
 		team_data = self.get_team_data_from_request(request)
 		team_serializer = TeamSerializers(data=team_data)
@@ -34,6 +35,28 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 			
 		return Response(data={"error": "Please make sure your [team name] is exist!"}, status=status.HTTP_400_BAD_REQUEST)
 
+	def update(self, request, *args, **kwargs):
+		team = Team.objects.get(pk=kwargs['pk'])
+		if (request.auth.team == team):
+			if (request.data.get('name') is not None):
+				return Response(data={"error": "Team name cannot be changed!"}, status=status.HTTP_400_BAD_REQUEST)
+			
+			# remove old image
+			if (request.data.get('logo') is not None and team.logo and os.path.exists(team.logo.path)):
+				os.remove(team.logo.path)
+				team.logo = request.data.get('logo')
+
+			if (request.data.get('description') is not None):
+				team.description = request.data.get('description')
+			
+			team.save()
+
+			serialized_obj = TeamSerializers(team)
+			return Response(data=serialized_obj.data, status=status.HTTP_200_OK)
+		else:
+			return Response(data={"error": "Team not found"}, status=status.HTTP_400_BAD_REQUEST)
+			
+		
 	@action(detail=False,methods=["GET"])
 	def current(self, request):
 		serializer = TeamManagementSerializers(request.auth.team)
