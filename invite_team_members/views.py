@@ -82,6 +82,8 @@ class RequestInviteTeamMemberTokenView(views.APIView):
 
 
 class AcceptInviteView(views.APIView):
+    authentication_classes = []
+    permission_classes = []
     def post(self, request, format=None):
         serializer = AcceptInviteSerializer(data=request.data)
         if serializer.is_valid():

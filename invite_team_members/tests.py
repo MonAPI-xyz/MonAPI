@@ -129,14 +129,14 @@ class AcceptInviteViewTest(APITestCase):
         self.default_invite_token = InviteTeamMemberToken.objects.create(team_member=self.default_team_member)
 
     def test_frontend_sends_no_data(self):
-        response = self.client.post(self.test_url, {}, format='json', **self.default_header)
+        response = self.client.post(self.test_url, {}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {"key": ["This field is required."]})
 
     def test_invite_already_verified_user(self):
         response = self.client.post(self.test_url, {
             'key': self.default_invite_token.key
-        }, format='json', **self.default_header)
+        }, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'You are already a member of the team'})
 
@@ -165,7 +165,7 @@ class AcceptInviteViewTest(APITestCase):
         invite_token_key = invite_token.key
         response = self.client.post(self.test_url, {
             'key': invite_token_key
-        }, format='json', **self.default_header)
+        }, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Invalid token'})
         self.assertEqual(InviteTeamMemberToken.objects.all().count(), 1)
