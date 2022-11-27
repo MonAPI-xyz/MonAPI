@@ -42,8 +42,9 @@ class TeamManagementViewSet(mixins.CreateModelMixin,
 				return Response(data={"error": "Team name cannot be changed!"}, status=status.HTTP_400_BAD_REQUEST)
 			
 			# remove old image
-			if (request.data.get('logo') is not None and team.logo and os.path.exists(team.logo.path)):
-				os.remove(team.logo.path)
+			if request.data.get('logo') is not None :
+				if (team.logo and os.path.exists(team.logo.path)):
+					os.remove(team.logo.path)
 				team.logo = request.data.get('logo')
 
 			if (request.data.get('description') is not None):
