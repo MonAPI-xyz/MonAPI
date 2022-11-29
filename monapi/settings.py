@@ -69,7 +69,6 @@ INSTALLED_APPS = [
     'alerts',
     'apimonitor',
     'cron',
-    'logout',
     'register',
     'password_validators',
     'login',
@@ -78,6 +77,7 @@ INSTALLED_APPS = [
     'apitest',
     'team_management',
     'invite_team_members',
+    'statuspage',
 ]
 
 MIDDLEWARE = [
