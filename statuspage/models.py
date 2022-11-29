@@ -3,7 +3,7 @@ from login.models import Team
 
 class StatusPageConfiguration(models.Model):
     team = models.OneToOneField(Team, on_delete=models.CASCADE)
-    path = models.CharField(max_length=64, blank=True)
+    path = models.CharField(max_length=64, blank=True, unique=True)
     
 class StatusPageCategory(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
