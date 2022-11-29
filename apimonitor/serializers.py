@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from apimonitor.models import APIMonitor, APIMonitorQueryParam, APIMonitorHeader, APIMonitorRawBody, \
     APIMonitorResult, AssertionExcludeKey
+from statuspage.serializers import StatusPageCategorySerializers
 
 class APIMonitorQueryParamSerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,6 +77,7 @@ class APIMonitorSerializer(serializers.ModelSerializer):
     body_form = APIMonitorBodyFormSerializer(many=True, required=False, allow_null=True)
     raw_body = APIMonitorRawBodySerializer(required=False, allow_null=True)
     previous_step_id = serializers.PrimaryKeyRelatedField(read_only=True, many=False)
+    status_page_category_id = serializers.PrimaryKeyRelatedField(read_only=True, many=False)
     exclude_keys = AssertionExcludeKeySerializer(many=True, required=False, allow_null=True)
     
     class Meta:
@@ -96,6 +98,7 @@ class APIMonitorSerializer(serializers.ModelSerializer):
             'assertion_value',
             'is_assert_json_schema_only',
             'exclude_keys',
+            'status_page_category_id',
         ]
 
 
@@ -147,6 +150,7 @@ class APIMonitorDashboardSerializer(serializers.Serializer):
 class APIMonitorRetrieveSerializer(APIMonitorSerializer):
     success_rate = APIMonitorDetailSuccessRateSerializer(many=True)
     response_time = APIMonitorDetailResponseTimeSerializer(many=True)
+    status_page_category = StatusPageCategorySerializers()
 
     class Meta:
         model = APIMonitor
@@ -168,4 +172,6 @@ class APIMonitorRetrieveSerializer(APIMonitorSerializer):
             'assertion_value',
             'is_assert_json_schema_only',
             'exclude_keys',
+            'status_page_category_id',
+            'status_page_category',
         ]
