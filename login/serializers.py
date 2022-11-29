@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from login.models import Team, TeamMember
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -20,3 +21,10 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError({'response': response}, code='authorization')
 
         
+class TeamSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = [
+            'id',
+            'name',
+        ]

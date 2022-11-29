@@ -34,3 +34,9 @@ Date: 13th November 2022
 1. Alerts integration
 2. Forget Password
 3. Test API
+
+### Release 5
+Version: v0.5.0<br>
+Date: 28th November 2022
+1. Team Management
+2. Alerts User-Defined Timezone

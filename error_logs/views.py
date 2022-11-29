@@ -15,12 +15,12 @@ class ErrorLogsViewSet(mixins.ListModelMixin,
   permission_classes = [IsAuthenticated]
 
   def retrieve(self, request, pk=None):
-    queryset = APIMonitorResult.objects.filter(monitor__user=self.request.user, success=False)
+    queryset = APIMonitorResult.objects.filter(monitor__team=self.request.auth.team, success=False)
     obj = get_object_or_404(queryset, id=pk)
     serializer = self.get_serializer(obj)
     return Response(serializer.data)
 
   def get_queryset(self):
     limit = 1500
-    queryset = APIMonitorResult.objects.filter(monitor__user=self.request.user, success=False).order_by("-execution_time")[:limit:1]
+    queryset = APIMonitorResult.objects.filter(monitor__team=self.request.auth.team, success=False).order_by("-execution_time")[:limit:1]
     return queryset

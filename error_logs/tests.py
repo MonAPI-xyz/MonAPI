@@ -11,6 +11,7 @@ from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 
 from apimonitor.models import APIMonitor, APIMonitorResult
+from login.models import Team, TeamMember, MonAPIToken
 
 class ListErrorLogs(APITestCase):
   url = reverse('error-logs-list')
@@ -31,7 +32,10 @@ class ListErrorLogs(APITestCase):
   def test_when_authenticated_and_empty_data_then_empty_error_logs_success(self):
     # Create dummy user and authenticate
     user = User.objects.create_user(username='test', email='test@test.com', password='test123')
-    token = Token.objects.create(user=user)
+    team = Team.objects.create(name='test team')
+    team_member = TeamMember.objects.create(team=team, user=user)
+    
+    token = MonAPIToken.objects.create(team_member=team_member)
     header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
     response = self.client.get(self.url, format='json', **header)
@@ -41,11 +45,14 @@ class ListErrorLogs(APITestCase):
   def test_when_authenticated_and_data_are_exists_then_view_error_logs_list_success(self):
     # Create dummy user and authenticate
     user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-    token = Token.objects.create(user=user)
+    team = Team.objects.create(name='test team')
+    team_member = TeamMember.objects.create(team=team, user=user)
+    
+    token = MonAPIToken.objects.create(team_member=team_member)
     header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
     monitor = APIMonitor.objects.create(
-      user=user,
+      team=team,
       name='Test Name',
       method='GET',
       url='Test Path',
@@ -135,11 +142,14 @@ class ListErrorLogs(APITestCase):
   def test_when_authenticated_and_data_are_exists_then_view_error_logs_detail_success(self):
     # Create dummy user and authenticate
     user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
-    token = Token.objects.create(user=user)
+    team = Team.objects.create(name='test team')
+    team_member = TeamMember.objects.create(team=team, user=user)
+    
+    token = MonAPIToken.objects.create(team_member=team_member)
     header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
 
     monitor = APIMonitor.objects.create(
-      user=user,
+      team=team,
       name='Test Name',
       method='GET',
       url='Test Path',
@@ -168,7 +178,7 @@ class ListErrorLogs(APITestCase):
         log_error='Log Error'
     )
 
-    log_id = APIMonitorResult.objects.filter(monitor__user=user, success=False)[:1].get().id
+    log_id = APIMonitorResult.objects.filter(monitor__team=team, success=False)[:1].get().id
     url = reverse('error-logs-detail', kwargs={'pk': log_id})
     response = self.client.get(url, format='json', **header)
     self.assertEqual(response.status_code, status.HTTP_200_OK)
