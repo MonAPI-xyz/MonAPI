@@ -15,6 +15,7 @@ from apimonitor.serializers import (APIMonitorSerializer, APIMonitorListSerializ
                                     APIMonitorBodyFormSerializer, APIMonitorRawBodySerializer,
                                     APIMonitorRetrieveSerializer, APIMonitorDashboardSerializer,
                                     AssertionExcludeKeySerializer)
+from statuspage.models import StatusPageCategory
 
 
 class APIMonitorViewSet(mixins.ListModelMixin,
@@ -41,6 +42,7 @@ class APIMonitorViewSet(mixins.ListModelMixin,
             'schedule': request.data.get('schedule'),
             'body_type': request.data.get('body_type'),
             'previous_step_id': None if request.data.get('previous_step_id') == '' else request.data.get('previous_step_id', None),
+            'status_page_category_id': None if request.data.get('status_page_category_id') == '' else request.data.get('status_page_category_id', None),
             'assertion_type': request.data.get('assertion_type', "DISABLED"),
             'assertion_value': request.data.get('assertion_value', ""),
             'is_assert_json_schema_only': request.data.get('is_assert_json_schema_only', False)
@@ -50,28 +52,33 @@ class APIMonitorViewSet(mixins.ListModelMixin,
     # PBI-15-edit-api-monitor-backend
     def update(self, request, *args, **kwargs):
         monitor_data = self.get_monitor_data_from_request(request)
-
-        if monitor_data['previous_step_id'] is not None:
-            previous_step_id = try_parse_int(monitor_data['previous_step_id'])
-            prev_api_monitor = APIMonitor.objects.filter(id=previous_step_id, team=request.auth.team)
-            if prev_api_monitor.exists():
-                monitor_data['previous_step_obj'] = prev_api_monitor[0]
-            else:
-                return Response(data={"error": ["Please make sure your [previous step id] is valid and exist!"]},
-                                status=status.HTTP_400_BAD_REQUEST)
-        else:
-            monitor_data['previous_step_obj'] = None
-
-        api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
+        
         monitor_obj = APIMonitor.objects.get(pk=kwargs['pk'])
+        api_monitor_serializer = APIMonitorSerializer(data=monitor_data)
+        
         if (api_monitor_serializer.is_valid()):
+            if monitor_data['previous_step_id'] is not None:
+                previous_step_id = try_parse_int(monitor_data['previous_step_id'])
+                prev_api_monitor = APIMonitor.objects.filter(id=previous_step_id, team=request.auth.team)
+                if not prev_api_monitor.exists():
+                    return Response(data={"error": ["Please make sure your [previous step id] is valid and exist!"]},
+                                    status=status.HTTP_400_BAD_REQUEST)
+            
+            if monitor_data['status_page_category_id'] is not None:
+                status_page_category_id = try_parse_int(monitor_data['status_page_category_id'])
+                status_page_category = StatusPageCategory.objects.filter(id=status_page_category_id, team=request.auth.team)
+                if not status_page_category.exists():
+                    return Response(data={"error": ["Please make sure your [status page category] is valid and exist!"]},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
             # Saved
             monitor_obj.name = monitor_data['name']
             monitor_obj.method = monitor_data['method']
             monitor_obj.url = monitor_data['url']
             monitor_obj.schedule = monitor_data['schedule']
             monitor_obj.body_type = monitor_data['body_type']
-            monitor_obj.previous_step = monitor_data['previous_step_obj']
+            monitor_obj.previous_step_id = monitor_data['previous_step_id']
+            monitor_obj.status_page_category_id = monitor_data['status_page_category_id']
             monitor_obj.assertion_type = monitor_data['assertion_type']
             monitor_obj.assertion_value = monitor_data['assertion_value']
             monitor_obj.is_assert_json_schema_only = monitor_data['is_assert_json_schema_only']
@@ -142,12 +149,22 @@ class APIMonitorViewSet(mixins.ListModelMixin,
         if api_monitor_serializer.is_valid():
             error_log = []
             try:    
-                if monitor_data['previous_step_id'] == None or try_parse_int(monitor_data['previous_step_id']) and APIMonitor.objects.filter(id=monitor_data['previous_step_id'], team=request.auth.team).exists():
-                    monitor_obj = APIMonitor.objects.create(**monitor_data)
-                else:
-                    error_log += ["Please make sure your [previous step id] is valid and exist!"]
-                    return Response(data={"error": f"{error_log[0]}"}, status=status.HTTP_400_BAD_REQUEST)
-
+                if monitor_data['previous_step_id']  != None:
+                    prev_step_id = try_parse_int(monitor_data['previous_step_id']) 
+                    prev_step = APIMonitor.objects.filter(id=prev_step_id, team=request.auth.team)
+                    if not prev_step.exists():
+                        error_log += ["Please make sure your [previous step id] is valid and exist!"]
+                        return Response(data={"error": f"{error_log[0]}"}, status=status.HTTP_400_BAD_REQUEST)
+                
+                if monitor_data['status_page_category_id'] != None:
+                    status_page_category_id = try_parse_int(monitor_data['status_page_category_id'])
+                    status_page_category = StatusPageCategory.objects.filter(id=status_page_category_id, team=request.auth.team)
+                    if not status_page_category.exists():
+                        error_log += ["Please make sure your [status page category] is valid and exist!"]
+                        return Response(data={"error": f"{error_log[0]}"}, status=status.HTTP_400_BAD_REQUEST)
+                    
+                monitor_obj = APIMonitor.objects.create(**monitor_data)
+                    
                 if request.data.get('query_params'):
                     for key_value_pair in request.data.get('query_params'):
                         if 'key' in key_value_pair and 'value' in key_value_pair:

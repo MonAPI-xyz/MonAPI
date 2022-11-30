@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class LogoutConfig(AppConfig):
+class StatuspageConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'logout'
+    name = 'statuspage'
