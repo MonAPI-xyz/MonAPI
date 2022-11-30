@@ -11,12 +11,6 @@ from statuspage.models import StatusPageConfiguration, StatusPageCategory
 
 class StatusPageConfigTest(APITestCase):
     test_url = reverse('statuspage-config')
-    local_timezone = pytz.timezone(settings.TIME_ZONE)
-    mock_current_time = local_timezone.localize(datetime(2022, 9, 20, 10))
-
-    def setUp(self):
-        # Mock time function
-        timezone.now = lambda: self.mock_current_time
         
     def test_status_page_config_get_first_time_then_return_success(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
@@ -105,12 +99,6 @@ class StatusPageConfigTest(APITestCase):
         
 class StatusPageCategoryTest(APITestCase):
     test_url = reverse('statuspage-category-list')
-    local_timezone = pytz.timezone(settings.TIME_ZONE)
-    mock_current_time = local_timezone.localize(datetime(2022, 9, 20, 10))
-
-    def setUp(self):
-        # Mock time function
-        timezone.now = lambda: self.mock_current_time
         
     def test_status_page_category_get_then_return_list_category(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
