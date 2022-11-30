@@ -244,7 +244,7 @@ class StatusPageDashboardTest(APITestCase):
         self.assertEqual(response.data[0]['success_rate_category'][23]['success'], 1)
         self.assertEqual(response.data[1]['success_rate_category'][23]['failed'], 1)
         
-    def test_unauthorized_and_empty_status_page_category_then_return_empty_status_page_dashboard(self):
+    def test_empty_status_page_category_then_return_empty_status_page_dashboard(self):
         # create path
         team = Team.objects.create(name='test team')
         StatusPageConfiguration.objects.create(team=team, path='test-path')
@@ -252,4 +252,39 @@ class StatusPageDashboardTest(APITestCase):
         response = self.client.get(self.test_url, data={"path": "test-path"}, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
+
+    def test_path_doesnt_exist_then_return_404_not_found(self):
+        response = self.client.get(self.test_url, data={"path": "no-path"}, format='json')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data['error'], "Please make sure your URL path is exist!")
         
+    def test_category_are_exist_but_have_not_assigned_then_return_empty_list_in_success_rate_category(self):
+        # create dummy data
+        team = Team.objects.create(name='test team')
+        StatusPageCategory.objects.create(team=team, name='test-category')
+        StatusPageConfiguration.objects.create(team=team, path='test-path')
+
+        monitor = APIMonitor.objects.create(
+            team=team,
+            name='Test Name1',
+            method='GET',
+            url='Test Path',
+            schedule='10MIN',
+            previous_step=None,
+            body_type='EMPTY',
+        )
+
+        APIMonitorResult.objects.create(
+            monitor=monitor,
+            execution_time=self.mock_current_time,
+            response_time=100,
+            success=True,
+            status_code=500,
+            log_response='Log Response',
+            log_error='',
+        )
+
+        response = self.client.get(self.test_url, data={"path": "test-path"}, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['name'], 'test-category')
+        self.assertEqual(response.data[0]['success_rate_category'], [])
