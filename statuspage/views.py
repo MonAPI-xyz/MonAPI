@@ -54,18 +54,18 @@ class StatusPageDashboardViewSet(mixins.ListModelMixin, viewsets.GenericViewSet)
     pagination_class = None
 
     def list(self, request):
-        statusPageConfig = StatusPageConfiguration.objects.filter(path=self.request.GET.get('path'))
-        if len(statusPageConfig) == 0:
+        status_page_config = StatusPageConfiguration.objects.filter(path=self.request.GET.get('path'))
+        if len(status_page_config) == 0:
             return Response(data={"error": "Please make sure your URL path is exist!"}, status=status.HTTP_404_NOT_FOUND)
         
-        queryset = StatusPageCategory.objects.filter(team=statusPageConfig[0].team)
+        queryset = StatusPageCategory.objects.filter(team=status_page_config[0].team)
 
         for category in queryset:
             success_rate_category = []
-            ApiMonitorCategory = APIMonitorResult.objects \
-                .filter(monitor__team=statusPageConfig[0].team, monitor__status_page_category=category)
+            api_monitor_category = APIMonitorResult.objects \
+                .filter(monitor__team=status_page_config[0].team, monitor__status_page_category=category)
 
-            if len(ApiMonitorCategory) == 0:
+            if len(api_monitor_category) == 0:
                 category.success_rate_category = success_rate_category
                 continue
             
@@ -76,7 +76,7 @@ class StatusPageDashboardViewSet(mixins.ListModelMixin, viewsets.GenericViewSet)
                 end_time = last_24_hour + timedelta(hours=1)
                 
                 # Average success rate
-                success_count = ApiMonitorCategory.filter(execution_time__gte=start_time, execution_time__lte=end_time) \
+                success_count = api_monitor_category.filter(execution_time__gte=start_time, execution_time__lte=end_time) \
                     .aggregate(
                         s=Count('success', filter=Q(success=True)), 
                         f=Count('success', filter=Q(success=False)),
