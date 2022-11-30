@@ -28,15 +28,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', include('register.urls')),
     path('forget-password/', include('forget_password.urls')),
-    path('logout/', include('logout.urls')),
     path('monitor/', include('apimonitor.urls')),
-    path('auth/', include('login.urls')), # New endpoint for authentication
-    path('login/', include('login.urls')),
+    path('auth/', include('login.urls')),
     path('error-logs/', include('error_logs.urls')),
     path('alerts/', include('alerts.urls')),
     path('api-test/', include('apitest.urls')),
     path('team-management/', include('team_management.urls')),
     path('invite-member/', include('invite_team_members.urls')),
+    path('status-page/', include('statuspage.urls')),
 ]
 
 if settings.DEBUG:
