@@ -7,6 +7,7 @@ from rest_framework import status
 from login.serializers import LoginSerializer, TeamSerializers
 from login.models import TeamMember, Team
 from login.utils import generate_token
+from register.models import VerifiedUser
 
 @api_view(["POST"])
 @authentication_classes([])
@@ -20,9 +21,16 @@ def user_login(request):
                         username=request.data['email'], 
                         email=request.data['email'], 
                         password=request.data['password'])
+
     if not user:
         data['response'] = 'Invalid email or password.'
-        return Response(data=data, status=status.HTTP_401_UNAUTHORIZED)   
+        return Response(data=data, status=status.HTTP_401_UNAUTHORIZED)
+
+    # Filter user based on VerifiedUser
+    is_verified = VerifiedUser.objects.get(user=user).verified
+    if not is_verified:
+        data['response'] = 'User not yet verified.'
+        return Response(data=data, status=status.HTTP_401_UNAUTHORIZED)
 
     data['response'] = 'Sign-in successful.'
     data['email']= user.email
