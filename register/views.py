@@ -1,3 +1,5 @@
+import os
+
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework import status
@@ -5,6 +7,10 @@ from rest_framework import status
 from django.db.utils import IntegrityError
 from register.serializers import RegistrationSerializer
 from login.models import Team, TeamMember
+from register.models import VerifiedUser, VerifiedUserToken
+
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 @api_view(['POST', ])
 @authentication_classes([])
@@ -18,6 +24,29 @@ def registration_view(request):
             username = user.username.split('@')[0]
             team = Team.objects.create(name=username.title())
             TeamMember.objects.create(user=user, team=team, verified=True)
+            verified_user = VerifiedUser.objects.create(user=user)
+            token = VerifiedUserToken.objects.create(verified_user=verified_user)
+            verify_url = f"{os.environ.get('FRONTEND_URL', '')}/verify?key={token.key}"
+
+            email_content = f'''
+                        To verify your registration on MonAPI, please follow the link below.\n
+                        If you did not register on MonAPI, you can ignore this email. \n\n
+                        {verify_url}
+                        '''
+
+            email_content_html = render_to_string('email/verify_email.html', {
+                'verify_url': verify_url,
+            })
+
+            send_mail(
+                f'MonAPI User Verification',
+                email_content,
+                None,
+                [user.email],
+                html_message=email_content_html,
+                fail_silently=False,
+            )
+
         except IntegrityError:
             data['response'] = 'User already registered! Please use a different email to register.'
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
