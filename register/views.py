@@ -5,12 +5,13 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework import status
 
 from django.db.utils import IntegrityError
-from register.serializers import RegistrationSerializer
+from register.serializers import RegistrationSerializer, VerifiedUserTokenSerializer
 from login.models import Team, TeamMember
 from register.models import VerifiedUser, VerifiedUserToken
 
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.core.exceptions import ObjectDoesNotExist
 
 @api_view(['POST', ])
 @authentication_classes([])
@@ -56,4 +57,24 @@ def registration_view(request):
         data = serializer.errors
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
     return Response(data, status=status.HTTP_201_CREATED)
+
+@api_view(['POST', ])
+@authentication_classes([])
+@permission_classes([])
+def verify_view(request):
+    serializer = VerifiedUserTokenSerializer(data=request.data)
+    if serializer.is_valid():
+        try:
+            verified_user = VerifiedUserToken.objects.get(key=serializer.validated_data['key']).verified_user
+            verified_user.verified = True
+            verified_user.save()
+            data = {'response': 'Success'}
+            return Response(data=data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            data = {'response': 'Token is invalid.'}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        data = {'response': 'Pass a valid token.'}
+        return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
 
