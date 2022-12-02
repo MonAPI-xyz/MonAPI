@@ -88,15 +88,58 @@ class APIViewTestCase(APITestCase):
 
 class TestUserVerification(APITestCase):
 
-    def test_register_create_an_unverified_user(self):
+    def helper_register(self, email="user1@gmail.com", password="B0tch1ng"):
         response = self.client.post(
             reverse('register-api'),
             {
-                'email': 'user1@gmail.com',
-                'password': 'B0tch1ng',
-                'password2': 'B0tch1ng'
-            },
+                'email': email,
+                'password': password,
+                'password2': password,
+            }
         )
+        return response
+
+    def test_register_create_an_unverified_user(self):
+        self.helper_register()
         user = User.objects.get(email='user1@gmail.com')
         verified_user = VerifiedUser.objects.get(user=user)
         self.assertEqual(verified_user.verified, False)
+
+    def test_passing_valid_key_verify_an_unverified_user(self):
+        self.helper_register()
+        user = User.objects.get(email='user1@gmail.com')
+        verified_user = VerifiedUser.objects.get(user=user)
+        verified_user_token = VerifiedUserToken.objects.get(verified_user=verified_user)
+
+        self.assertEqual(verified_user.verified, False)
+        response = self.client.post(
+            reverse('verify-user'),
+            {
+                'key': verified_user_token.key
+            }
+        )
+        self.assertEqual(response.data['response'], 'Success')
+        verified_user = VerifiedUser.objects.get(user=user)
+        self.assertEqual(verified_user.verified, True)
+
+    def test_passing_invalid_key_verify_an_unverified_user(self):
+        self.helper_register()
+
+        response = self.client.post(
+            reverse('verify-user'),
+            {
+                'key': 'false-key'
+            }
+        )
+        self.assertEqual(response.data['response'], 'Token is invalid.')
+
+    def test_passing_non_key_verify_an_unverified_user(self):
+        self.helper_register()
+
+        response = self.client.post(
+            reverse('verify-user'),
+            {
+                'invalid-key': "None"
+            }
+        )
+        self.assertEqual(response.data['response'], 'Pass a valid token.')
