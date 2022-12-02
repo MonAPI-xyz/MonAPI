@@ -5,12 +5,14 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from login.models import MonAPIToken, TeamMember, Team, get_file_path
+from register.models import VerifiedUser
 
 class LoginTest(APITestCase):
     login_url = reverse('login')
 
     def test_when_non_authenticated_and_login_without_team_then_return_success(self):
-        User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')
+        user = User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')
+        VerifiedUser.objects.create(user=user, verified=True)
 
         request_params = {'email': 'test@gmail.com', 'password': 'Test1234'}
         response = self.client.post(self.login_url, request_params)
@@ -22,6 +24,7 @@ class LoginTest(APITestCase):
         
     def test_when_non_authenticated_and_team_exists_then_return_success(self):
         user = User.objects.create_user(username='test@gmail.com', email='test@gmail.com', password='Test1234')
+        VerifiedUser.objects.create(user=user, verified=True)
         team = Team.objects.create(name='test team')
         team_member = TeamMember.objects.create(team=team, user=user, verified=True)
 
@@ -253,3 +256,14 @@ class InviteMemberTest(TestCase):
         team_member = TeamMember.objects.create(user=user, team=team)
 
         self.assertEqual(team_member.verified, False)
+
+class VerifiedUserTest(APITestCase):
+    login_url = reverse('login')
+
+    def test_user_can_not_login_if_account_not_verified(self):
+        user = User.objects.create_user(username="test@gmail.com", email="test@gmail.com", password="Test1234")
+        VerifiedUser.objects.create(user=user)
+        request_params = {'email': 'test@gmail.com', 'password': 'Test1234'}
+        response = self.client.post(self.login_url, request_params)
+        self.assertEqual(response.data['response'], 'User not yet verified.')
+
