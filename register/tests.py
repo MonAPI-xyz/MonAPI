@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 from login.models import Team, TeamMember
+from register.models import VerifiedUser, VerifiedUserToken
 
 
 class APIViewTestCase(APITestCase):
@@ -84,3 +85,18 @@ class APIViewTestCase(APITestCase):
         self.assertEqual(response2.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response2.data['response'],
                          'User already registered! Please use a different email to register.')
+
+class TestUserVerification(APITestCase):
+
+    def test_register_create_an_unverified_user(self):
+        response = self.client.post(
+            reverse('register-api'),
+            {
+                'email': 'user1@gmail.com',
+                'password': 'B0tch1ng',
+                'password2': 'B0tch1ng'
+            },
+        )
+        user = User.objects.get(email='user1@gmail.com')
+        verified_user = VerifiedUser.objects.get(user=user)
+        self.assertEqual(verified_user.verified, False)
