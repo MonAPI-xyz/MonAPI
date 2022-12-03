@@ -63,7 +63,7 @@ class StatusPageDashboardViewSet(mixins.ListModelMixin, viewsets.GenericViewSet)
         for category in queryset:
             success_rate_category = []
             api_monitor_category = APIMonitorResult.objects \
-                .filter(monitor__team=status_page_config[0].team, monitor__status_page_category=category)
+                .filter(monitor__status_page_category=category)
 
             if len(api_monitor_category) == 0:
                 category.success_rate_category = success_rate_category
