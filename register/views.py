@@ -65,10 +65,12 @@ def verify_view(request):
     serializer = VerifiedUserTokenSerializer(data=request.data)
     if serializer.is_valid():
         try:
-            verified_user = VerifiedUserToken.objects.get(key=serializer.validated_data['key']).verified_user
+            verify_token = VerifiedUserToken.objects.get(key=serializer.validated_data['key'])
+            verified_user = verify_token.verified_user
             verified_user.verified = True
             verified_user.save()
             data = {'response': 'Success'}
+            verify_token.delete()
             return Response(data=data, status=status.HTTP_200_OK)
         except ObjectDoesNotExist:
             data = {'response': 'Token is invalid.'}
