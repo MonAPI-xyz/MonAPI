@@ -8,6 +8,7 @@ from login.serializers import LoginSerializer, TeamSerializers
 from login.models import TeamMember, Team
 from login.utils import generate_token
 from register.models import VerifiedUser
+from django.core.exceptions import ObjectDoesNotExist
 
 @api_view(["POST"])
 @authentication_classes([])
@@ -27,7 +28,14 @@ def user_login(request):
         return Response(data=data, status=status.HTTP_401_UNAUTHORIZED)
 
     # Filter user based on VerifiedUser
-    is_verified = VerifiedUser.objects.get(user=user).verified
+    try:
+        is_verified = VerifiedUser.objects.get(user=user).verified
+    except ObjectDoesNotExist:
+        # Legacy Support: Users that already create their account
+        # before this update will automatically be verified
+        VerifiedUser.objects.create(user=user, verified=True)
+        is_verified = True
+
     if not is_verified:
         data['response'] = 'User not yet verified.'
         return Response(data=data, status=status.HTTP_401_UNAUTHORIZED)
