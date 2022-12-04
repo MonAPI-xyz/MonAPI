@@ -918,6 +918,62 @@ class CronManagementCommand(TransactionTestCase):
         self.assertEqual(result[0].success, False)
         self.assertEqual(result[0].log_response, "NonJSON response")
         self.assertEqual(result[0].log_error, 'Assertion text failed.\nExpected: ""\nGot: "NonJSON response"')
+
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_partial_assert_text_success(self, *args):
+        team = Team.objects.create(name='test team')
+        
+        APIMonitor.objects.create(
+            team=team,
+            name='apimonitor',
+            method='GET',
+            url='https://monapinonjson.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            assertion_type='PARTIAL',
+            assertion_value="NonJSON",
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, True)
+        self.assertEqual(result[0].log_response, "NonJSON response")
+        self.assertEqual(result[0].log_error, '')
+
+    @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
+    @patch("requests.get", mocked_request_get)
+    def test_when_api_monitor_partial_assert_text_failure_then_error(self, *args):
+        team = Team.objects.create(name='test team')
+        
+        APIMonitor.objects.create(
+            team=team,
+            name='apimonitor',
+            method='GET',
+            url='https://monapinonjson.xyz',
+            schedule='60MIN',
+            body_type='RAW',
+            assertion_type='PARTIAL',
+            assertion_value='Monapi',
+        )
+        
+        try:
+            self.call_command()
+        except InterruptedError:
+            pass
+        time.sleep(0.1)
+
+        result = APIMonitorResult.objects.all()
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].success, False)
+        self.assertEqual(result[0].log_response, "NonJSON response")
+        self.assertEqual(result[0].log_error, 'Partial Assertion text failed.\nExpected: "Monapi"\nGot: "NonJSON response"')
         
     @patch("cron.management.commands.run_cron.mock_cron_interrupt", side_effect=InterruptedError)
     @patch("requests.get", mocked_request_get)
