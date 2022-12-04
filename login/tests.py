@@ -267,3 +267,10 @@ class VerifiedUserTest(APITestCase):
         response = self.client.post(self.login_url, request_params)
         self.assertEqual(response.data['response'], 'User not yet verified.')
 
+    def test_existing_user_is_automatically_a_verified_user(self):
+        past_user = User.objects.create_user(username="test@gmail.com", email="test@gmail.com", password="Test1234")
+        request_params = {'email': 'test@gmail.com', 'password': 'Test1234'}
+        response = self.client.post(self.login_url, request_params)
+        self.assertEqual(response.data['response'], 'Sign-in successful.')
+        self.assertEqual(VerifiedUser.objects.all().count(), 1)
+
