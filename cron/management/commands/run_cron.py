@@ -83,7 +83,7 @@ class Command(BaseCommand):
         monitor = APIMonitor.objects.get(id=monitor_id)
         if monitor.assertion_type == 'TEXT' and response != monitor.assertion_value:
             raise AssertionError(f'Assertion text failed.\nExpected: "{monitor.assertion_value}"\nGot: "{response}"')
-        elif monitor.assertion_type == 'PARTIAL' and not monitor.assertion_value in response:
+        elif monitor.assertion_type == 'PARTIAL' and monitor.assertion_value not in response:
             raise AssertionError(f'Partial Assertion text failed.\nExpected: "{monitor.assertion_value}"\nGot: "{response}"')
         elif monitor.assertion_type == 'JSON':
             try:
