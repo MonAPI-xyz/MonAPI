@@ -34,6 +34,7 @@ class APIMonitor(models.Model):
         ('DISABLED', 'Disabled'),
         ('TEXT', 'Text'),
         ('JSON', 'JSON'),
+        ('PARTIAL', 'Partial'),
     ]
     
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
