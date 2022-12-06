@@ -18,6 +18,8 @@ class StatusPageCategorySerializers(serializers.ModelSerializer):
             'team',
             'name',
         ]
+        
+        read_only_fields = ['team']
 
 class APIMonitorSuccessRateSerializer(serializers.Serializer):
     start_time = serializers.DateTimeField()
