@@ -42,8 +42,15 @@ class StatusPageCategoryViewSet(mixins.ListModelMixin,
         return queryset
 
     def create(self, request, *args, **kwargs):
-        request.data['team'] = request.auth.team.pk
-        return super().create(request, *args, **kwargs)
+        serializer = StatusPageCategorySerializers(data=request.data)
+        if serializer.is_valid():
+            status_page = StatusPageCategory.objects.create(
+                team = request.auth.team,
+                name = serializer.data['name'],
+            )
+            serializer = StatusPageCategorySerializers(status_page)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 class StatusPageDashboardViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
