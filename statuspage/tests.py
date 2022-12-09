@@ -24,7 +24,7 @@ class StatusPageConfigTest(APITestCase):
         response = self.client.get(self.test_url, format='json', **header)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {
-            "path": ""
+            "path": None
         })
         
     def test_status_page_config_get_when_exists_then_return_success(self):
@@ -64,7 +64,7 @@ class StatusPageConfigTest(APITestCase):
         status_config = StatusPageConfiguration.objects.get(team=team)
         self.assertEqual(status_config.path, "updatepath")
     
-    def test_status_page_config_update_when_empty_param_then_return_success(self):
+    def test_status_page_config_update_when_empty_param_then_return_error(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         team = Team.objects.create(name='test team')
         team_member = TeamMember.objects.create(team=team, user=user)
@@ -72,15 +72,19 @@ class StatusPageConfigTest(APITestCase):
         token = MonAPIToken.objects.create(team_member=team_member)
         header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
         
-        req_body = {}
+        req_body = {
+            "path": "",
+        }
 
         response = self.client.post(self.test_url, data=req_body, format='json', **header)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, {
-            "path": ""
+             "path": [
+                "This field may not be blank."
+            ]
         })
         
-    def test_status_page_config_update_when_invalid_param_then_return_error(self):
+    def test_status_page_config_update_when_none_then_return_success(self):
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
         team = Team.objects.create(name='test team')
         team_member = TeamMember.objects.create(team=team, user=user)
@@ -93,9 +97,9 @@ class StatusPageConfigTest(APITestCase):
         }
 
         response = self.client.post(self.test_url, data=req_body, format='json', **header)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {
-            "path": ["This field may not be null."]
+            "path": None
         })
         
 class StatusPageCategoryTest(APITestCase):
