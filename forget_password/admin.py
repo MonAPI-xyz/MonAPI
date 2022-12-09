@@ -1,3 +1,4 @@
 from django.contrib import admin
+from forget_password.models import ForgetPasswordToken
 
-# Register your models here.
+admin.site.register(ForgetPasswordToken)
