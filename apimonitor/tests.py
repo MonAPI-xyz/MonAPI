@@ -15,6 +15,7 @@ from django_test_migrations.contrib.unittest_case import MigratorTestCase
 from apimonitor.models import APIMonitor, APIMonitorBodyForm, APIMonitorHeader, APIMonitorQueryParam, APIMonitorRawBody, \
     APIMonitorResult, AssertionExcludeKey
 from login.models import Team, TeamMember, MonAPIToken
+from statuspage.models import StatusPageCategory
 
 
 class DetailListAPIMonitor(APITestCase):
@@ -79,7 +80,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "30MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body":
-                              None, 'previous_step_id': None, "success_rate": [
+                              None, 'previous_step_id': None, 'status_page_category': None, 'status_page_category_id': None, "success_rate": [
                              {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:31:00+07:00",
                               "success": 0, "failed": 0},
                              {"start_time": "2022-09-20T09:31:00+07:00", "end_time": "2022-09-20T09:32:00+07:00",
@@ -209,7 +210,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "30MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body":
-                              None, 'previous_step_id': None, "success_rate": [
+                              None, 'previous_step_id': None, 'status_page_category': None, 'status_page_category_id': None, "success_rate": [
                              {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T09:31:00+07:00",
                               "success": 0, "failed": 0},
                              {"start_time": "2022-09-20T09:31:00+07:00", "end_time": "2022-09-20T09:32:00+07:00",
@@ -338,6 +339,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "60MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
+                          'status_page_category': None, 'status_page_category_id': None, 
                           "success_rate": [
                               {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:02:00+07:00",
                                "success": 0, "failed": 0},
@@ -469,6 +471,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "60MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
+                          'status_page_category': None, 'status_page_category_id': None, 
                           "success_rate": [
                               {"start_time": "2022-09-20T09:00:00+07:00", "end_time": "2022-09-20T09:02:00+07:00",
                                "success": 0, "failed": 0},
@@ -601,6 +604,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "180MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
+                          'status_page_category': None, 'status_page_category_id': None, 
                           "success_rate": [
                               {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:05:00+07:00",
                                "success": 0, "failed": 0},
@@ -756,6 +760,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "180MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
+                          'status_page_category': None, 'status_page_category_id': None, 
                           "success_rate": [
                               {"start_time": "2022-09-20T07:00:00+07:00", "end_time": "2022-09-20T07:05:00+07:00",
                                "success": 0, "failed": 0},
@@ -909,6 +914,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "360MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
+                          'status_page_category': None, 'status_page_category_id': None, 
                           "success_rate": [
                               {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:10:00+07:00",
                                "success": 0, "failed": 0},
@@ -1063,7 +1069,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "360MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [],
-                          "raw_body": None, 'previous_step_id': None, "success_rate": [
+                          "raw_body": None, 'previous_step_id': None, 'status_page_category': None, 'status_page_category_id': None, "success_rate": [
                              {"start_time": "2022-09-20T04:00:00+07:00", "end_time": "2022-09-20T04:10:00+07:00",
                               "success": 0, "failed": 0},
                              {"start_time": "2022-09-20T04:10:00+07:00", "end_time": "2022-09-20T04:20:00+07:00",
@@ -1216,7 +1222,8 @@ class DetailListAPIMonitor(APITestCase):
 
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "720MIN",
-                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
+                          "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None, 
+                          'status_page_category': None, 'status_page_category_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:20:00+07:00",
                                "success": 0, "failed": 0},
@@ -1372,6 +1379,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "720MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
+                          'status_page_category': None, 'status_page_category_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-19T22:00:00+07:00", "end_time": "2022-09-19T22:20:00+07:00",
                                "success": 0, "failed": 0},
@@ -1527,6 +1535,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "1440MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
+                          'status_page_category': None, 'status_page_category_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T10:30:00+07:00",
                                "success": 0, "failed": 0},
@@ -1625,151 +1634,151 @@ class DetailListAPIMonitor(APITestCase):
                                "success": 0, "failed": 0},
                               {"start_time": "2022-09-20T09:30:00+07:00", "end_time": "2022-09-20T10:00:00+07:00",
                                "success": 1, "failed": 0}], "response_time": [{"start_time":
-                                                                                   "2022-09-19T10:00:00+07:00",
-                                                                               "end_time": "2022-09-19T10:30:00+07:00",
-                                                                               "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T10:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T11:00:00+07:00",
-                                                                                  "avg": 0},
-                                                                              {
-                                                                                  "start_time": "2022-09-19T11:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T11:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T11:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T12:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T12:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T12:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T12:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T13:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T13:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T13:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T13:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T14:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T14:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T14:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T14:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T15:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T15:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T15:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T15:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T16:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T16:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T16:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T16:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T17:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T17:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T17:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T17:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T18:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T18:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T18:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T18:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T19:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T19:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T19:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T19:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T20:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T20:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T20:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T20:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T21:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T21:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T21:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T21:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T22:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T22:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T22:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T22:30:00+07:00",
-                                                                                  "end_time": "2022-09-19T23:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T23:00:00+07:00",
-                                                                                  "end_time": "2022-09-19T23:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-19T23:30:00+07:00",
-                                                                                  "end_time": "2022-09-20T00:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T00:00:00+07:00",
-                                                                                  "end_time": "2022-09-20T00:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T00:30:00+07:00",
-                                                                                  "end_time": "2022-09-20T01:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T01:00:00+07:00",
-                                                                                  "end_time": "2022-09-20T01:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T01:30:00+07:00",
-                                                                                  "end_time": "2022-09-20T02:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T02:00:00+07:00",
-                                                                                  "end_time": "2022-09-20T02:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T02:30:00+07:00",
-                                                                                  "end_time": "2022-09-20T03:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T03:00:00+07:00",
-                                                                                  "end_time": "2022-09-20T03:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T03:30:00+07:00",
-                                                                                  "end_time": "2022-09-20T04:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T04:00:00+07:00",
-                                                                                  "end_time": "2022-09-20T04:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T04:30:00+07:00",
-                                                                                  "end_time": "2022-09-20T05:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T05:00:00+07:00",
-                                                                                  "end_time": "2022-09-20T05:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T05:30:00+07:00",
-                                                                                  "end_time": "2022-09-20T06:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T06:00:00+07:00",
-                                                                                  "end_time": "2022-09-20T06:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T06:30:00+07:00",
-                                                                                  "end_time": "2022-09-20T07:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T07:00:00+07:00",
-                                                                                  "end_time": "2022-09-20T07:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T07:30:00+07:00",
-                                                                                  "end_time": "2022-09-20T08:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T08:00:00+07:00",
-                                                                                  "end_time": "2022-09-20T08:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T08:30:00+07:00",
-                                                                                  "end_time": "2022-09-20T09:00:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T09:00:00+07:00",
-                                                                                  "end_time": "2022-09-20T09:30:00+07:00",
-                                                                                  "avg": 0}, {
-                                                                                  "start_time": "2022-09-20T09:30:00+07:00",
-                                                                                  "end_time": "2022-09-20T10:00:00+07:00",
-                                                                                  "avg": 100}],
+                                    "2022-09-19T10:00:00+07:00",
+                                "end_time": "2022-09-19T10:30:00+07:00",
+                                "avg": 0}, {
+                                    "start_time": "2022-09-19T10:30:00+07:00",
+                                    "end_time": "2022-09-19T11:00:00+07:00",
+                                    "avg": 0},
+                                {
+                                    "start_time": "2022-09-19T11:00:00+07:00",
+                                    "end_time": "2022-09-19T11:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T11:30:00+07:00",
+                                    "end_time": "2022-09-19T12:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T12:00:00+07:00",
+                                    "end_time": "2022-09-19T12:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T12:30:00+07:00",
+                                    "end_time": "2022-09-19T13:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T13:00:00+07:00",
+                                    "end_time": "2022-09-19T13:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T13:30:00+07:00",
+                                    "end_time": "2022-09-19T14:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T14:00:00+07:00",
+                                    "end_time": "2022-09-19T14:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T14:30:00+07:00",
+                                    "end_time": "2022-09-19T15:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T15:00:00+07:00",
+                                    "end_time": "2022-09-19T15:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T15:30:00+07:00",
+                                    "end_time": "2022-09-19T16:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T16:00:00+07:00",
+                                    "end_time": "2022-09-19T16:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T16:30:00+07:00",
+                                    "end_time": "2022-09-19T17:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T17:00:00+07:00",
+                                    "end_time": "2022-09-19T17:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T17:30:00+07:00",
+                                    "end_time": "2022-09-19T18:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T18:00:00+07:00",
+                                    "end_time": "2022-09-19T18:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T18:30:00+07:00",
+                                    "end_time": "2022-09-19T19:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T19:00:00+07:00",
+                                    "end_time": "2022-09-19T19:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T19:30:00+07:00",
+                                    "end_time": "2022-09-19T20:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T20:00:00+07:00",
+                                    "end_time": "2022-09-19T20:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T20:30:00+07:00",
+                                    "end_time": "2022-09-19T21:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T21:00:00+07:00",
+                                    "end_time": "2022-09-19T21:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T21:30:00+07:00",
+                                    "end_time": "2022-09-19T22:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T22:00:00+07:00",
+                                    "end_time": "2022-09-19T22:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T22:30:00+07:00",
+                                    "end_time": "2022-09-19T23:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T23:00:00+07:00",
+                                    "end_time": "2022-09-19T23:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-19T23:30:00+07:00",
+                                    "end_time": "2022-09-20T00:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T00:00:00+07:00",
+                                    "end_time": "2022-09-20T00:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T00:30:00+07:00",
+                                    "end_time": "2022-09-20T01:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T01:00:00+07:00",
+                                    "end_time": "2022-09-20T01:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T01:30:00+07:00",
+                                    "end_time": "2022-09-20T02:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T02:00:00+07:00",
+                                    "end_time": "2022-09-20T02:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T02:30:00+07:00",
+                                    "end_time": "2022-09-20T03:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T03:00:00+07:00",
+                                    "end_time": "2022-09-20T03:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T03:30:00+07:00",
+                                    "end_time": "2022-09-20T04:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T04:00:00+07:00",
+                                    "end_time": "2022-09-20T04:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T04:30:00+07:00",
+                                    "end_time": "2022-09-20T05:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T05:00:00+07:00",
+                                    "end_time": "2022-09-20T05:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T05:30:00+07:00",
+                                    "end_time": "2022-09-20T06:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T06:00:00+07:00",
+                                    "end_time": "2022-09-20T06:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T06:30:00+07:00",
+                                    "end_time": "2022-09-20T07:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T07:00:00+07:00",
+                                    "end_time": "2022-09-20T07:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T07:30:00+07:00",
+                                    "end_time": "2022-09-20T08:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T08:00:00+07:00",
+                                    "end_time": "2022-09-20T08:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T08:30:00+07:00",
+                                    "end_time": "2022-09-20T09:00:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T09:00:00+07:00",
+                                    "end_time": "2022-09-20T09:30:00+07:00",
+                                    "avg": 0}, {
+                                    "start_time": "2022-09-20T09:30:00+07:00",
+                                    "end_time": "2022-09-20T10:00:00+07:00",
+                                    "avg": 100}],
                           'assertion_type': 'DISABLED', 'assertion_value': '', 'is_assert_json_schema_only': False, 'exclude_keys': []
         })
 
@@ -1779,6 +1788,7 @@ class DetailListAPIMonitor(APITestCase):
         self.assertEqual(response.data,
                          {"id": 1, "name": "Test Monitor", "method": "GET", "url": "Test Path", "schedule": "1440MIN",
                           "body_type": "FORM", "query_params": [], "headers": [], "body_form": [], "raw_body": None, 'previous_step_id': None,
+                          'status_page_category': None, 'status_page_category_id': None,
                           "success_rate": [
                               {"start_time": "2022-09-19T10:00:00+07:00", "end_time": "2022-09-19T10:30:00+07:00",
                                "success": 0, "failed": 0},
@@ -1820,9 +1830,9 @@ class DetailListAPIMonitor(APITestCase):
                                "success": 0, "failed": 0},
                               {"start_time": "2022-09-19T19:30:00+07:00", "end_time": "2022-09-19T20:00:00+07:00",
                                "success": 0, "failed": 0}, {"start_time":
-                                                                "2022-09-19T20:00:00+07:00",
-                                                            "end_time": "2022-09-19T20:30:00+07:00", "success": 0,
-                                                            "failed": 0},
+                                    "2022-09-19T20:00:00+07:00",
+                                "end_time": "2022-09-19T20:30:00+07:00", "success": 0,
+                                "failed": 0},
                               {"start_time": "2022-09-19T20:30:00+07:00", "end_time": "2022-09-19T21:00:00+07:00",
                                "success": 0, "failed": 0},
                               {"start_time": "2022-09-19T21:00:00+07:00", "end_time": "2022-09-19T21:30:00+07:00",
@@ -3311,7 +3321,8 @@ class ListAPIMonitor(APITestCase):
                 "assertion_type": "DISABLED",
                 "assertion_value": "",
                 "is_assert_json_schema_only": False,
-                "exclude_keys": []
+                "exclude_keys": [],
+                "status_page_category_id": None,
             }
         )
 
@@ -3365,7 +3376,8 @@ class ListAPIMonitor(APITestCase):
                 "assertion_type": "DISABLED",
                 "assertion_value": "",
                 "is_assert_json_schema_only": False,
-                "exclude_keys": []
+                "exclude_keys": [],
+                "status_page_category_id": None,
             }
         )
 
@@ -3428,9 +3440,11 @@ class ListAPIMonitor(APITestCase):
                 "assertion_type": "DISABLED",
                 "assertion_value": "",
                 "is_assert_json_schema_only": False,
-                "exclude_keys": []
+                "exclude_keys": [],
+                "status_page_category_id": None,
             }
         )
+        
     def test_user_cannot_create_api_monitor_with_other_user_previous_step_id(self):
         # Create a user object
         user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
@@ -3518,6 +3532,139 @@ class ListAPIMonitor(APITestCase):
         response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['error'], "Please make sure your [previous step id] is valid and exist!")
+        self.assertEqual(APIMonitor.objects.all().count(), 0)
+        
+    def test_user_can_create_api_monitor_with_valid_statuspage_category_id(self):
+        # Create a user object
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        statuspage_category = StatusPageCategory.objects.create(team=team, name='category')
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'EMPTY',
+            'status_page_category_id': statuspage_category.id,
+        }
+        
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'status_page_category_id': monitor_value['status_page_category_id'],
+        }
+
+        # Get path
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(APIMonitor.objects.all().count(), 1)
+        self.assertEqual(response.data,
+            {
+                "id": 1,
+                "name": "Test Monitor",
+                "method": "GET",
+                "url": "Test Path",
+                "schedule": "10MIN",
+                "body_type": "EMPTY",
+                "query_params": [],
+                "headers": [],
+                "body_form": [],
+                "raw_body": None,
+                "previous_step_id": None,
+                "assertion_type": "DISABLED",
+                "assertion_value": "",
+                "is_assert_json_schema_only": False,
+                "exclude_keys": [],
+                "status_page_category_id": statuspage_category.id,
+            }
+        )
+        
+    def test_user_cannot_create_api_monitor_with_other_user_status_page_id(self):
+        # Create a user object
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+        
+        user_two = User.objects.create_user(username="test2@test.com", email="test2@test.com", password="Test1234")
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user_two)
+        
+        status_page = StatusPageCategory.objects.create(team=team, name='category2')
+
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'EMPTY',
+            'status_page_category_id': status_page.id,
+        }
+
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'status_page_category_id': monitor_value['status_page_category_id'],
+        }
+
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+        self.assertEqual(APIMonitor.objects.all().count(), 0)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], "Please make sure your [status page category] is valid and exist!")
+                
+                            
+    def test_user_can_create_api_monitor_with_invalid_status_page_category(self):
+        # Create a user object
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'status_page_category_id': -1,
+            'body_type': 'EMPTY',
+        }
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'status_page_category_id': monitor_value['status_page_category_id'],
+            'body_type': monitor_value['body_type'],
+        }
+
+        # Get path
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        response = self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], "Please make sure your [status page category] is valid and exist!")
         self.assertEqual(APIMonitor.objects.all().count(), 0)
 
     def test_user_can_create_api_monitor_with_invalid_previous_step_2(self):
@@ -4709,6 +4856,128 @@ class EditAPIMonitor(APITestCase):
         edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
         response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
         self.assertEqual(response.data['error'], ['Please make sure your [previous step id] is valid and exist!'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    def test_user_can_edit_status_page_category(self):
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+        }
+
+        queryparam_value = [
+            {
+                'key': 'key1',
+                'value': 'value1',
+            },
+            {
+                'key': 'key2',
+                'value': 'value2'
+            }
+        ]
+        monitorheader_value = [{
+            'key': 'key3',
+            'value': 'value3'
+        }]
+        monitorbodyform_value = "This doesn't matter since body type is FORM"
+        monitorrawbody_value = "Valid raw body"
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # 1. Create Object id = 1
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+
+        # 2. Create  Status Page Category
+        status_page_category = StatusPageCategory.objects.create(team=team, name='category')
+
+        # 3. Edit object id = 1 status page
+        received_json['status_page_category_id'] = status_page_category.id
+        target_monitor_id = APIMonitor.objects.filter(team=team)[0].id
+        edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
+        response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status_page_category_id'], status_page_category.id)
+
+    def test_user_input_invalid_status_page_category_then_return_error(self):
+        user = User.objects.create_user(username="test@test.com", email="test@test.com", password="Test1234")
+        team = Team.objects.create(name='test team')
+        team_member = TeamMember.objects.create(team=team, user=user)
+        
+        token = MonAPIToken.objects.create(team_member=team_member)
+        header = {'HTTP_AUTHORIZATION': f"Token {token.key}"}
+        monitor_value = {
+            'user': 'test@test.com',
+            'name': 'Test Monitor',
+            'method': 'GET',
+            'url': 'Test Path',
+            'schedule': '10MIN',
+            'body_type': 'RAW',
+        }
+
+        queryparam_value = [
+            {
+                'key': 'key1',
+                'value': 'value1',
+            },
+            {
+                'key': 'key2',
+                'value': 'value2'
+            }
+        ]
+        monitorheader_value = [{
+            'key': 'key3',
+            'value': 'value3'
+        }]
+        monitorbodyform_value = "This doesn't matter since body type is FORM"
+        monitorrawbody_value = "Valid raw body"
+
+        # Expected JSON from frontend
+        received_json = {
+            'name': monitor_value['name'],
+            'method': monitor_value['method'],
+            'url': monitor_value['url'],
+            'schedule': monitor_value['schedule'],
+            'body_type': monitor_value['body_type'],
+            'query_params': queryparam_value,
+            'headers': monitorheader_value,
+            'body_form': monitorbodyform_value,
+            'raw_body': monitorrawbody_value
+        }
+
+        # 1. Create Object id = 1
+        create_new_monitor_test_path = reverse('api-monitor-list')
+        self.client.post(create_new_monitor_test_path, data=received_json, format='json', **header)
+
+        # 2. Create  Status Page Category
+        status_page_category = StatusPageCategory.objects.create(team=team, name='category')
+
+        # 3. Edit object id = 1 status page
+        received_json['status_page_category_id'] = '999'
+        target_monitor_id = APIMonitor.objects.filter(team=team)[0].id
+        edit_monitor_path = reverse('api-monitor-detail', kwargs={'pk': target_monitor_id})
+        response = self.client.put(edit_monitor_path, data=received_json, format='json', **header)
+        self.assertEqual(response.data['error'], ['Please make sure your [status page category] is valid and exist!'])
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 

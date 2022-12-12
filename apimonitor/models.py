@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from login.models import Team
+from statuspage.models import StatusPageCategory
 
 class APIMonitor(models.Model):
     method_choices = [
@@ -34,6 +35,7 @@ class APIMonitor(models.Model):
         ('DISABLED', 'Disabled'),
         ('TEXT', 'Text'),
         ('JSON', 'JSON'),
+        ('PARTIAL', 'Partial'),
     ]
     
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
@@ -47,6 +49,7 @@ class APIMonitor(models.Model):
     assertion_value = models.TextField(blank=True)
     is_assert_json_schema_only = models.BooleanField(default=False)
     last_notified = models.DateTimeField(null=True, blank=True)
+    status_page_category = models.ForeignKey(StatusPageCategory, null=True, blank=True, on_delete=models.SET_NULL)
     
     
 class APIMonitorQueryParam(models.Model):

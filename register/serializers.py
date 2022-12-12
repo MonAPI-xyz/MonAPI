@@ -35,3 +35,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
+
+class VerifiedUserTokenSerializer(serializers.Serializer):
+    key = serializers.CharField(max_length=256)
