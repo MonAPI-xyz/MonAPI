@@ -23,7 +23,7 @@ def registration_view(request):
         try:
             user = serializer.save()
             username = user.username.split('@')[0]
-            team = Team.objects.create(name=username.title())
+            team = Team.objects.create(name=f"{username.title()}'s Workspace")
             TeamMember.objects.create(user=user, team=team, verified=True)
             verified_user = VerifiedUser.objects.create(user=user)
             token = VerifiedUserToken.objects.create(verified_user=verified_user)

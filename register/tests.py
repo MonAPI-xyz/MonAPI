@@ -29,7 +29,7 @@ class APIViewTestCase(APITestCase):
         self.assertEqual(new_user.check_password('B0tch1ng'), True)
         
         self.assertEqual(Team.objects.count(), 1)
-        self.assertEqual(Team.objects.all()[0].name, "User1")
+        self.assertEqual(Team.objects.all()[0].name, "User1's Workspace")
         self.assertEqual(TeamMember.objects.count(), 1)
         self.assertEqual(TeamMember.objects.all()[0].user, new_user)
 
