@@ -40,3 +40,12 @@ Version: v0.5.0<br>
 Date: 28th November 2022
 1. Team Management
 2. Alerts User-Defined Timezone
+
+### Release 6
+Version: v1.0.0<br>
+Date: 12th December 2022
+1. Status Page Integration
+2. Email register verification
+3. Create new category directly when create API Monitor
+4. Partial Assertions Text
+5. Release 1st version of MonAPI
