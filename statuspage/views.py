@@ -69,10 +69,10 @@ class StatusPageDashboardViewSet(mixins.ListModelMixin, viewsets.GenericViewSet)
 
         for category in queryset:
             success_rate_category = []
-            api_monitor_category = APIMonitorResult.objects \
-                .filter(monitor__status_page_category=category)
+            api_monitor_result_count = APIMonitorResult.objects \
+                .filter(monitor__status_page_category=category).count()
 
-            if len(api_monitor_category) == 0:
+            if api_monitor_result_count == 0:
                 category.success_rate_category = success_rate_category
                 continue
             
@@ -83,12 +83,15 @@ class StatusPageDashboardViewSet(mixins.ListModelMixin, viewsets.GenericViewSet)
                 end_time = last_24_hour + timedelta(hours=1)
                 
                 # Average success rate
-                success_count = api_monitor_category.filter(execution_time__gte=start_time, execution_time__lte=end_time) \
-                    .aggregate(
-                        s=Count('success', filter=Q(success=True)), 
-                        f=Count('success', filter=Q(success=False)),
-                        total=Count('pk'),
-                    )
+                success_count = APIMonitorResult.objects.filter(
+                    monitor__status_page_category=category, 
+                    execution_time__gte=start_time, 
+                    execution_time__lte=end_time
+                ).aggregate(
+                    s=Count('success', filter=Q(success=True)), 
+                    f=Count('success', filter=Q(success=False)),
+                    total=Count('pk'),
+                )
 
                 success_rate_category.append({
                     "start_time": start_time,
