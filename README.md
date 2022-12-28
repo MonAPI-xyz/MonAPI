@@ -61,6 +61,11 @@ Full release notes can be found in [Release Notes](https://github.com/MonAPI-xyz
 
 📝  [User Manual - https://docs.monapi.xyz](https://docs.monapi.xyz)
 
+📝  [Technical Documentation - https://docs.monapi.xyz/monapi-tech-documentation/](https://docs.monapi.xyz/monapi-tech-documentation/)
+
+📺  [Youtube - https://www.youtube.com/@monapi](https://www.youtube.com/@monapi)
+
+
 ## Our Teams
 - Lucky Susanto
 - Ferdi Fadillah
