@@ -49,3 +49,10 @@ Date: 12th December 2022
 3. Create new category directly when create API Monitor
 4. Partial Assertions Text
 5. Release 1st version of MonAPI
+
+
+### Release 7
+Version: v1.0.1<br>
+Date: 28th December 2022
+1. Fix bug password validation on forget password
+2. Update pagerduty email configuration title
