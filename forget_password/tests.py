@@ -86,32 +86,47 @@ class ResetPasswordTest(APITestCase):
     def test_if_key_exists_but_token_invalid_then_return_error(self):
         response = self.client.post(self.test_url, {
             'key': 'abc',
-            'password': 'newpassword',
+            'password': 'Test123486827',
         }, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Invalid token'})
         
     def test_if_key_exists_and_token_valid__and_pasword_same_as_old_then_return_error(self):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+        user = User.objects.create_user(username='test', email='test@test.com', password='Test123486827')
         token = ForgetPasswordToken.objects.create(user=user)
         response = self.client.post(self.test_url, {
             'key': token.key,
-            'password': 'test123',
+            'password': 'Test123486827',
         }, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Please choose password that different from your current password'})
         
-    def test_if_key_exists_and_token_valid_then_return_success(self):
-        user = User.objects.create_user(username='test', email='test@test.com', password='test123')
+    def test_if_key_exists_token_valid_but_invalid_password_then_return_error(self):
+        user = User.objects.create_user(username='test', email='test@test.com', password='Test123486827')
         token = ForgetPasswordToken.objects.create(user=user)
         response = self.client.post(self.test_url, {
             'key': token.key,
-            'password': 'newpassword',
+            'password': 'abc',
+        }, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {"password": [
+            "This password is too short. It must contain at least 8 characters.",
+            "This password is too common.",
+            "The password must contain at least 1 digit, 0-9.",
+            "The password must contain at least 1 uppercase letter, A-Z."
+        ]})
+        
+    def test_if_key_exists_and_token_valid_then_return_success(self):
+        user = User.objects.create_user(username='test', email='test@test.com', password='Test123486827')
+        token = ForgetPasswordToken.objects.create(user=user)
+        response = self.client.post(self.test_url, {
+            'key': token.key,
+            'password': 'Test1234868271',
         }, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'success': True})
         
         user = User.objects.get(email='test@test.com')
-        self.assertTrue(user.check_password('newpassword'))
+        self.assertTrue(user.check_password('Test1234868271'))
     
     
